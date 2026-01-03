@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>aspnet-MyCOLL.GestaoLoja-7badf052-6ede-4696-a074-6dbe29bf17e6</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Update="Data\app.db" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.22"/>
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.22"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.22"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.22"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\MyCOLL.Data\MyCOLL.Data.csproj" />
+    </ItemGroup>
+
+</Project>
