@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using MyCOLL.GestaoLoja.Data;
+using MyCOLL.Data.Data;
 
 namespace MyCOLL.GestaoLoja.Components.Account;
 

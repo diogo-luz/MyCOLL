@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Identity;
-using MyCOLL.GestaoLoja.Data;
+using MyCOLL.Data.Data;
 
 namespace MyCOLL.GestaoLoja.Components.Account;
 

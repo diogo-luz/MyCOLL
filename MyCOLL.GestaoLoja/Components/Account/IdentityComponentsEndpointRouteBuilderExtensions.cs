@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using MyCOLL.GestaoLoja.Components.Account.Pages;
 using MyCOLL.GestaoLoja.Components.Account.Pages.Manage;
-using MyCOLL.GestaoLoja.Data;
+using MyCOLL.Data.Data;
 
 namespace Microsoft.AspNetCore.Routing;
 

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace MyCOLL.GestaoLoja.Data;
+namespace MyCOLL.Data.Data;
 
 // Add profile data for application users by adding properties to the ApplicationUser class
 public class ApplicationUser : IdentityUser {
