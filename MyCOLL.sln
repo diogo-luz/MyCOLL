@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCOLL.Shared", "MyCOLL.Sha
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCOLL.Data", "MyCOLL.Data\MyCOLL.Data.csproj", "{BDF797AF-FCFE-4A2E-957A-9590F67FE3B7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCOLL.API", "MyCOLL.API\MyCOLL.API.csproj", "{9231268E-D260-4846-9228-FB93C28514CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{BDF797AF-FCFE-4A2E-957A-9590F67FE3B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BDF797AF-FCFE-4A2E-957A-9590F67FE3B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BDF797AF-FCFE-4A2E-957A-9590F67FE3B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9231268E-D260-4846-9228-FB93C28514CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9231268E-D260-4846-9228-FB93C28514CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9231268E-D260-4846-9228-FB93C28514CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9231268E-D260-4846-9228-FB93C28514CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
