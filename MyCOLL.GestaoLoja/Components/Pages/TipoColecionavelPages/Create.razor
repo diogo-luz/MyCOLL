@@ -1,0 +1,59 @@
+@page "/tiposcolecionaveis/create"
+@using Microsoft.EntityFrameworkCore
+@using MyCOLL.Data.Entities
+@inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>TipoColecionavel</h2>
+<hr/>
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="TipoColecionavel" OnValidSubmit="AddTipoColecionavel" FormName="create" Enhance>
+            <DataAnnotationsValidator/>
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <span class="text-danger">*</span>
+                <label for="nome" class="form-label">Nome:</label>
+                <InputText id="nome" @bind-Value="TipoColecionavel.Nome" class="form-control" aria-required="true"/>
+                <ValidationMessage For="() => TipoColecionavel.Nome" class="text-danger"/>
+            </div>
+            <div class="mb-3">
+                <label for="ordem" class="form-label">Ordem:</label>
+                <InputNumber id="ordem" @bind-Value="TipoColecionavel.Ordem" class="form-control"/>
+                <ValidationMessage For="() => TipoColecionavel.Ordem" class="text-danger"/>
+            </div>
+            <div class="mb-3">
+                <label for="urlimagem" class="form-label">UrlImagem:</label>
+                <InputText id="urlimagem" @bind-Value="TipoColecionavel.UrlImagem" class="form-control"/>
+                <ValidationMessage For="() => TipoColecionavel.UrlImagem" class="text-danger"/>
+            </div>
+            @* <div class="mb-3">
+                <label for="imagem" class="form-label">Imagem:</label> 
+                <InputText id="imagem" @bind-Value="TipoColecionavel.Imagem" class="form-control" /> 
+                <ValidationMessage For="() => TipoColecionavel.Imagem" class="text-danger" /> 
+            </div>         *@
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/tiposcolecionaveis">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm] private TipoColecionavel TipoColecionavel { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddTipoColecionavel() {
+        using var context = DbFactory.CreateDbContext();
+        context.TiposColecionaveis.Add(TipoColecionavel);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/tiposcolecionaveis");
+    }
+
+}

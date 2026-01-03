@@ -1,0 +1,59 @@
+@page "/paises/create"
+@using Microsoft.EntityFrameworkCore
+@using MyCOLL.Data.Entities
+@inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Pais</h2>
+<hr/>
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Pais" OnValidSubmit="AddPais" FormName="create" Enhance>
+            <DataAnnotationsValidator/>
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <span class="text-danger">*</span>
+                <label for="nome" class="form-label">Nome:</label>
+                <InputText id="nome" @bind-Value="Pais.Nome" class="form-control" aria-required="true"/>
+                <ValidationMessage For="() => Pais.Nome" class="text-danger"/>
+            </div>
+            <div class="mb-3">
+                <label for="codigoiso" class="form-label">CodigoISO:</label>
+                <InputText id="codigoiso" @bind-Value="Pais.CodigoISO" class="form-control"/>
+                <ValidationMessage For="() => Pais.CodigoISO" class="text-danger"/>
+            </div>
+            <div class="mb-3">
+                <label for="ordem" class="form-label">Ordem:</label>
+                <InputNumber id="ordem" @bind-Value="Pais.Ordem" class="form-control"/>
+                <ValidationMessage For="() => Pais.Ordem" class="text-danger"/>
+            </div>
+            @* <div class="mb-3">
+                <label for="bandeira" class="form-label">Bandeira:</label> 
+                <InputText id="bandeira" @bind-Value="Pais.Bandeira" class="form-control" /> 
+                <ValidationMessage For="() => Pais.Bandeira" class="text-danger" /> 
+            </div>         *@
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/paises">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm] private Pais Pais { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddPais() {
+        using var context = DbFactory.CreateDbContext();
+        context.Paises.Add(Pais);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/paises");
+    }
+
+}

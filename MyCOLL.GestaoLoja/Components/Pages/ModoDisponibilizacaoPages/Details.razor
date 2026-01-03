@@ -1,0 +1,46 @@
+@page "/modosdisponibilizacao/details"
+@using Microsoft.EntityFrameworkCore
+@using MyCOLL.Data.Entities
+@inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>ModoDisponibilizacao</h2>
+    <hr/>
+    @if (mododisponibilizacao is null) {
+        <p>
+            <em>Loading...</em>
+        </p>
+    } else {
+        <dl class="row">
+            <dt class="col-sm-2">Nome</dt>
+            <dd class="col-sm-10">@mododisponibilizacao.Nome</dd>
+            <dt class="col-sm-2">Descricao</dt>
+            <dd class="col-sm-10">@mododisponibilizacao.Descricao</dd>
+        </dl>
+        <div>
+            <a href="@($"/modosdisponibilizacao/edit?id={mododisponibilizacao.Id}")">Edit</a> |
+            <a href="@($"/modosdisponibilizacao")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private ModoDisponibilizacao? mododisponibilizacao;
+
+    [SupplyParameterFromQuery] private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync() {
+        using var context = DbFactory.CreateDbContext();
+        mododisponibilizacao = await context.ModosDisponibilizacao.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (mododisponibilizacao is null) {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+}

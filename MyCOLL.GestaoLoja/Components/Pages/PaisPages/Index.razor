@@ -1,0 +1,38 @@
+@page "/paises"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using MyCOLL.Data.Entities
+@using MyCOLL.Data.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="paises/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Paises">
+    <PropertyColumn Property="pais => pais.Nome"/>
+    <PropertyColumn Property="pais => pais.CodigoISO"/>
+    <PropertyColumn Property="pais => pais.Ordem"/>
+    <PropertyColumn Property="pais => pais.Bandeira"/>
+
+    <TemplateColumn Context="pais">
+        <a href="@($"paises/edit?id={pais.Id}")">Edit</a> |
+        <a href="@($"paises/details?id={pais.Id}")">Details</a> |
+        <a href="@($"paises/delete?id={pais.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private ApplicationDbContext context = default!;
+
+    protected override void OnInitialized() {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

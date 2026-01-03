@@ -1,0 +1,39 @@
+@page "/encomendas"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using MyCOLL.Data.Entities
+@using MyCOLL.Data.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="encomendas/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Encomendas">
+    <PropertyColumn Property="encomenda => encomenda.DataEncomenda"/>
+    <PropertyColumn Property="encomenda => encomenda.Estado"/>
+    <PropertyColumn Property="encomenda => encomenda.Total"/>
+    <PropertyColumn Property="encomenda => encomenda.Observacoes"/>
+    <PropertyColumn Property="encomenda => encomenda.ClienteId"/>
+
+    <TemplateColumn Context="encomenda">
+        <a href="@($"encomendas/edit?id={encomenda.Id}")">Edit</a> |
+        <a href="@($"encomendas/details?id={encomenda.Id}")">Details</a> |
+        <a href="@($"encomendas/delete?id={encomenda.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private ApplicationDbContext context = default!;
+
+    protected override void OnInitialized() {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

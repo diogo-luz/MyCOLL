@@ -1,0 +1,168 @@
+@page "/produtos/edit"
+@using Microsoft.EntityFrameworkCore
+@using MyCOLL.Data.Entities
+@inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Produto</h2>
+<hr/>
+@if (Produto is null) {
+    <p>
+        <em>Loading...</em>
+    </p>
+} else {
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Produto" OnValidSubmit="UpdateProduto" FormName="edit" Enhance>
+                <DataAnnotationsValidator/>
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Produto.Id" value="@Produto.Id"/>
+                <div class="mb-3">
+                    <span class="text-danger">*</span>
+                    <label for="nome" class="form-label">Nome:</label>
+                    <InputText id="nome" @bind-Value="Produto.Nome" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Produto.Nome" class="text-danger"/>
+                </div>
+                <div class="mb-3">
+                    <span class="text-danger">*</span>
+                    <label for="descricao" class="form-label">Descricao:</label>
+                    <InputText id="descricao" @bind-Value="Produto.Descricao" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Produto.Descricao" class="text-danger"/>
+                </div>
+                <div class="mb-3">
+                    <span class="text-danger">*</span>
+                    <label for="precobase" class="form-label">PrecoBase:</label>
+                    <InputNumber id="precobase" @bind-Value="Produto.PrecoBase" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Produto.PrecoBase" class="text-danger"/>
+                </div>
+                <div class="mb-3">
+                    <label for="percentagem" class="form-label">Percentagem:</label>
+                    <InputNumber id="percentagem" @bind-Value="Produto.Percentagem" class="form-control"/>
+                    <ValidationMessage For="() => Produto.Percentagem" class="text-danger"/>
+                </div>
+                <div class="mb-3">
+                    <label for="precofinal" class="form-label">PrecoFinal:</label>
+                    <InputNumber id="precofinal" @bind-Value="Produto.PrecoFinal" class="form-control"/>
+                    <ValidationMessage For="() => Produto.PrecoFinal" class="text-danger"/>
+                </div>
+                <div class="mb-3">
+                    <label for="stock" class="form-label">Stock:</label>
+                    <InputNumber id="stock" @bind-Value="Produto.Stock" class="form-control"/>
+                    <ValidationMessage For="() => Produto.Stock" class="text-danger"/>
+                </div>
+                <div class="mb-3">
+                    <label for="paravenda" class="form-label">ParaVenda:</label>
+                    <InputCheckbox id="paravenda" @bind-Value="Produto.ParaVenda" class="form-check-input"/>
+                    <ValidationMessage For="() => Produto.ParaVenda" class="text-danger"/>
+                </div>
+                <div class="mb-3">
+                    <label for="activo" class="form-label">Activo:</label>
+                    <InputCheckbox id="activo" @bind-Value="Produto.Activo" class="form-check-input"/>
+                    <ValidationMessage For="() => Produto.Activo" class="text-danger"/>
+                </div>
+                <div class="mb-3">
+                    <label for="estado" class="form-label">Estado:</label>
+                    <InputText id="estado" @bind-Value="Produto.Estado" class="form-control"/>
+                    <ValidationMessage For="() => Produto.Estado" class="text-danger"/>
+                </div>
+                <div class="mb-3">
+                    <label for="ano" class="form-label">Ano:</label>
+                    <InputNumber id="ano" @bind-Value="Produto.Ano" class="form-control"/>
+                    <ValidationMessage For="() => Produto.Ano" class="text-danger"/>
+                </div>
+                <div class="mb-3">
+                    <label for="urlimagem" class="form-label">UrlImagem:</label>
+                    <InputText id="urlimagem" @bind-Value="Produto.UrlImagem" class="form-control"/>
+                    <ValidationMessage For="() => Produto.UrlImagem" class="text-danger"/>
+                </div>
+                @* <div class="mb-3">
+                    <label for="imagem" class="form-label">Imagem:</label>
+                    <InputText id="imagem" @bind-Value="Produto.Imagem" class="form-control"/>
+                    <ValidationMessage For="() => Produto.Imagem" class="text-danger"/>
+                </div> *@
+                <div class="mb-3">
+                    <label for="datacriacao" class="form-label">DataCriacao:</label>
+                    <InputDate id="datacriacao" @bind-Value="Produto.DataCriacao" class="form-control"/>
+                    <ValidationMessage For="() => Produto.DataCriacao" class="text-danger"/>
+                </div>
+                <div class="mb-3">
+                    <span class="text-danger">*</span>
+                    <label for="fornecedorid" class="form-label">FornecedorId:</label>
+                    <InputText id="fornecedorid" @bind-Value="Produto.FornecedorId" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Produto.FornecedorId" class="text-danger"/>
+                </div>
+                <div class="mb-3">
+                    <span class="text-danger">*</span>
+                    <label for="tipocolecionavelid" class="form-label">TipoColecionavelId:</label>
+                    <InputNumber id="tipocolecionavelid" @bind-Value="Produto.TipoColecionavelId" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Produto.TipoColecionavelId" class="text-danger"/>
+                </div>
+                <div class="mb-3">
+                    <label for="paisid" class="form-label">PaisId:</label>
+                    <InputNumber id="paisid" @bind-Value="Produto.PaisId" class="form-control"/>
+                    <ValidationMessage For="() => Produto.PaisId" class="text-danger"/>
+                </div>
+                <div class="mb-3">
+                    <label for="categoriaid" class="form-label">CategoriaId:</label>
+                    <InputNumber id="categoriaid" @bind-Value="Produto.CategoriaId" class="form-control"/>
+                    <ValidationMessage For="() => Produto.CategoriaId" class="text-danger"/>
+                </div>
+                <div class="mb-3">
+                    <span class="text-danger">*</span>
+                    <label for="mododisponibilizacaoid" class="form-label">ModoDisponibilizacaoId:</label>
+                    <InputNumber id="mododisponibilizacaoid" @bind-Value="Produto.ModoDisponibilizacaoId" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Produto.ModoDisponibilizacaoId" class="text-danger"/>
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/produtos">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery] private int Id { get; set; }
+
+    [SupplyParameterFromForm] private Produto? Produto { get; set; }
+
+    protected override async Task OnInitializedAsync() {
+        using var context = DbFactory.CreateDbContext();
+        Produto ??= await context.Produtos.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Produto is null) {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateProduto() {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Produto!).State = EntityState.Modified;
+
+        try {
+            await context.SaveChangesAsync();
+        } catch (DbUpdateConcurrencyException) {
+            if (!ProdutoExists(Produto!.Id)) {
+                NavigationManager.NavigateTo("notfound");
+            } else {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/produtos");
+    }
+
+    private bool ProdutoExists(int id) {
+        using var context = DbFactory.CreateDbContext();
+        return context.Produtos.Any(e => e.Id == id);
+    }
+
+}

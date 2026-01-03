@@ -1,0 +1,50 @@
+@page "/paises/details"
+@using Microsoft.EntityFrameworkCore
+@using MyCOLL.Data.Entities
+@inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Pais</h2>
+    <hr/>
+    @if (pais is null) {
+        <p>
+            <em>Loading...</em>
+        </p>
+    } else {
+        <dl class="row">
+            <dt class="col-sm-2">Nome</dt>
+            <dd class="col-sm-10">@pais.Nome</dd>
+            <dt class="col-sm-2">CodigoISO</dt>
+            <dd class="col-sm-10">@pais.CodigoISO</dd>
+            <dt class="col-sm-2">Ordem</dt>
+            <dd class="col-sm-10">@pais.Ordem</dd>
+            <dt class="col-sm-2">Bandeira</dt>
+            <dd class="col-sm-10">@pais.Bandeira</dd>
+        </dl>
+        <div>
+            <a href="@($"/paises/edit?id={pais.Id}")">Edit</a> |
+            <a href="@($"/paises")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Pais? pais;
+
+    [SupplyParameterFromQuery] private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync() {
+        using var context = DbFactory.CreateDbContext();
+        pais = await context.Paises.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (pais is null) {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+}

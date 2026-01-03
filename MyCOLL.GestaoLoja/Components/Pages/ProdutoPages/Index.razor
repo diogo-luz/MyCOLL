@@ -1,0 +1,52 @@
+@page "/produtos"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using MyCOLL.Data.Entities
+@using MyCOLL.Data.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="produtos/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Produtos">
+    <PropertyColumn Property="produto => produto.Nome"/>
+    <PropertyColumn Property="produto => produto.Descricao"/>
+    <PropertyColumn Property="produto => produto.PrecoBase"/>
+    <PropertyColumn Property="produto => produto.Percentagem"/>
+    <PropertyColumn Property="produto => produto.PrecoFinal"/>
+    <PropertyColumn Property="produto => produto.Stock"/>
+    <PropertyColumn Property="produto => produto.ParaVenda"/>
+    <PropertyColumn Property="produto => produto.Activo"/>
+    <PropertyColumn Property="produto => produto.Estado"/>
+    <PropertyColumn Property="produto => produto.Ano"/>
+    <PropertyColumn Property="produto => produto.UrlImagem"/>
+    <PropertyColumn Property="produto => produto.Imagem"/>
+    <PropertyColumn Property="produto => produto.DataCriacao"/>
+    <PropertyColumn Property="produto => produto.FornecedorId"/>
+    <PropertyColumn Property="produto => produto.TipoColecionavelId"/>
+    <PropertyColumn Property="produto => produto.PaisId"/>
+    <PropertyColumn Property="produto => produto.CategoriaId"/>
+    <PropertyColumn Property="produto => produto.ModoDisponibilizacaoId"/>
+
+    <TemplateColumn Context="produto">
+        <a href="@($"produtos/edit?id={produto.Id}")">Edit</a> |
+        <a href="@($"produtos/details?id={produto.Id}")">Details</a> |
+        <a href="@($"produtos/delete?id={produto.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private ApplicationDbContext context = default!;
+
+    protected override void OnInitialized() {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

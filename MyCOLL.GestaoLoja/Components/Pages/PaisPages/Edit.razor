@@ -1,0 +1,93 @@
+@page "/paises/edit"
+@using Microsoft.EntityFrameworkCore
+@using MyCOLL.Data.Entities
+@inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Pais</h2>
+<hr/>
+@if (Pais is null) {
+    <p>
+        <em>Loading...</em>
+    </p>
+} else {
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Pais" OnValidSubmit="UpdatePais" FormName="edit" Enhance>
+                <DataAnnotationsValidator/>
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Pais.Id" value="@Pais.Id"/>
+                <div class="mb-3">
+                    <span class="text-danger">*</span>
+                    <label for="nome" class="form-label">Nome:</label>
+                    <InputText id="nome" @bind-Value="Pais.Nome" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Pais.Nome" class="text-danger"/>
+                </div>
+                <div class="mb-3">
+                    <label for="codigoiso" class="form-label">CodigoISO:</label>
+                    <InputText id="codigoiso" @bind-Value="Pais.CodigoISO" class="form-control"/>
+                    <ValidationMessage For="() => Pais.CodigoISO" class="text-danger"/>
+                </div>
+                <div class="mb-3">
+                    <label for="ordem" class="form-label">Ordem:</label>
+                    <InputNumber id="ordem" @bind-Value="Pais.Ordem" class="form-control"/>
+                    <ValidationMessage For="() => Pais.Ordem" class="text-danger"/>
+                </div>
+                @* <div class="mb-3">
+                    <label for="bandeira" class="form-label">Bandeira:</label>
+                    <InputText id="bandeira" @bind-Value="Pais.Bandeira" class="form-control"/>
+                    <ValidationMessage For="() => Pais.Bandeira" class="text-danger"/>
+                </div> *@
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/paises">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery] private int Id { get; set; }
+
+    [SupplyParameterFromForm] private Pais? Pais { get; set; }
+
+    protected override async Task OnInitializedAsync() {
+        using var context = DbFactory.CreateDbContext();
+        Pais ??= await context.Paises.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Pais is null) {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdatePais() {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Pais!).State = EntityState.Modified;
+
+        try {
+            await context.SaveChangesAsync();
+        } catch (DbUpdateConcurrencyException) {
+            if (!PaisExists(Pais!.Id)) {
+                NavigationManager.NavigateTo("notfound");
+            } else {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/paises");
+    }
+
+    private bool PaisExists(int id) {
+        using var context = DbFactory.CreateDbContext();
+        return context.Paises.Any(e => e.Id == id);
+    }
+
+}

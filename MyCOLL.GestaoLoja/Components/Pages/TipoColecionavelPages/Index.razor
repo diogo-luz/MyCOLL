@@ -1,0 +1,38 @@
+@page "/tiposcolecionaveis"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using MyCOLL.Data.Entities
+@using MyCOLL.Data.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="tiposcolecionaveis/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.TiposColecionaveis">
+    <PropertyColumn Property="tipocolecionavel => tipocolecionavel.Nome"/>
+    <PropertyColumn Property="tipocolecionavel => tipocolecionavel.Ordem"/>
+    <PropertyColumn Property="tipocolecionavel => tipocolecionavel.UrlImagem"/>
+    <PropertyColumn Property="tipocolecionavel => tipocolecionavel.Imagem"/>
+
+    <TemplateColumn Context="tipocolecionavel">
+        <a href="@($"tiposcolecionaveis/edit?id={tipocolecionavel.Id}")">Edit</a> |
+        <a href="@($"tiposcolecionaveis/details?id={tipocolecionavel.Id}")">Details</a> |
+        <a href="@($"tiposcolecionaveis/delete?id={tipocolecionavel.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private ApplicationDbContext context = default!;
+
+    protected override void OnInitialized() {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}
