@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCOLL.API", "MyCOLL.API\My
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCOLL.Web", "MyCOLL.Web\MyCOLL.Web.csproj", "{A139689A-B4A9-4581-9C94-4FF217ACE897}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCOLL.MAUI", "MyCOLL.MAUI\MyCOLL.MAUI.csproj", "{9BFB8364-3FDD-428B-B86A-F39F3FA91970}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{A139689A-B4A9-4581-9C94-4FF217ACE897}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A139689A-B4A9-4581-9C94-4FF217ACE897}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A139689A-B4A9-4581-9C94-4FF217ACE897}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BFB8364-3FDD-428B-B86A-F39F3FA91970}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BFB8364-3FDD-428B-B86A-F39F3FA91970}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BFB8364-3FDD-428B-B86A-F39F3FA91970}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BFB8364-3FDD-428B-B86A-F39F3FA91970}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
