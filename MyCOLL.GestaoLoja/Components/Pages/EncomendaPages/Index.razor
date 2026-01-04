@@ -4,35 +4,45 @@
 @using MyCOLL.Data.Entities
 @using MyCOLL.Data.Data
 @implements IAsyncDisposable
-@inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Encomendas</PageTitle>
 
-<h1>Index</h1>
+<h1>Encomendas</h1>
 
-<p>
-    <a href="encomendas/create">Create New</a>
-</p>
+@* <p>
+    <a href="encomendas/create">Criar nova encomenda</a>
+</p> *@
 
-<QuickGrid Class="table" Items="context.Encomendas">
-    <PropertyColumn Property="encomenda => encomenda.DataEncomenda"/>
-    <PropertyColumn Property="encomenda => encomenda.Estado"/>
-    <PropertyColumn Property="encomenda => encomenda.Total"/>
-    <PropertyColumn Property="encomenda => encomenda.Observacoes"/>
-    <PropertyColumn Property="encomenda => encomenda.ClienteId"/>
+<QuickGrid Class="table" Items="encomendas.AsQueryable()">
+    <PropertyColumn Property="e => e.DataEncomenda" Title="Data"/>
+    <PropertyColumn Property="e => e.Estado" Title="Estado"/>
+    <PropertyColumn Property="e => e.Total" Title="Total (€)"/>
+    <TemplateColumn Context="e" Title="Cliente">
+        @(e.Cliente?.Nome) @(e.Cliente?.Apelido)
+    </TemplateColumn>
+    <PropertyColumn Property="e => e.Observacoes" Title="Observações"/>
 
-    <TemplateColumn Context="encomenda">
-        <a href="@($"encomendas/edit?id={encomenda.Id}")">Edit</a> |
-        <a href="@($"encomendas/details?id={encomenda.Id}")">Details</a> |
-        <a href="@($"encomendas/delete?id={encomenda.Id}")">Delete</a>
+    <TemplateColumn Context="encomenda" Title="Ações">
+        <a href="@($"encomendas/edit?id={encomenda.Id}")">
+            <i class="bi bi-pencil-square"></i>
+        </a> |
+        <a href="@($"encomendas/details?id={encomenda.Id}")">
+            <i class="bi bi-eye-fill"></i>
+        </a> |
+        <a href="@($"encomendas/delete?id={encomenda.Id}")">
+            <i class="bi bi-trash-fill"></i>
+        </a>
     </TemplateColumn>
 </QuickGrid>
 
 @code {
     private ApplicationDbContext context = default!;
+    private List<Encomenda> encomendas = new();
 
-    protected override void OnInitialized() {
+    protected override async Task OnInitializedAsync() {
         context = DbFactory.CreateDbContext();
+        encomendas = await context.Encomendas.Include(e => e.Cliente).ToListAsync();
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();

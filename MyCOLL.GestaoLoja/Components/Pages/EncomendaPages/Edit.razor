@@ -1,61 +1,71 @@
 @page "/encomendas/edit"
 @using Microsoft.EntityFrameworkCore
 @using MyCOLL.Data.Entities
-@inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
+@using MyCOLL.Data.Data
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Edit</PageTitle>
+<PageTitle>Editar Encomenda</PageTitle>
 
-<h1>Edit</h1>
+<h1>Editar Encomenda</h1>
 
-<h2>Encomenda</h2>
 <hr/>
 @if (Encomenda is null) {
     <p>
-        <em>Loading...</em>
+        <em>A carregar...</em>
     </p>
 } else {
     <div class="row">
         <div class="col-md-4">
-            <EditForm method="post" Model="Encomenda" OnValidSubmit="UpdateEncomenda" FormName="edit" Enhance>
+            <EditForm method="post" Model="Encomenda" OnValidSubmit="UpdateEncomenda" FormName="edit">
                 <DataAnnotationsValidator/>
                 <ValidationSummary role="alert"/>
                 <input type="hidden" name="Encomenda.Id" value="@Encomenda.Id"/>
                 <div class="mb-3">
-                    <label for="dataencomenda" class="form-label">DataEncomenda:</label>
+                    <label for="dataencomenda" class="form-label">Data Encomenda:</label>
                     <InputDate id="dataencomenda" @bind-Value="Encomenda.DataEncomenda" class="form-control"/>
                     <ValidationMessage For="() => Encomenda.DataEncomenda" class="text-danger"/>
                 </div>
                 <div class="mb-3">
                     <span class="text-danger">*</span>
                     <label for="estado" class="form-label">Estado:</label>
-                    <InputText id="estado" @bind-Value="Encomenda.Estado" class="form-control" aria-required="true"/>
+                    <InputSelect id="estado" class="form-select" @bind-Value="Encomenda.Estado">
+                        <option value="Pendente">Pendente</option>
+                        <option value="Confirmada">Confirmada</option>
+                        <option value="Expedida">Expedida</option>
+                        <option value="Entregue">Entregue</option>
+                        <option value="Cancelada">Cancelada</option>
+                    </InputSelect>
                     <ValidationMessage For="() => Encomenda.Estado" class="text-danger"/>
                 </div>
                 <div class="mb-3">
-                    <label for="total" class="form-label">Total:</label>
+                    <label for="total" class="form-label">Total (€):</label>
                     <InputNumber id="total" @bind-Value="Encomenda.Total" class="form-control"/>
                     <ValidationMessage For="() => Encomenda.Total" class="text-danger"/>
                 </div>
                 <div class="mb-3">
-                    <label for="observacoes" class="form-label">Observacoes:</label>
+                    <label for="observacoes" class="form-label">Observações:</label>
                     <InputText id="observacoes" @bind-Value="Encomenda.Observacoes" class="form-control"/>
                     <ValidationMessage For="() => Encomenda.Observacoes" class="text-danger"/>
                 </div>
                 <div class="mb-3">
                     <span class="text-danger">*</span>
-                    <label for="clienteid" class="form-label">ClienteId:</label>
-                    <InputText id="clienteid" @bind-Value="Encomenda.ClienteId" class="form-control" aria-required="true"/>
+                    <label for="clienteid" class="form-label">Cliente:</label>
+                    <InputSelect id="clienteid" class="form-select" @bind-Value="Encomenda.ClienteId">
+                        @foreach (var item in clientes) {
+                            <option value="@item.Id">@item.Nome @item.Apelido (@item.Email)</option>
+                        }
+                    </InputSelect>
                     <ValidationMessage For="() => Encomenda.ClienteId" class="text-danger"/>
                 </div>
-                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="submit" class="btn btn-primary">Guardar</button>
             </EditForm>
         </div>
     </div>
 }
 
 <div>
-    <a href="/encomendas">Back to List</a>
+    <a href="/encomendas">Voltar à lista</a>
 </div>
 
 @code {
@@ -63,17 +73,19 @@
 
     [SupplyParameterFromForm] private Encomenda? Encomenda { get; set; }
 
+    List<ApplicationUser> clientes = new();
+
     protected override async Task OnInitializedAsync() {
         using var context = DbFactory.CreateDbContext();
         Encomenda ??= await context.Encomendas.FirstOrDefaultAsync(m => m.Id == Id);
+
+        clientes = await context.Users.Where(u => u.TipoUtilizador == "Cliente").ToListAsync();
 
         if (Encomenda is null) {
             NavigationManager.NavigateTo("notfound");
         }
     }
 
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task UpdateEncomenda() {
         using var context = DbFactory.CreateDbContext();
         context.Attach(Encomenda!).State = EntityState.Modified;

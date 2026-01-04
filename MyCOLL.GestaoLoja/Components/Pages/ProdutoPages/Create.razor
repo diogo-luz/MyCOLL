@@ -1,14 +1,14 @@
 @page "/produtos/create"
 @using Microsoft.EntityFrameworkCore
 @using MyCOLL.Data.Entities
-@inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
+@using MyCOLL.Data.Data
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Create</PageTitle>
+<PageTitle>Criar Produto</PageTitle>
 
-<h1>Create</h1>
+<h1>Criar Produto</h1>
 
-<h2>Produto</h2>
 <hr/>
 <div class="row">
     <div class="col-md-4">
@@ -23,13 +23,13 @@
             </div>
             <div class="mb-3">
                 <span class="text-danger">*</span>
-                <label for="descricao" class="form-label">Descricao:</label>
+                <label for="descricao" class="form-label">Descrição:</label>
                 <InputText id="descricao" @bind-Value="Produto.Descricao" class="form-control" aria-required="true"/>
                 <ValidationMessage For="() => Produto.Descricao" class="text-danger"/>
             </div>
             <div class="mb-3">
                 <span class="text-danger">*</span>
-                <label for="precobase" class="form-label">PrecoBase:</label>
+                <label for="precobase" class="form-label">Preço Base:</label>
                 <InputNumber id="precobase" @bind-Value="Produto.PrecoBase" class="form-control" aria-required="true"/>
                 <ValidationMessage For="() => Produto.PrecoBase" class="text-danger"/>
             </div>
@@ -39,7 +39,7 @@
                 <ValidationMessage For="() => Produto.Percentagem" class="text-danger"/>
             </div>
             <div class="mb-3">
-                <label for="precofinal" class="form-label">PrecoFinal:</label>
+                <label for="precofinal" class="form-label">Preço Final:</label>
                 <InputNumber id="precofinal" @bind-Value="Produto.PrecoFinal" class="form-control"/>
                 <ValidationMessage For="() => Produto.PrecoFinal" class="text-danger"/>
             </div>
@@ -49,7 +49,7 @@
                 <ValidationMessage For="() => Produto.Stock" class="text-danger"/>
             </div>
             <div class="mb-3">
-                <label for="paravenda" class="form-label">ParaVenda:</label>
+                <label for="paravenda" class="form-label">Para Venda:</label>
                 <InputCheckbox id="paravenda" @bind-Value="Produto.ParaVenda" class="form-check-input"/>
                 <ValidationMessage For="() => Produto.ParaVenda" class="text-danger"/>
             </div>
@@ -69,7 +69,7 @@
                 <ValidationMessage For="() => Produto.Ano" class="text-danger"/>
             </div>
             <div class="mb-3">
-                <label for="urlimagem" class="form-label">UrlImagem:</label>
+                <label for="urlimagem" class="form-label">URL Imagem:</label>
                 <InputText id="urlimagem" @bind-Value="Produto.UrlImagem" class="form-control"/>
                 <ValidationMessage For="() => Produto.UrlImagem" class="text-danger"/>
             </div>
@@ -83,45 +83,70 @@
                 <ValidationMessage For="() => Produto.Imagem" class="text-danger"/>
             </div>
             <div class="mb-3">
-                <label for="datacriacao" class="form-label">DataCriacao:</label>
+                <label for="datacriacao" class="form-label">Data Criação:</label>
                 <InputDate id="datacriacao" @bind-Value="Produto.DataCriacao" class="form-control"/>
                 <ValidationMessage For="() => Produto.DataCriacao" class="text-danger"/>
             </div>
             <div class="mb-3">
                 <span class="text-danger">*</span>
-                <label for="fornecedorid" class="form-label">FornecedorId:</label>
-                <InputText id="fornecedorid" @bind-Value="Produto.FornecedorId" class="form-control" aria-required="true"/>
+                <label for="fornecedorid" class="form-label">Fornecedor:</label>
+                <InputSelect id="fornecedorid" class="form-select" @bind-Value="Produto.FornecedorId">
+                    <option value="">Escolha um fornecedor</option>
+                    @foreach (var item in fornecedores) {
+                        <option value="@item.Id">@item.Nome @item.Apelido (@item.Email)</option>
+                    }
+                </InputSelect>
                 <ValidationMessage For="() => Produto.FornecedorId" class="text-danger"/>
             </div>
             <div class="mb-3">
                 <span class="text-danger">*</span>
-                <label for="tipocolecionavelid" class="form-label">TipoColecionavelId:</label>
-                <InputNumber id="tipocolecionavelid" @bind-Value="Produto.TipoColecionavelId" class="form-control" aria-required="true"/>
+                <label for="tipocolecionavelid" class="form-label">Tipo Colecionável:</label>
+                <InputSelect id="tipocolecionavelid" class="form-select" @bind-Value="Produto.TipoColecionavelId">
+                    <option value="">Escolha um tipo</option>
+                    @foreach (var item in tiposColecionaveis) {
+                        <option value="@item.Id">@item.Nome</option>
+                    }
+                </InputSelect>
                 <ValidationMessage For="() => Produto.TipoColecionavelId" class="text-danger"/>
             </div>
             <div class="mb-3">
-                <label for="paisid" class="form-label">PaisId:</label>
-                <InputNumber id="paisid" @bind-Value="Produto.PaisId" class="form-control"/>
+                <label for="paisid" class="form-label">País:</label>
+                <InputSelect id="paisid" class="form-select" @bind-Value="Produto.PaisId">
+                    <option value="">Escolha um país</option>
+                    @foreach (var item in paises) {
+                        <option value="@item.Id">@item.Nome</option>
+                    }
+                </InputSelect>
                 <ValidationMessage For="() => Produto.PaisId" class="text-danger"/>
             </div>
             <div class="mb-3">
-                <label for="categoriaid" class="form-label">CategoriaId:</label>
-                <InputNumber id="categoriaid" @bind-Value="Produto.CategoriaId" class="form-control"/>
+                <label for="categoriaid" class="form-label">Categoria:</label>
+                <InputSelect id="categoriaid" class="form-select" @bind-Value="Produto.CategoriaId">
+                    <option value="">Escolha uma categoria</option>
+                    @foreach (var item in categorias) {
+                        <option value="@item.Id">@item.Nome</option>
+                    }
+                </InputSelect>
                 <ValidationMessage For="() => Produto.CategoriaId" class="text-danger"/>
             </div>
             <div class="mb-3">
                 <span class="text-danger">*</span>
-                <label for="mododisponibilizacaoid" class="form-label">ModoDisponibilizacaoId:</label>
-                <InputNumber id="mododisponibilizacaoid" @bind-Value="Produto.ModoDisponibilizacaoId" class="form-control" aria-required="true"/>
+                <label for="mododisponibilizacaoid" class="form-label">Modo Disponibilização:</label>
+                <InputSelect id="mododisponibilizacaoid" class="form-select" @bind-Value="Produto.ModoDisponibilizacaoId">
+                    <option value="">Escolha um modo</option>
+                    @foreach (var item in modosDisponibilizacao) {
+                        <option value="@item.Id">@item.Nome</option>
+                    }
+                </InputSelect>
                 <ValidationMessage For="() => Produto.ModoDisponibilizacaoId" class="text-danger"/>
             </div>
-            <button type="submit" class="btn btn-primary">Create</button>
+            <button type="submit" class="btn btn-primary">Criar</button>
         </EditForm>
     </div>
 </div>
 
 <div>
-    <a href="/produtos">Back to List</a>
+    <a href="/produtos">Voltar à lista</a>
 </div>
 
 @code {
@@ -129,10 +154,25 @@
 
     private string? previewUrl;
 
+    // Listas para os InputSelect
+    List<ApplicationUser> fornecedores = new();
+    List<TipoColecionavel> tiposColecionaveis = new();
+    List<Pais> paises = new();
+    List<Categoria> categorias = new();
+    List<ModoDisponibilizacao> modosDisponibilizacao = new();
+
+    protected override async Task OnInitializedAsync() {
+        await using var context = DbFactory.CreateDbContext();
+        fornecedores = await context.Users.Where(u => u.TipoUtilizador == "Fornecedor").ToListAsync();
+        tiposColecionaveis = await context.TiposColecionaveis.OrderBy(t => t.Ordem).ToListAsync();
+        paises = await context.Paises.OrderBy(p => p.Ordem).ToListAsync();
+        categorias = await context.Categorias.OrderBy(c => c.Ordem).ToListAsync();
+        modosDisponibilizacao = await context.ModosDisponibilizacao.ToListAsync();
+    }
+
     private async Task OnImageChange(InputFileChangeEventArgs e) {
         var file = e.File;
 
-        // Definir limite de 5MB
         var maxSize = 5 * 1024 * 1024; // 5MB
 
         if (file.Size > maxSize) {
@@ -140,18 +180,15 @@
         }
 
         using var stream = new MemoryStream();
-        await file.OpenReadStream(maxSize).CopyToAsync(stream); // <-- max size aqui
-        Produto.Imagem = stream.ToArray(); // so guarda os bytes
+        await file.OpenReadStream(maxSize).CopyToAsync(stream);
+        Produto.Imagem = stream.ToArray();
 
-        //Cria pré-visualização
-        //depois verificar a melhor forma de fazer isto
         using var previewStream = new MemoryStream();
-        await file.OpenReadStream(maxSize).CopyToAsync(previewStream); // <-- max size aqui
-        var base64 = Convert.ToBase64String(previewStream.ToArray()); //converter para base64 a nossa imagem
-        previewUrl = $"data:{file.ContentType};base64,{base64}"; //enviar com o formato que o browser entende como sendo imagem
+        await file.OpenReadStream(maxSize).CopyToAsync(previewStream);
+        var base64 = Convert.ToBase64String(previewStream.ToArray());
+        previewUrl = $"data:{file.ContentType};base64,{base64}";
     }
 
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddProduto() {
         using var context = DbFactory.CreateDbContext();
         context.Produtos.Add(Produto);
