@@ -15,24 +15,32 @@
 </p>
 
 <QuickGrid Class="table" Items="context.Produtos">
+    <TemplateColumn Context="produto" Title="Imagem" Class="col-1">
+        @*Se nao for null e se tiver conteudo*@
+        @if (produto.Imagem is not null && produto.Imagem.Length > 0) {
+            <img src="@($"data:image/png;base64, {Convert.ToBase64String(produto.Imagem)}")" alt="@produto.Nome" style="max-width: 100px; max-height: 100px;"/>
+        } else {
+            <img src="img/placeholderImg.png" alt="Sem imagem" style="max-width: 100px; max-height: 100px"/>
+        }
+    </TemplateColumn>
     <PropertyColumn Property="produto => produto.Nome"/>
     <PropertyColumn Property="produto => produto.Descricao"/>
-    <PropertyColumn Property="produto => produto.PrecoBase"/>
-    <PropertyColumn Property="produto => produto.Percentagem"/>
+    @* <PropertyColumn Property="produto => produto.PrecoBase"/>
+    <PropertyColumn Property="produto => produto.Percentagem"/> *@
     <PropertyColumn Property="produto => produto.PrecoFinal"/>
     <PropertyColumn Property="produto => produto.Stock"/>
     <PropertyColumn Property="produto => produto.ParaVenda"/>
     <PropertyColumn Property="produto => produto.Activo"/>
     <PropertyColumn Property="produto => produto.Estado"/>
     <PropertyColumn Property="produto => produto.Ano"/>
-    <PropertyColumn Property="produto => produto.UrlImagem"/>
-    <PropertyColumn Property="produto => produto.Imagem"/>
-    <PropertyColumn Property="produto => produto.DataCriacao"/>
+    @* <PropertyColumn Property="produto => produto.UrlImagem"/>
+    <PropertyColumn Property="produto => produto.Imagem"/> *@
+    @* <PropertyColumn Property="produto => produto.DataCriacao"/>
     <PropertyColumn Property="produto => produto.FornecedorId"/>
     <PropertyColumn Property="produto => produto.TipoColecionavelId"/>
     <PropertyColumn Property="produto => produto.PaisId"/>
     <PropertyColumn Property="produto => produto.CategoriaId"/>
-    <PropertyColumn Property="produto => produto.ModoDisponibilizacaoId"/>
+    <PropertyColumn Property="produto => produto.ModoDisponibilizacaoId"/> *@
 
     <TemplateColumn Context="produto">
         <a href="@($"produtos/edit?id={produto.Id}")">Edit</a> |

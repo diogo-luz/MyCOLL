@@ -17,7 +17,7 @@
 } else {
     <div class="row">
         <div class="col-md-4">
-            <EditForm method="post" Model="Pais" OnValidSubmit="UpdatePais" FormName="edit" Enhance>
+            <EditForm method="post" Model="Pais" OnValidSubmit="UpdatePais" FormName="edit">
                 <DataAnnotationsValidator/>
                 <ValidationSummary role="alert"/>
                 <input type="hidden" name="Pais.Id" value="@Pais.Id"/>
@@ -37,11 +37,20 @@
                     <InputNumber id="ordem" @bind-Value="Pais.Ordem" class="form-control"/>
                     <ValidationMessage For="() => Pais.Ordem" class="text-danger"/>
                 </div>
-                @* <div class="mb-3">
-                    <label for="bandeira" class="form-label">Bandeira:</label>
-                    <InputText id="bandeira" @bind-Value="Pais.Bandeira" class="form-control"/>
+                <div class="mb-3">
+                    <label for="imagem" class="form-label">Imagem:</label>
+                    <InputFile id="imagem" OnChange="OnImageChange" class="form-control" accept=".png, .jpg, .jpeg"/>
+                    @if (previewUrl is not null) {
+                        <img src="@previewUrl" style="max-width: 200px; max-height: 200px; margin-top: 10px;"/>
+                    } else {
+                        if (Pais.Bandeira is not null && Pais.Bandeira.Length > 0) {
+                            <img src="@($"data:image/png;base64, {Convert.ToBase64String(Pais.Bandeira)}")" alt="@Pais.Nome" style="max-width: 200px; max-height: 200px; margin-top: 10px"/>
+                        } else {
+                            <img src="img/placeholderImg.png" alt="Sem imagem" style="max-width: 200px; max-height: 200px; margin-top: 10px"/>
+                        }
+                    }
                     <ValidationMessage For="() => Pais.Bandeira" class="text-danger"/>
-                </div> *@
+                </div>
                 <button type="submit" class="btn btn-primary">Save</button>
             </EditForm>
         </div>
@@ -56,6 +65,29 @@
     [SupplyParameterFromQuery] private int Id { get; set; }
 
     [SupplyParameterFromForm] private Pais? Pais { get; set; }
+
+    private string? previewUrl;
+
+    private async Task OnImageChange(InputFileChangeEventArgs e) {
+        var file = e.File;
+
+        // Definir limite de 5MB
+        var maxSize = 5 * 1024 * 1024; // 5MB
+
+        if (file.Size > maxSize) {
+            throw new Exception("Imagem muito grande. O limite é de 5MB.");
+        }
+
+        using var stream = new MemoryStream();
+        await file.OpenReadStream(maxSize).CopyToAsync(stream);
+        Pais!.Bandeira = stream.ToArray();
+
+        //Cria pré-visualização
+        using var previewStream = new MemoryStream();
+        await file.OpenReadStream(maxSize).CopyToAsync(previewStream);
+        var base64 = Convert.ToBase64String(previewStream.ToArray());
+        previewUrl = $"data:{file.ContentType};base64,{base64}";
+    }
 
     protected override async Task OnInitializedAsync() {
         using var context = DbFactory.CreateDbContext();

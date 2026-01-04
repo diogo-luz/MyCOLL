@@ -29,4 +29,8 @@
       <ProjectReference Include="..\MyCOLL.Data\MyCOLL.Data.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="wwwroot\img\" />
+    </ItemGroup>
+
 </Project>

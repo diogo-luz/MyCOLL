@@ -31,9 +31,15 @@
         </dl>
         <dl class="row">
             <dt class="col-sm-2">Bandeira</dt>
-            <dd class="col-sm-10">@pais.Bandeira</dd>
+            <dd class="col-sm-10">
+                @if (pais.Bandeira is not null && pais.Bandeira.Length > 0) {
+                    <img src="@($"data:image/png;base64, {Convert.ToBase64String(pais.Bandeira)}")" alt="@pais.Nome" style="max-width: 100px; max-height: 100px;"/>
+                } else {
+                    <img src="img/placeholderImg.png" alt="Sem imagem" style="max-width: 100px; max-height: 100px"/>
+                }
+            </dd>
         </dl>
-        <EditForm method="post" Model="pais" OnValidSubmit="DeletePais" FormName="delete" Enhance>
+        <EditForm method="post" Model="pais" OnValidSubmit="DeletePais" FormName="delete">
             <button type="submit" class="btn btn-danger" disabled="@(pais is null)">Delete</button> |
             <a href="/paises">Back to List</a>
         </EditForm>

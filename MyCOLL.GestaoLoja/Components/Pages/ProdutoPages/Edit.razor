@@ -17,7 +17,7 @@
 } else {
     <div class="row">
         <div class="col-md-4">
-            <EditForm method="post" Model="Produto" OnValidSubmit="UpdateProduto" FormName="edit" Enhance>
+            <EditForm method="post" Model="Produto" OnValidSubmit="UpdateProduto" FormName="edit">
                 <DataAnnotationsValidator/>
                 <ValidationSummary role="alert"/>
                 <input type="hidden" name="Produto.Id" value="@Produto.Id"/>
@@ -79,11 +79,20 @@
                     <InputText id="urlimagem" @bind-Value="Produto.UrlImagem" class="form-control"/>
                     <ValidationMessage For="() => Produto.UrlImagem" class="text-danger"/>
                 </div>
-                @* <div class="mb-3">
+                <div class="mb-3">
                     <label for="imagem" class="form-label">Imagem:</label>
-                    <InputText id="imagem" @bind-Value="Produto.Imagem" class="form-control"/>
+                    <InputFile id="imagem" OnChange="OnImageChange" class="form-control" accept=".png, .jpg, .jpeg"/>
+                    @if (previewUrl is not null) {
+                        <img src="@previewUrl" style="max-width: 200px; max-height: 200px; margin-top: 10px;"/>
+                    } else {
+                        if (Produto.Imagem is not null && Produto.Imagem.Length > 0) {
+                            <img src="@($"data:image/png;base64, {Convert.ToBase64String(Produto.Imagem)}")" alt="@Produto.Nome" style="max-width: 200px; max-height: 200px; margin-top: 10px"/>
+                        } else {
+                            <img src="img/placeholderImg.png" alt="Sem imagem" style="max-width: 200px; max-height: 200px; margin-top: 10px"/>
+                        }
+                    }
                     <ValidationMessage For="() => Produto.Imagem" class="text-danger"/>
-                </div> *@
+                </div>
                 <div class="mb-3">
                     <label for="datacriacao" class="form-label">DataCriacao:</label>
                     <InputDate id="datacriacao" @bind-Value="Produto.DataCriacao" class="form-control"/>
@@ -131,6 +140,29 @@
     [SupplyParameterFromQuery] private int Id { get; set; }
 
     [SupplyParameterFromForm] private Produto? Produto { get; set; }
+
+    private string? previewUrl;
+
+    private async Task OnImageChange(InputFileChangeEventArgs e) {
+        var file = e.File;
+
+        // Definir limite de 5MB
+        var maxSize = 5 * 1024 * 1024; // 5MB
+
+        if (file.Size > maxSize) {
+            throw new Exception("Imagem muito grande. O limite é de 5MB.");
+        }
+
+        using var stream = new MemoryStream();
+        await file.OpenReadStream(maxSize).CopyToAsync(stream);
+        Produto!.Imagem = stream.ToArray();
+
+        //Cria pré-visualização
+        using var previewStream = new MemoryStream();
+        await file.OpenReadStream(maxSize).CopyToAsync(previewStream);
+        var base64 = Convert.ToBase64String(previewStream.ToArray());
+        previewUrl = $"data:{file.ContentType};base64,{base64}";
+    }
 
     protected override async Task OnInitializedAsync() {
         using var context = DbFactory.CreateDbContext();

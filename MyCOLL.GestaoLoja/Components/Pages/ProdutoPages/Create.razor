@@ -12,7 +12,7 @@
 <hr/>
 <div class="row">
     <div class="col-md-4">
-        <EditForm method="post" Model="Produto" OnValidSubmit="AddProduto" FormName="create" Enhance>
+        <EditForm method="post" Model="Produto" OnValidSubmit="AddProduto" FormName="create">
             <DataAnnotationsValidator/>
             <ValidationSummary class="text-danger" role="alert"/>
             <div class="mb-3">
@@ -73,11 +73,15 @@
                 <InputText id="urlimagem" @bind-Value="Produto.UrlImagem" class="form-control"/>
                 <ValidationMessage For="() => Produto.UrlImagem" class="text-danger"/>
             </div>
-            @* <div class="mb-3">
-                <label for="imagem" class="form-label">Imagem:</label> 
-                <InputText id="imagem" @bind-Value="Produto.Imagem" class="form-control" /> 
-                <ValidationMessage For="() => Produto.Imagem" class="text-danger" /> 
-            </div>         *@
+            <div class="mb-3">
+                <label for="imagem" class="form-label">Imagem:</label>
+                <InputFile id="imagem" OnChange="OnImageChange" class="form-control"
+                           accept=".png, .jpg, .jpeg"/>
+                @if (previewUrl is not null) {
+                    <img src="@previewUrl" style="max-width: 200px; max-height: 200px; margin-top: 10px;"/>
+                }
+                <ValidationMessage For="() => Produto.Imagem" class="text-danger"/>
+            </div>
             <div class="mb-3">
                 <label for="datacriacao" class="form-label">DataCriacao:</label>
                 <InputDate id="datacriacao" @bind-Value="Produto.DataCriacao" class="form-control"/>
@@ -122,6 +126,30 @@
 
 @code {
     [SupplyParameterFromForm] private Produto Produto { get; set; } = new();
+
+    private string? previewUrl;
+
+    private async Task OnImageChange(InputFileChangeEventArgs e) {
+        var file = e.File;
+
+        // Definir limite de 5MB
+        var maxSize = 5 * 1024 * 1024; // 5MB
+
+        if (file.Size > maxSize) {
+            throw new Exception("Imagem muito grande. O limite é de 5MB.");
+        }
+
+        using var stream = new MemoryStream();
+        await file.OpenReadStream(maxSize).CopyToAsync(stream); // <-- max size aqui
+        Produto.Imagem = stream.ToArray(); // so guarda os bytes
+
+        //Cria pré-visualização
+        //depois verificar a melhor forma de fazer isto
+        using var previewStream = new MemoryStream();
+        await file.OpenReadStream(maxSize).CopyToAsync(previewStream); // <-- max size aqui
+        var base64 = Convert.ToBase64String(previewStream.ToArray()); //converter para base64 a nossa imagem
+        previewUrl = $"data:{file.ContentType};base64,{base64}"; //enviar com o formato que o browser entende como sendo imagem
+    }
 
     // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddProduto() {

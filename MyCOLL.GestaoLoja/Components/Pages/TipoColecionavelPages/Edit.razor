@@ -17,7 +17,7 @@
 } else {
     <div class="row">
         <div class="col-md-4">
-            <EditForm method="post" Model="TipoColecionavel" OnValidSubmit="UpdateTipoColecionavel" FormName="edit" Enhance>
+            <EditForm method="post" Model="TipoColecionavel" OnValidSubmit="UpdateTipoColecionavel" FormName="edit">
                 <DataAnnotationsValidator/>
                 <ValidationSummary role="alert"/>
                 <input type="hidden" name="TipoColecionavel.Id" value="@TipoColecionavel.Id"/>
@@ -37,11 +37,20 @@
                     <InputText id="urlimagem" @bind-Value="TipoColecionavel.UrlImagem" class="form-control"/>
                     <ValidationMessage For="() => TipoColecionavel.UrlImagem" class="text-danger"/>
                 </div>
-                @* <div class="mb-3">
+                <div class="mb-3">
                     <label for="imagem" class="form-label">Imagem:</label>
-                    <InputText id="imagem" @bind-Value="TipoColecionavel.Imagem" class="form-control" />
-                    <ValidationMessage For="() => TipoColecionavel.Imagem" class="text-danger" />
-                </div> *@
+                    <InputFile id="imagem" OnChange="OnImageChange" class="form-control" accept=".png, .jpg, .jpeg"/>
+                    @if (previewUrl is not null) {
+                        <img src="@previewUrl" style="max-width: 200px; max-height: 200px; margin-top: 10px;"/>
+                    } else {
+                        if (TipoColecionavel.Imagem is not null && TipoColecionavel.Imagem.Length > 0) {
+                            <img src="@($"data:image/png;base64, {Convert.ToBase64String(TipoColecionavel.Imagem)}")" alt="@TipoColecionavel.Nome" style="max-width: 200px; max-height: 200px; margin-top: 10px"/>
+                        } else {
+                            <img src="img/placeholderImg.png" alt="Sem imagem" style="max-width: 200px; max-height: 200px; margin-top: 10px"/>
+                        }
+                    }
+                    <ValidationMessage For="() => TipoColecionavel.Imagem" class="text-danger"/>
+                </div>
                 <button type="submit" class="btn btn-primary">Save</button>
             </EditForm>
         </div>
@@ -56,6 +65,29 @@
     [SupplyParameterFromQuery] private int Id { get; set; }
 
     [SupplyParameterFromForm] private TipoColecionavel? TipoColecionavel { get; set; }
+
+    private string? previewUrl;
+
+    private async Task OnImageChange(InputFileChangeEventArgs e) {
+        var file = e.File;
+
+        // Definir limite de 5MB
+        var maxSize = 5 * 1024 * 1024; // 5MB
+
+        if (file.Size > maxSize) {
+            throw new Exception("Imagem muito grande. O limite é de 5MB.");
+        }
+
+        using var stream = new MemoryStream();
+        await file.OpenReadStream(maxSize).CopyToAsync(stream);
+        TipoColecionavel!.Imagem = stream.ToArray();
+
+        //Cria pré-visualização
+        using var previewStream = new MemoryStream();
+        await file.OpenReadStream(maxSize).CopyToAsync(previewStream);
+        var base64 = Convert.ToBase64String(previewStream.ToArray());
+        previewUrl = $"data:{file.ContentType};base64,{base64}";
+    }
 
     protected override async Task OnInitializedAsync() {
         using var context = DbFactory.CreateDbContext();
