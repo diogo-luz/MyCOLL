@@ -10,20 +10,20 @@
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
 
-<PageTitle>Log in</PageTitle>
+<PageTitle>Iniciar Sessão</PageTitle>
 
-<h1>Log in</h1>
+<h1>Iniciar Sessão</h1>
 <div class="row">
     <div class="col-md-4">
         <section>
             <StatusMessage Message="@errorMessage"/>
             <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
                 <DataAnnotationsValidator/>
-                <h2>Use a local account to log in.</h2>
+                <h2>Inicie sessão com a sua conta.</h2>
                 <hr/>
                 <ValidationSummary class="text-danger" role="alert"/>
                 <div class="form-floating mb-3">
-                    <InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com"/>
+                    <InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="email@exemplo.com"/>
                     <label for="email" class="form-label">Email</label>
                     <ValidationMessage For="() => Input.Email" class="text-danger"/>
                 </div>
@@ -35,31 +35,24 @@
                 <div class="checkbox mb-3">
                     <label class="form-label">
                         <InputCheckbox @bind-Value="Input.RememberMe" class="darker-border-checkbox form-check-input"/>
-                        Remember me
+                        Lembrar-me
                     </label>
                 </div>
                 <div>
-                    <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+                    <button type="submit" class="w-100 btn btn-lg btn-primary">Entrar</button>
                 </div>
-                <div>
+                <div class="mt-3">
                     <p>
-                        <a href="Account/ForgotPassword">Forgot your password?</a>
+                        <a href="Account/ForgotPassword">Esqueceu a password?</a>
                     </p>
                     <p>
-                        <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Register as a new user</a>
+                        <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Registar nova conta</a>
                     </p>
                     <p>
-                        <a href="Account/ResendEmailConfirmation">Resend email confirmation</a>
+                        <a href="Account/ResendEmailConfirmation">Reenviar confirmação de email</a>
                     </p>
                 </div>
             </EditForm>
-        </section>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to log in.</h3>
-            <hr/>
-            <ExternalLoginPicker/>
         </section>
     </div>
 </div>
@@ -85,28 +78,30 @@
         // To enable password failures to trigger account lockout, set lockoutOnFailure: true
         var result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
         if (result.Succeeded) {
-            Logger.LogInformation("User logged in.");
+            Logger.LogInformation("Utilizador autenticado.");
             RedirectManager.RedirectTo(ReturnUrl);
         } else if (result.RequiresTwoFactor) {
             RedirectManager.RedirectTo(
                 "Account/LoginWith2fa",
                 new() { ["returnUrl"] = ReturnUrl, ["rememberMe"] = Input.RememberMe });
         } else if (result.IsLockedOut) {
-            Logger.LogWarning("User account locked out.");
+            Logger.LogWarning("Conta de utilizador bloqueada.");
             RedirectManager.RedirectTo("Account/Lockout");
         } else {
-            errorMessage = "Error: Invalid login attempt.";
+            errorMessage = "Erro: Email ou password inválidos.";
         }
     }
 
     private sealed class InputModel {
-        [Required] [EmailAddress] public string Email { get; set; } = "";
+        [Required(ErrorMessage = "O email é obrigatório.")]
+        [EmailAddress(ErrorMessage = "Email inválido.")]
+        public string Email { get; set; } = "";
 
-        [Required]
+        [Required(ErrorMessage = "A password é obrigatória.")]
         [DataType(DataType.Password)]
         public string Password { get; set; } = "";
 
-        [Display(Name = "Remember me?")] public bool RememberMe { get; set; }
+        [Display(Name = "Lembrar-me")] public bool RememberMe { get; set; }
     }
 
 }

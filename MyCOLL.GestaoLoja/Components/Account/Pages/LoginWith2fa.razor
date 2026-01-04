@@ -9,12 +9,12 @@
 @inject IdentityRedirectManager RedirectManager
 @inject ILogger<LoginWith2fa> Logger
 
-<PageTitle>Two-factor authentication</PageTitle>
+<PageTitle>Autenticação de dois factores</PageTitle>
 
-<h1>Two-factor authentication</h1>
+<h1>Autenticação de dois factores</h1>
 <hr/>
 <StatusMessage Message="@message"/>
-<p>Your login is protected with an authenticator app. Enter your authenticator code below.</p>
+<p>O seu login está protegido com uma app autenticadora. Introduza o código de autenticação abaixo.</p>
 <div class="row">
     <div class="col-md-4">
         <EditForm Model="Input" FormName="login-with-2fa" OnValidSubmit="OnValidSubmitAsync" method="post">
@@ -24,13 +24,13 @@
             <ValidationSummary class="text-danger" role="alert"/>
             <div class="form-floating mb-3">
                 <InputText @bind-Value="Input.TwoFactorCode" class="form-control" autocomplete="off"/>
-                <label for="two-factor-code" class="form-label">Authenticator code</label>
+                <label for="two-factor-code" class="form-label">Código de autenticação</label>
                 <ValidationMessage For="() => Input.TwoFactorCode" class="text-danger"/>
             </div>
             <div class="checkbox mb-3">
                 <label for="remember-machine" class="form-label">
                     <InputCheckbox @bind-Value="Input.RememberMachine"/>
-                    Remember this machine
+                    Lembre-se deste computador
                 </label>
             </div>
             <div>
@@ -40,8 +40,8 @@
     </div>
 </div>
 <p>
-    Don't have access to your authenticator device? You can
-    <a href="Account/LoginWithRecoveryCode?ReturnUrl=@ReturnUrl">log in with a recovery code</a>.
+    Não tem acesso ao seu dispositivo autenticador? Pode
+    <a href="Account/LoginWithRecoveryCode?ReturnUrl=@ReturnUrl">fazer login com um código de recuperação</a>.
 </p>
 
 @code {
@@ -79,12 +79,12 @@
 
     private sealed class InputModel {
         [Required]
-        [StringLength(7, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [StringLength(7, ErrorMessage = "O {0} deve ter pelo menos {2} e no máximo {1} caracteres.", MinimumLength = 6)]
         [DataType(DataType.Text)]
-        [Display(Name = "Authenticator code")]
+        [Display(Name = "Código de autenticação")]
         public string? TwoFactorCode { get; set; }
 
-        [Display(Name = "Remember this machine")]
+        [Display(Name = "Lembre-se deste computador")]
         public bool RememberMachine { get; set; }
     }
 

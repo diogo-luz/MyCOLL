@@ -10,15 +10,15 @@
 @inject IdentityRedirectManager RedirectManager
 @inject ILogger<DeletePersonalData> Logger
 
-<PageTitle>Delete Personal Data</PageTitle>
+<PageTitle>Eliminar Dados Pessoais</PageTitle>
 
 <StatusMessage Message="@message"/>
 
-<h3>Delete Personal Data</h3>
+<h3>Eliminar Dados Pessoais</h3>
 
 <div class="alert alert-warning" role="alert">
     <p>
-        <strong>Deleting this data will permanently remove your account, and this cannot be recovered.</strong>
+        <strong>Eliminar estes dados irá remover permanentemente a sua conta, e esta ação não pode ser revertida.</strong>
     </p>
 </div>
 
@@ -28,12 +28,12 @@
         <ValidationSummary class="text-danger" role="alert"/>
         @if (requirePassword) {
             <div class="form-floating mb-3">
-                <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="Please enter your password."/>
+                <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="Introduza a sua password"/>
                 <label for="password" class="form-label">Password</label>
                 <ValidationMessage For="() => Input.Password" class="text-danger"/>
             </div>
         }
-        <button class="w-100 btn btn-lg btn-danger" type="submit">Delete data and close my account</button>
+        <button class="w-100 btn btn-lg btn-danger" type="submit">Eliminar dados e encerrar a minha conta</button>
     </EditForm>
 </div>
 
@@ -54,19 +54,19 @@
 
     private async Task OnValidSubmitAsync() {
         if (requirePassword && !await UserManager.CheckPasswordAsync(user, Input.Password)) {
-            message = "Error: Incorrect password.";
+            message = "Erro: Password incorreta.";
             return;
         }
 
         var result = await UserManager.DeleteAsync(user);
         if (!result.Succeeded) {
-            throw new InvalidOperationException("Unexpected error occurred deleting user.");
+            throw new InvalidOperationException("Ocorreu um erro inesperado ao eliminar o utilizador.");
         }
 
         await SignInManager.SignOutAsync();
 
         var userId = await UserManager.GetUserIdAsync(user);
-        Logger.LogInformation("User with ID '{UserId}' deleted themselves.", userId);
+        Logger.LogInformation("Utilizador com ID '{UserId}' eliminou a sua própria conta.", userId);
 
         RedirectManager.RedirectToCurrentPage();
     }
