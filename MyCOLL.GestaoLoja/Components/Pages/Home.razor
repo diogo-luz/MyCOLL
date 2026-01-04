@@ -1,7 +1,326 @@
 ﻿@page "/"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Identity
+@using MyCOLL.Data.Data
+@using MyCOLL.Data.Entities
 
-<PageTitle>Home</PageTitle>
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+@inject UserManager<ApplicationUser> UserManager
 
-<h1>Hello, world!</h1>
+<PageTitle>Dashboard - MyCOLL</PageTitle>
 
-Welcome to your new app.
+<div class="container-fluid">
+<h1 class="mb-4">
+    <i class="bi bi-speedometer2"></i> Dashboard
+</h1>
+
+<AuthorizeView>
+<Authorized>
+<!-- Estatísticas Principais -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card bg-primary text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1">Produtos</h6>
+                        <h2 class="mb-0">@totalProdutos</h2>
+                    </div>
+                    <i class="bi bi-box-seam" style="font-size: 3rem; opacity: 0.5;"></i>
+                </div>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a href="/produtos" class="text-white text-decoration-none small">Ver todos</a>
+                <i class="bi bi-arrow-right text-white"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card bg-success text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1">Encomendas</h6>
+                        <h2 class="mb-0">@totalEncomendas</h2>
+                    </div>
+                    <i class="bi bi-cart-check" style="font-size: 3rem; opacity: 0.5;"></i>
+                </div>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a href="/encomendas" class="text-white text-decoration-none small">Ver todas</a>
+                <i class="bi bi-arrow-right text-white"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card bg-warning text-dark h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1">Categorias</h6>
+                        <h2 class="mb-0">@totalCategorias</h2>
+                    </div>
+                    <i class="bi bi-tags" style="font-size: 3rem; opacity: 0.5;"></i>
+                </div>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a href="/categorias" class="text-dark text-decoration-none small">Ver todas</a>
+                <i class="bi bi-arrow-right text-dark"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card bg-info text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1">Utilizadores</h6>
+                        <h2 class="mb-0">@totalUtilizadores</h2>
+                    </div>
+                    <i class="bi bi-people" style="font-size: 3rem; opacity: 0.5;"></i>
+                </div>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a href="/utilizadores" class="text-white text-decoration-none small">Ver todos</a>
+                <i class="bi bi-arrow-right text-white"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Segunda linha de estatísticas -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card border-primary h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-collection text-primary" style="font-size: 2rem;"></i>
+                <h3 class="mt-2">@totalTipos</h3>
+                <p class="text-muted mb-0">Tipos de Colecionáveis</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card border-success h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-globe text-success" style="font-size: 2rem;"></i>
+                <h3 class="mt-2">@totalPaises</h3>
+                <p class="text-muted mb-0">Países</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card border-warning h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-box-arrow-in-right text-warning" style="font-size: 2rem;"></i>
+                <h3 class="mt-2">@totalModos</h3>
+                <p class="text-muted mb-0">Modos Disponibilização</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card border-danger h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-currency-euro text-danger" style="font-size: 2rem;"></i>
+                <h3 class="mt-2">@totalVendas.ToString("C")</h3>
+                <p class="text-muted mb-0">Total em Vendas</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Produtos Recentes e Encomendas Pendentes -->
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Produtos Recentes</h5>
+            </div>
+            <div class="card-body">
+                @if (produtosRecentes.Count == 0) {
+                    <p class="text-muted">Nenhum produto registado.</p>
+                } else {
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Preço</th>
+                                <th>Estado</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var produto in produtosRecentes) {
+                                <tr>
+                                    <td>
+                                        <a href="/produtos/details?id=@produto.Id">@produto.Nome</a>
+                                    </td>
+                                    <td>@produto.PrecoFinal.ToString("C")</td>
+                                    <td>
+                                        @if (produto.Estado == "Activo") {
+                                            <span class="badge bg-success">@produto.Estado</span>
+                                        } else if (produto.Estado == "Pendente") {
+                                            <span class="badge bg-warning">@produto.Estado</span>
+                                        } else {
+                                            <span class="badge bg-secondary">@produto.Estado</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+            <div class="card-footer">
+                <a href="/produtos" class="btn btn-sm btn-outline-primary">Ver todos os produtos</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <h5 class="mb-0"><i class="bi bi-hourglass-split"></i> Encomendas Pendentes</h5>
+            </div>
+            <div class="card-body">
+                @if (encomendasPendentes.Count == 0) {
+                    <p class="text-muted">Nenhuma encomenda pendente.</p>
+                } else {
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Cliente</th>
+                                <th>Total</th>
+                                <th>Estado</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var encomenda in encomendasPendentes) {
+                                <tr>
+                                    <td>@encomenda.DataEncomenda.ToString("dd/MM/yyyy")</td>
+                                    <td>@encomenda.Cliente?.Nome @encomenda.Cliente?.Apelido</td>
+                                    <td>@encomenda.Total.ToString("C")</td>
+                                    <td>
+                                        <span class="badge bg-warning">@encomenda.Estado</span>
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+            <div class="card-footer">
+                <a href="/encomendas" class="btn btn-sm btn-outline-success">Ver todas as encomendas</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ações Rápidas -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0"><i class="bi bi-lightning"></i> Ações Rápidas</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="/produtos/create" class="btn btn-primary">
+                        <i class="bi bi-plus-lg"></i> Novo Produto
+                    </a>
+                    <a href="/categorias/create" class="btn btn-outline-primary">
+                        <i class="bi bi-plus-lg"></i> Nova Categoria
+                    </a>
+                    <a href="/tiposcolecionaveis/create" class="btn btn-outline-primary">
+                        <i class="bi bi-plus-lg"></i> Novo Tipo
+                    </a>
+                    <a href="/paises/create" class="btn btn-outline-primary">
+                        <i class="bi bi-plus-lg"></i> Novo País
+                    </a>
+                    <AuthorizeView Roles="Admin">
+                        <a href="/utilizadores/create" class="btn btn-outline-secondary">
+                            <i class="bi bi-person-plus"></i> Novo Utilizador
+                        </a>
+                    </AuthorizeView>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</Authorized>
+<NotAuthorized>
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="card shadow-lg">
+                <div class="card-body p-5">
+                    <i class="bi bi-collection" style="font-size: 5rem; color: #0d6efd;"></i>
+                    <h1 class="mt-4">MyCOLL</h1>
+                    <p class="lead text-muted">Sistema de Gestão de Colecionáveis</p>
+                    <hr/>
+                    <p>Faça login para aceder ao painel de gestão.</p>
+                    <a href="Account/Login" class="btn btn-primary btn-lg">
+                        <i class="bi bi-box-arrow-in-right"></i> Iniciar Sessão
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</NotAuthorized>
+</AuthorizeView>
+</div>
+
+@code {
+    private int totalProdutos;
+    private int totalEncomendas;
+    private int totalCategorias;
+    private int totalUtilizadores;
+    private int totalTipos;
+    private int totalPaises;
+    private int totalModos;
+    private decimal totalVendas;
+
+    private List<Produto> produtosRecentes = new();
+    private List<Encomenda> encomendasPendentes = new();
+
+    protected override async Task OnInitializedAsync() {
+        using var context = DbFactory.CreateDbContext();
+
+        // Contadores
+        totalProdutos = await context.Produtos.CountAsync();
+        totalEncomendas = await context.Encomendas.CountAsync();
+        totalCategorias = await context.Categorias.CountAsync();
+        totalUtilizadores = await context.Users.CountAsync();
+        totalTipos = await context.TiposColecionaveis.CountAsync();
+        totalPaises = await context.Paises.CountAsync();
+        totalModos = await context.ModosDisponibilizacao.CountAsync();
+
+        // Total de vendas (encomendas confirmadas/entregues)
+        totalVendas = await context.Encomendas
+            .Where(e => e.Estado == "Confirmada" || e.Estado == "Expedida" || e.Estado == "Entregue")
+            .SumAsync(e => e.Total);
+
+        // Produtos recentes (últimos 5)
+        produtosRecentes = await context.Produtos
+            .OrderByDescending(p => p.DataCriacao)
+            .Take(5)
+            .ToListAsync();
+
+        // Encomendas pendentes (últimas 5)
+        encomendasPendentes = await context.Encomendas
+            .Include(e => e.Cliente)
+            .Where(e => e.Estado == "Pendente")
+            .OrderByDescending(e => e.DataEncomenda)
+            .Take(5)
+            .ToListAsync();
+    }
+
+}
