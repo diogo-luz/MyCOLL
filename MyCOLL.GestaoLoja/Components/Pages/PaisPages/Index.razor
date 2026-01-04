@@ -6,32 +6,37 @@
 @implements IAsyncDisposable
 @inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Países</PageTitle>
 
-<h1>Index</h1>
+<h1>Países</h1>
 
 <p>
-    <a href="paises/create">Create New</a>
+    <a href="paises/create">Criar novo país</a>
 </p>
 
 <QuickGrid Class="table" Items="context.Paises">
-    <TemplateColumn Context="pais" Title="Bandeira" Class="col-1">
-        @*Se nao for null e se tiver conteudo*@
-        @if (pais.Bandeira is not null && pais.Bandeira.Length > 0) {
-            <img src="@($"data:image/png;base64, {Convert.ToBase64String(pais.Bandeira)}")" alt="@pais.Nome" style="max-width: 100px; max-height: 100px;"/>
+    <TemplateColumn Context="p" Title="Bandeira" Class="col-1">
+        @if (p.Bandeira is not null && p.Bandeira.Length > 0) {
+            <img src="@($"data:image/png;base64, {Convert.ToBase64String(p.Bandeira)}")" alt="@p.Nome" style="max-width: 100px; max-height: 100px;"/>
         } else {
             <img src="img/placeholderImg.png" alt="Sem imagem" style="max-width: 100px; max-height: 100px"/>
         }
     </TemplateColumn>
 
-    <PropertyColumn Property="pais => pais.Nome"/>
-    <PropertyColumn Property="pais => pais.CodigoISO"/>
-    <PropertyColumn Property="pais => pais.Ordem"/>
+    <PropertyColumn Property="p => p.Nome" Title="Nome"/>
+    <PropertyColumn Property="p => p.CodigoISO" Title="Código ISO"/>
+    <PropertyColumn Property="p => p.Ordem" Title="Ordem"/>
 
-    <TemplateColumn Context="pais">
-        <a href="@($"paises/edit?id={pais.Id}")">Edit</a> |
-        <a href="@($"paises/details?id={pais.Id}")">Details</a> |
-        <a href="@($"paises/delete?id={pais.Id}")">Delete</a>
+    <TemplateColumn Context="p" Title="Ações">
+        <a href="@($"paises/edit?id={p.Id}")">
+            <i class="bi bi-pencil-square"></i>
+        </a> |
+        <a href="@($"paises/details?id={p.Id}")">
+            <i class="bi bi-eye-fill"></i>
+        </a> |
+        <a href="@($"paises/delete?id={p.Id}")">
+            <i class="bi bi-trash-fill"></i>
+        </a>
     </TemplateColumn>
 </QuickGrid>
 

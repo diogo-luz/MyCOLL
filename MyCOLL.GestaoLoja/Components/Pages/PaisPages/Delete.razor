@@ -4,17 +4,18 @@
 @inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Delete</PageTitle>
+<PageTitle>Eliminar País</PageTitle>
 
-<h1>Delete</h1>
+<h1>Eliminar País</h1>
 
-<p>Are you sure you want to delete this?</p>
+<p class="text-danger">
+    <strong>Tem a certeza que pretende eliminar este país?</strong>
+</p>
 <div>
-    <h2>Pais</h2>
     <hr/>
     @if (pais is null) {
         <p>
-            <em>Loading...</em>
+            <em>A carregar...</em>
         </p>
     } else {
         <dl class="row">
@@ -22,7 +23,7 @@
             <dd class="col-sm-10">@pais.Nome</dd>
         </dl>
         <dl class="row">
-            <dt class="col-sm-2">CodigoISO</dt>
+            <dt class="col-sm-2">Código ISO</dt>
             <dd class="col-sm-10">@pais.CodigoISO</dd>
         </dl>
         <dl class="row">
@@ -40,8 +41,8 @@
             </dd>
         </dl>
         <EditForm method="post" Model="pais" OnValidSubmit="DeletePais" FormName="delete">
-            <button type="submit" class="btn btn-danger" disabled="@(pais is null)">Delete</button> |
-            <a href="/paises">Back to List</a>
+            <button type="submit" class="btn btn-danger" disabled="@(pais is null)">Eliminar</button> |
+            <a href="/paises">Cancelar</a>
         </EditForm>
     }
 </div>

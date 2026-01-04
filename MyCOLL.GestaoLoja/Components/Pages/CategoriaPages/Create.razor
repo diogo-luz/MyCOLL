@@ -4,11 +4,9 @@
 @inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Create</PageTitle>
+<PageTitle>Criar Categoria</PageTitle>
 
-<h1>Create</h1>
-
-<h2>Categoria</h2>
+<h1>Criar Categoria</h1>
 <hr/>
 <div class="row">
     <div class="col-md-4">
@@ -27,7 +25,7 @@
                 <ValidationMessage For="() => Categoria.Ordem" class="text-danger"/>
             </div>
             <div class="mb-3">
-                <label for="urlimagem" class="form-label">UrlImagem:</label>
+                <label for="urlimagem" class="form-label">URL Imagem:</label>
                 <InputText id="urlimagem" @bind-Value="Categoria.UrlImagem" class="form-control"/>
                 <ValidationMessage For="() => Categoria.UrlImagem" class="text-danger"/>
             </div>
@@ -40,13 +38,13 @@
                 }
                 <ValidationMessage For="() => Categoria.Imagem" class="text-danger"/>
             </div>
-            <button type="submit" class="btn btn-primary">Create</button>
+            <button type="submit" class="btn btn-primary">Criar</button>
         </EditForm>
     </div>
 </div>
 
 <div>
-    <a href="/categorias">Back to List</a>
+    <a href="/categorias">Voltar à lista</a>
 </div>
 
 @code {

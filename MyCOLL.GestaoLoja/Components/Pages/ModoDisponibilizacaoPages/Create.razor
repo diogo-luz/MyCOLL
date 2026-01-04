@@ -4,15 +4,13 @@
 @inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Create</PageTitle>
+<PageTitle>Criar Modo de Disponibilização</PageTitle>
 
-<h1>Create</h1>
-
-<h2>ModoDisponibilizacao</h2>
+<h1>Criar Modo de Disponibilização</h1>
 <hr/>
 <div class="row">
     <div class="col-md-4">
-        <EditForm method="post" Model="ModoDisponibilizacao" OnValidSubmit="AddModoDisponibilizacao" FormName="create" Enhance>
+        <EditForm method="post" Model="ModoDisponibilizacao" OnValidSubmit="AddModoDisponibilizacao" FormName="create">
             <DataAnnotationsValidator/>
             <ValidationSummary class="text-danger" role="alert"/>
             <div class="mb-3">
@@ -22,17 +20,17 @@
                 <ValidationMessage For="() => ModoDisponibilizacao.Nome" class="text-danger"/>
             </div>
             <div class="mb-3">
-                <label for="descricao" class="form-label">Descricao:</label>
+                <label for="descricao" class="form-label">Descrição:</label>
                 <InputText id="descricao" @bind-Value="ModoDisponibilizacao.Descricao" class="form-control"/>
                 <ValidationMessage For="() => ModoDisponibilizacao.Descricao" class="text-danger"/>
             </div>
-            <button type="submit" class="btn btn-primary">Create</button>
+            <button type="submit" class="btn btn-primary">Criar</button>
         </EditForm>
     </div>
 </div>
 
 <div>
-    <a href="/modosdisponibilizacao">Back to List</a>
+    <a href="/modosdisponibilizacao">Voltar à lista</a>
 </div>
 
 @code {

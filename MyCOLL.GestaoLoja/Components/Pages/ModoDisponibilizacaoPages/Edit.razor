@@ -4,20 +4,18 @@
 @inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Edit</PageTitle>
+<PageTitle>Editar Modo de Disponibilização</PageTitle>
 
-<h1>Edit</h1>
-
-<h2>ModoDisponibilizacao</h2>
+<h1>Editar Modo de Disponibilização</h1>
 <hr/>
 @if (ModoDisponibilizacao is null) {
     <p>
-        <em>Loading...</em>
+        <em>A carregar...</em>
     </p>
 } else {
     <div class="row">
         <div class="col-md-4">
-            <EditForm method="post" Model="ModoDisponibilizacao" OnValidSubmit="UpdateModoDisponibilizacao" FormName="edit" Enhance>
+            <EditForm method="post" Model="ModoDisponibilizacao" OnValidSubmit="UpdateModoDisponibilizacao" FormName="edit">
                 <DataAnnotationsValidator/>
                 <ValidationSummary role="alert"/>
                 <input type="hidden" name="ModoDisponibilizacao.Id" value="@ModoDisponibilizacao.Id"/>
@@ -28,18 +26,18 @@
                     <ValidationMessage For="() => ModoDisponibilizacao.Nome" class="text-danger"/>
                 </div>
                 <div class="mb-3">
-                    <label for="descricao" class="form-label">Descricao:</label>
+                    <label for="descricao" class="form-label">Descrição:</label>
                     <InputText id="descricao" @bind-Value="ModoDisponibilizacao.Descricao" class="form-control"/>
                     <ValidationMessage For="() => ModoDisponibilizacao.Descricao" class="text-danger"/>
                 </div>
-                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="submit" class="btn btn-primary">Guardar</button>
             </EditForm>
         </div>
     </div>
 }
 
 <div>
-    <a href="/modosdisponibilizacao">Back to List</a>
+    <a href="/modosdisponibilizacao">Voltar à lista</a>
 </div>
 
 @code {

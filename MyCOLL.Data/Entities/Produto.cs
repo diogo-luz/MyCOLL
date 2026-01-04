@@ -68,11 +68,15 @@ public class Produto {
     public DateTime DataCriacao { get; set; } = DateTime.UtcNow;
 
     // FK - Fornecedor
-    [Required] public string FornecedorId { get; set; } = null!;
+    [Required(ErrorMessage = "O fornecedor é obrigatório.")]
+    public string FornecedorId { get; set; } = null!;
+
     [JsonIgnore] public ApplicationUser? Fornecedor { get; set; }
 
     // FK - TipoColecionavel
-    [Required] public int TipoColecionavelId { get; set; }
+    [Required(ErrorMessage = "O tipo de colecionável é obrigatório.")]
+    public int TipoColecionavelId { get; set; }
+
     public TipoColecionavel? TipoColecionavel { get; set; }
 
     // FK - Pais (opcional)
@@ -84,7 +88,9 @@ public class Produto {
     public Categoria? Categoria { get; set; }
 
     // FK - ModoDisponibilizacao
-    [Required] public int ModoDisponibilizacaoId { get; set; }
+    [Required(ErrorMessage = "O modo de disponibilização é obrigatório.")]
+    public int ModoDisponibilizacaoId { get; set; }
+
     public ModoDisponibilizacao? ModoDisponibilizacao { get; set; }
 
     // Navigation property

@@ -16,21 +16,19 @@ public class Encomenda {
     /// <summary>
     /// Pendente, Confirmada, Expedida, Entregue, Rejeitada
     /// </summary>
-    [Required]
+    [Required(ErrorMessage = "O estado é obrigatório.")]
     [StringLength(20)]
     public string Estado { get; set; } = "Pendente";
 
-    [Column(TypeName = "decimal(10,2)")]
-    public decimal Total { get; set; }
+    [Column(TypeName = "decimal(10,2)")] public decimal Total { get; set; }
 
-    [StringLength(500)]
-    public string? Observacoes { get; set; }
+    [StringLength(500)] public string? Observacoes { get; set; }
 
     // FK - Cliente
-    [Required]
+    [Required(ErrorMessage = "O cliente é obrigatório.")]
     public string ClienteId { get; set; } = null!;
-    [JsonIgnore]
-    public ApplicationUser? Cliente { get; set; }
+
+    [JsonIgnore] public ApplicationUser? Cliente { get; set; }
 
     // Navigation property
     public ICollection<ItemEncomenda>? Itens { get; set; }

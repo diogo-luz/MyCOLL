@@ -4,11 +4,9 @@
 @inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Create</PageTitle>
+<PageTitle>Criar País</PageTitle>
 
-<h1>Create</h1>
-
-<h2>Pais</h2>
+<h1>Criar País</h1>
 <hr/>
 <div class="row">
     <div class="col-md-4">
@@ -22,7 +20,7 @@
                 <ValidationMessage For="() => Pais.Nome" class="text-danger"/>
             </div>
             <div class="mb-3">
-                <label for="codigoiso" class="form-label">CodigoISO:</label>
+                <label for="codigoiso" class="form-label">Código ISO:</label>
                 <InputText id="codigoiso" @bind-Value="Pais.CodigoISO" class="form-control"/>
                 <ValidationMessage For="() => Pais.CodigoISO" class="text-danger"/>
             </div>
@@ -40,13 +38,13 @@
                 }
                 <ValidationMessage For="() => Pais.Bandeira" class="text-danger"/>
             </div>
-            <button type="submit" class="btn btn-primary">Create</button>
+            <button type="submit" class="btn btn-primary">Criar</button>
         </EditForm>
     </div>
 </div>
 
 <div>
-    <a href="/paises">Back to List</a>
+    <a href="/paises">Voltar à lista</a>
 </div>
 
 @code {

@@ -11,32 +11,31 @@
 <h1>Tipos de Colecionáveis</h1>
 
 <p>
-    <a href="tiposcolecionaveis/create">Create New</a>
+    <a href="tiposcolecionaveis/create">Criar novo tipo</a>
 </p>
 
 <QuickGrid Class="table" Items="context.TiposColecionaveis">
-    @*
-    Substituir a imagem por um preview da imagem
-    <PropertyColumn Property="categoria => categoria.Imagem" />
-    *@
-    <TemplateColumn Context="tipocolecionavel" Title="Imagem" Class="col-1">
-        @*Se nao for null e se tiver conteudo*@
-        @if (tipocolecionavel.Imagem is not null && tipocolecionavel.Imagem.Length > 0) {
-            <img src="@($"data:image/png;base64, {Convert.ToBase64String(tipocolecionavel.Imagem)}")" alt="@tipocolecionavel.Nome" style="max-width: 100px; max-height: 100px;"/>
+    <TemplateColumn Context="t" Title="Imagem" Class="col-1">
+        @if (t.Imagem is not null && t.Imagem.Length > 0) {
+            <img src="@($"data:image/png;base64, {Convert.ToBase64String(t.Imagem)}")" alt="@t.Nome" style="max-width: 100px; max-height: 100px;"/>
         } else {
             <img src="img/placeholderImg.png" alt="Sem imagem" style="max-width: 100px; max-height: 100px"/>
         }
     </TemplateColumn>
 
-    <PropertyColumn Property="tipocolecionavel => tipocolecionavel.Nome"/>
-    <PropertyColumn Property="tipocolecionavel => tipocolecionavel.Ordem"/>
-    @* <PropertyColumn Property="tipocolecionavel => tipocolecionavel.UrlImagem"/> *@
-    @* <PropertyColumn Property="tipocolecionavel => tipocolecionavel.Imagem"/> *@
+    <PropertyColumn Property="t => t.Nome" Title="Nome"/>
+    <PropertyColumn Property="t => t.Ordem" Title="Ordem"/>
 
-    <TemplateColumn Context="tipocolecionavel">
-        <a href="@($"tiposcolecionaveis/edit?id={tipocolecionavel.Id}")">Edit</a> |
-        <a href="@($"tiposcolecionaveis/details?id={tipocolecionavel.Id}")">Details</a> |
-        <a href="@($"tiposcolecionaveis/delete?id={tipocolecionavel.Id}")">Delete</a>
+    <TemplateColumn Context="t" Title="Ações">
+        <a href="@($"tiposcolecionaveis/edit?id={t.Id}")">
+            <i class="bi bi-pencil-square"></i>
+        </a> |
+        <a href="@($"tiposcolecionaveis/details?id={t.Id}")">
+            <i class="bi bi-eye-fill"></i>
+        </a> |
+        <a href="@($"tiposcolecionaveis/delete?id={t.Id}")">
+            <i class="bi bi-trash-fill"></i>
+        </a>
     </TemplateColumn>
 </QuickGrid>
 

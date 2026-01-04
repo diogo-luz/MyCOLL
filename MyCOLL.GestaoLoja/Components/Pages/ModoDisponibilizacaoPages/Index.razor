@@ -6,22 +6,28 @@
 @implements IAsyncDisposable
 @inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Modos de Disponibilização</PageTitle>
 
-<h1>Index</h1>
+<h1>Modos de Disponibilização</h1>
 
 <p>
-    <a href="modosdisponibilizacao/create">Create New</a>
+    <a href="modosdisponibilizacao/create">Criar novo modo</a>
 </p>
 
 <QuickGrid Class="table" Items="context.ModosDisponibilizacao">
-    <PropertyColumn Property="mododisponibilizacao => mododisponibilizacao.Nome"/>
-    <PropertyColumn Property="mododisponibilizacao => mododisponibilizacao.Descricao"/>
+    <PropertyColumn Property="m => m.Nome" Title="Nome"/>
+    <PropertyColumn Property="m => m.Descricao" Title="Descrição"/>
 
-    <TemplateColumn Context="mododisponibilizacao">
-        <a href="@($"modosdisponibilizacao/edit?id={mododisponibilizacao.Id}")">Edit</a> |
-        <a href="@($"modosdisponibilizacao/details?id={mododisponibilizacao.Id}")">Details</a> |
-        <a href="@($"modosdisponibilizacao/delete?id={mododisponibilizacao.Id}")">Delete</a>
+    <TemplateColumn Context="m" Title="Ações">
+        <a href="@($"modosdisponibilizacao/edit?id={m.Id}")">
+            <i class="bi bi-pencil-square"></i>
+        </a> |
+        <a href="@($"modosdisponibilizacao/details?id={m.Id}")">
+            <i class="bi bi-eye-fill"></i>
+        </a> |
+        <a href="@($"modosdisponibilizacao/delete?id={m.Id}")">
+            <i class="bi bi-trash-fill"></i>
+        </a>
     </TemplateColumn>
 </QuickGrid>
 

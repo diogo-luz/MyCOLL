@@ -4,15 +4,13 @@
 @inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Edit</PageTitle>
+<PageTitle>Editar Tipo de Colecionável</PageTitle>
 
-<h1>Edit</h1>
-
-<h2>TipoColecionavel</h2>
+<h1>Editar Tipo de Colecionável</h1>
 <hr/>
 @if (TipoColecionavel is null) {
     <p>
-        <em>Loading...</em>
+        <em>A carregar...</em>
     </p>
 } else {
     <div class="row">
@@ -33,7 +31,7 @@
                     <ValidationMessage For="() => TipoColecionavel.Ordem" class="text-danger"/>
                 </div>
                 <div class="mb-3">
-                    <label for="urlimagem" class="form-label">UrlImagem:</label>
+                    <label for="urlimagem" class="form-label">URL Imagem:</label>
                     <InputText id="urlimagem" @bind-Value="TipoColecionavel.UrlImagem" class="form-control"/>
                     <ValidationMessage For="() => TipoColecionavel.UrlImagem" class="text-danger"/>
                 </div>
@@ -51,14 +49,14 @@
                     }
                     <ValidationMessage For="() => TipoColecionavel.Imagem" class="text-danger"/>
                 </div>
-                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="submit" class="btn btn-primary">Guardar</button>
             </EditForm>
         </div>
     </div>
 }
 
 <div>
-    <a href="/tiposcolecionaveis">Back to List</a>
+    <a href="/tiposcolecionaveis">Voltar à lista</a>
 </div>
 
 @code {
