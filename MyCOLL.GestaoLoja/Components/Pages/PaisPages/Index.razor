@@ -4,47 +4,86 @@
 @using MyCOLL.Data.Entities
 @using MyCOLL.Data.Data
 @implements IAsyncDisposable
-@inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
 
 <PageTitle>Países</PageTitle>
 
-<h1>Países</h1>
-
-<p>
-    <a href="paises/create">Criar novo país</a>
-</p>
-
-<QuickGrid Class="table" Items="context.Paises">
-    <TemplateColumn Context="p" Title="Bandeira" Class="col-1">
-        @if (p.Bandeira is not null && p.Bandeira.Length > 0) {
-            <img src="@($"data:image/png;base64, {Convert.ToBase64String(p.Bandeira)}")" alt="@p.Nome" style="max-width: 100px; max-height: 100px;"/>
-        } else {
-            <img src="img/placeholderImg.png" alt="Sem imagem" style="max-width: 100px; max-height: 100px"/>
-        }
-    </TemplateColumn>
-
-    <PropertyColumn Property="p => p.Nome" Title="Nome"/>
-    <PropertyColumn Property="p => p.CodigoISO" Title="Código ISO"/>
-    <PropertyColumn Property="p => p.Ordem" Title="Ordem"/>
-
-    <TemplateColumn Context="p" Title="Ações">
-        <a href="@($"paises/edit?id={p.Id}")">
-            <i class="bi bi-pencil-square"></i>
-        </a> |
-        <a href="@($"paises/details?id={p.Id}")">
-            <i class="bi bi-eye-fill"></i>
-        </a> |
-        <a href="@($"paises/delete?id={p.Id}")">
-            <i class="bi bi-trash-fill"></i>
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-0">
+                <i class="bi bi-globe text-success"></i> Países
+            </h1>
+            <p class="text-muted mb-0">Gestão de países de origem</p>
+        </div>
+        <a href="paises/create" class="btn btn-success">
+            <i class="bi bi-plus-lg"></i> Novo País
         </a>
-    </TemplateColumn>
-</QuickGrid>
+    </div>
+
+    <!-- Stats -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card border-success h-100">
+                <div class="card-body text-center">
+                    <h3 class="text-success">@paises.Count</h3>
+                    <small class="text-muted">Total de Países</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="bi bi-table"></i> Lista de Países</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <QuickGrid Class="table table-hover mb-0" Items="paises.AsQueryable()">
+                    <TemplateColumn Context="p" Title="Bandeira" Class="col-1">
+                        @if (p.Bandeira is not null && p.Bandeira.Length > 0) {
+                            <img src="@($"data:image/png;base64, {Convert.ToBase64String(p.Bandeira)}")" alt="@p.Nome" class="rounded" style="max-width: 50px; max-height: 35px; object-fit: cover;"/>
+                        } else {
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 35px;">
+                                <i class="bi bi-flag text-muted"></i>
+                            </div>
+                        }
+                    </TemplateColumn>
+                    <PropertyColumn Property="p => p.Nome" Title="Nome"/>
+                    <TemplateColumn Context="p" Title="Código ISO">
+                        <span class="badge bg-primary">@p.CodigoISO</span>
+                    </TemplateColumn>
+                    <TemplateColumn Context="p" Title="Ordem">
+                        <span class="badge bg-secondary">@p.Ordem</span>
+                    </TemplateColumn>
+                    <TemplateColumn Context="p" Title="Ações">
+                        <div class="btn-group btn-group-sm">
+                            <a href="@($"paises/edit?id={p.Id}")" class="btn btn-outline-primary" title="Editar">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <a href="@($"paises/details?id={p.Id}")" class="btn btn-outline-info" title="Detalhes">
+                                <i class="bi bi-eye-fill"></i>
+                            </a>
+                            <a href="@($"paises/delete?id={p.Id}")" class="btn btn-outline-danger" title="Eliminar">
+                                <i class="bi bi-trash-fill"></i>
+                            </a>
+                        </div>
+                    </TemplateColumn>
+                </QuickGrid>
+            </div>
+        </div>
+    </div>
+</div>
 
 @code {
     private ApplicationDbContext context = default!;
+    private List<Pais> paises = new();
 
-    protected override void OnInitialized() {
+    protected override async Task OnInitializedAsync() {
         context = DbFactory.CreateDbContext();
+        paises = await context.Paises.OrderBy(p => p.Ordem).ToListAsync();
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();

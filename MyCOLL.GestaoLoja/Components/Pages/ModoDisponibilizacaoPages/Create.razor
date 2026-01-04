@@ -1,42 +1,67 @@
 @page "/modosdisponibilizacao/create"
 @using Microsoft.EntityFrameworkCore
 @using MyCOLL.Data.Entities
-@inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
+@using MyCOLL.Data.Data
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
 <PageTitle>Criar Modo de Disponibilização</PageTitle>
 
-<h1>Criar Modo de Disponibilização</h1>
-<hr/>
-<div class="row">
-    <div class="col-md-4">
-        <EditForm method="post" Model="ModoDisponibilizacao" OnValidSubmit="AddModoDisponibilizacao" FormName="create">
-            <DataAnnotationsValidator/>
-            <ValidationSummary class="text-danger" role="alert"/>
-            <div class="mb-3">
-                <span class="text-danger">*</span>
-                <label for="nome" class="form-label">Nome:</label>
-                <InputText id="nome" @bind-Value="ModoDisponibilizacao.Nome" class="form-control" aria-required="true"/>
-                <ValidationMessage For="() => ModoDisponibilizacao.Nome" class="text-danger"/>
-            </div>
-            <div class="mb-3">
-                <label for="descricao" class="form-label">Descrição:</label>
-                <InputText id="descricao" @bind-Value="ModoDisponibilizacao.Descricao" class="form-control"/>
-                <ValidationMessage For="() => ModoDisponibilizacao.Descricao" class="text-danger"/>
-            </div>
-            <button type="submit" class="btn btn-primary">Criar</button>
-        </EditForm>
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-0">
+                <i class="bi bi-plus-circle text-success"></i> Novo Modo de Disponibilização
+            </h1>
+            <p class="text-muted mb-0">Adicionar um novo modo</p>
+        </div>
+        <a href="/modosdisponibilizacao" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
     </div>
-</div>
 
-<div>
-    <a href="/modosdisponibilizacao">Voltar à lista</a>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="bi bi-pencil"></i> Dados do Modo</h5>
+                </div>
+                <div class="card-body">
+                    <EditForm method="post" Model="ModoDisponibilizacao" OnValidSubmit="AddModoDisponibilizacao" FormName="create">
+                        <DataAnnotationsValidator/>
+                        <ValidationSummary class="alert alert-danger" role="alert"/>
+
+                        <div class="mb-3">
+                            <label for="nome" class="form-label">Nome: <span class="text-danger">*</span></label>
+                            <InputText id="nome" @bind-Value="ModoDisponibilizacao.Nome" class="form-control" placeholder="Nome do modo"/>
+                            <ValidationMessage For="() => ModoDisponibilizacao.Nome" class="text-danger"/>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="descricao" class="form-label">Descrição:</label>
+                            <InputText id="descricao" @bind-Value="ModoDisponibilizacao.Descricao" class="form-control" placeholder="Descrição do modo"/>
+                        </div>
+
+                        <hr/>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-lg"></i> Criar Modo
+                            </button>
+                            <a href="/modosdisponibilizacao" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg"></i> Cancelar
+                            </a>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @code {
     [SupplyParameterFromForm] private ModoDisponibilizacao ModoDisponibilizacao { get; set; } = new();
 
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddModoDisponibilizacao() {
         using var context = DbFactory.CreateDbContext();
         context.ModosDisponibilizacao.Add(ModoDisponibilizacao);

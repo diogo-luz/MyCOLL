@@ -6,48 +6,118 @@
 
 <PageTitle>Utilizadores</PageTitle>
 
-<h1>Gestão de Utilizadores</h1>
-
-<p>
-    <a href="utilizadores/create">Criar novo utilizador</a>
-</p>
-
-<QuickGrid Class="table" Items="utilizadores.AsQueryable()">
-    <TemplateColumn Context="u" Title="Foto" Class="col-1">
-        @if (u.Fotografia is not null && u.Fotografia.Length > 0) {
-            <img src="@($"data:image/png;base64, {Convert.ToBase64String(u.Fotografia)}")" alt="@u.Nome" style="max-width: 50px; max-height: 50px; border-radius: 50%;"/>
-        } else {
-            <i class="bi bi-person-circle" style="font-size: 2rem;"></i>
-        }
-    </TemplateColumn>
-    <PropertyColumn Property="u => u.Nome" Title="Nome"/>
-    <PropertyColumn Property="u => u.Apelido" Title="Apelido"/>
-    <PropertyColumn Property="u => u.Email" Title="Email"/>
-    <PropertyColumn Property="u => u.TipoUtilizador" Title="Tipo"/>
-    <TemplateColumn Context="u" Title="Activo">
-        @if (u.Activo) {
-            <span class="badge bg-success">Activo</span>
-        } else {
-            <span class="badge bg-warning">Inactivo</span>
-        }
-    </TemplateColumn>
-    <TemplateColumn Context="u" Title="Roles">
-        @if (userRoles.ContainsKey(u.Id)) {
-            @string.Join(", ", userRoles[u.Id])
-        }
-    </TemplateColumn>
-    <TemplateColumn Context="u" Title="Ações">
-        <a href="@($"utilizadores/edit?id={u.Id}")">
-            <i class="bi bi-pencil-square"></i>
-        </a> |
-        <a href="@($"utilizadores/details?id={u.Id}")">
-            <i class="bi bi-eye-fill"></i>
-        </a> |
-        <a href="@($"utilizadores/delete?id={u.Id}")">
-            <i class="bi bi-trash-fill"></i>
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-0">
+                <i class="bi bi-people text-primary"></i> Utilizadores
+            </h1>
+            <p class="text-muted mb-0">Gestão de utilizadores do sistema</p>
+        </div>
+        <a href="utilizadores/create" class="btn btn-primary">
+            <i class="bi bi-person-plus"></i> Novo Utilizador
         </a>
-    </TemplateColumn>
-</QuickGrid>
+    </div>
+
+    <!-- Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-primary h-100">
+                <div class="card-body text-center">
+                    <h3 class="text-primary">@utilizadores.Count</h3>
+                    <small class="text-muted">Total</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-success h-100">
+                <div class="card-body text-center">
+                    <h3 class="text-success">@utilizadores.Count(u => u.Activo)</h3>
+                    <small class="text-muted">Activos</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-info h-100">
+                <div class="card-body text-center">
+                    <h3 class="text-info">@utilizadores.Count(u => u.TipoUtilizador == "Cliente")</h3>
+                    <small class="text-muted">Clientes</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-warning h-100">
+                <div class="card-body text-center">
+                    <h3 class="text-warning">@utilizadores.Count(u => u.TipoUtilizador == "Fornecedor")</h3>
+                    <small class="text-muted">Fornecedores</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="bi bi-table"></i> Lista de Utilizadores</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <QuickGrid Class="table table-hover mb-0" Items="utilizadores.AsQueryable()">
+                    <TemplateColumn Context="u" Title="Foto" Class="col-1">
+                        @if (u.Fotografia is not null && u.Fotografia.Length > 0) {
+                            <img src="@($"data:image/png;base64, {Convert.ToBase64String(u.Fotografia)}")" alt="@u.Nome" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;"/>
+                        } else {
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="bi bi-person"></i>
+                            </div>
+                        }
+                    </TemplateColumn>
+                    <TemplateColumn Context="u" Title="Nome">
+                        <strong>@u.Nome @u.Apelido</strong>
+                    </TemplateColumn>
+                    <PropertyColumn Property="u => u.Email" Title="Email"/>
+                    <TemplateColumn Context="u" Title="Tipo">
+                        @if (u.TipoUtilizador == "Cliente") {
+                            <span class="badge bg-info">Cliente</span>
+                        } else if (u.TipoUtilizador == "Fornecedor") {
+                            <span class="badge bg-warning">Fornecedor</span>
+                        } else {
+                            <span class="badge bg-secondary">@u.TipoUtilizador</span>
+                        }
+                    </TemplateColumn>
+                    <TemplateColumn Context="u" Title="Estado">
+                        @if (u.Activo) {
+                            <span class="badge bg-success">Activo</span>
+                        } else {
+                            <span class="badge bg-danger">Inactivo</span>
+                        }
+                    </TemplateColumn>
+                    <TemplateColumn Context="u" Title="Roles">
+                        @if (userRoles.ContainsKey(u.Id)) {
+                            @foreach (var role in userRoles[u.Id]) {
+                                <span class="badge bg-primary me-1">@role</span>
+                            }
+                        }
+                    </TemplateColumn>
+                    <TemplateColumn Context="u" Title="Ações">
+                        <div class="btn-group btn-group-sm">
+                            <a href="@($"utilizadores/edit?id={u.Id}")" class="btn btn-outline-primary" title="Editar">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <a href="@($"utilizadores/details?id={u.Id}")" class="btn btn-outline-info" title="Detalhes">
+                                <i class="bi bi-eye-fill"></i>
+                            </a>
+                            <a href="@($"utilizadores/delete?id={u.Id}")" class="btn btn-outline-danger" title="Eliminar">
+                                <i class="bi bi-trash-fill"></i>
+                            </a>
+                        </div>
+                    </TemplateColumn>
+                </QuickGrid>
+            </div>
+        </div>
+    </div>
+</div>
 
 @code {
     private List<ApplicationUser> utilizadores = new();
@@ -56,11 +126,11 @@
     protected override async Task OnInitializedAsync() {
         using var context = DbFactory.CreateDbContext();
         utilizadores = await context.Users.OrderBy(u => u.Nome).ToListAsync();
-        
-        // Get roles for each user
+
         foreach (var user in utilizadores) {
             var roles = await UserManager.GetRolesAsync(user);
             userRoles[user.Id] = roles.ToList();
         }
     }
+
 }

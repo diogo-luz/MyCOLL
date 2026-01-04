@@ -7,57 +7,168 @@
 
 <PageTitle>Detalhes Produto</PageTitle>
 
-<h1>Detalhes do Produto</h1>
-
-<div>
-    <hr/>
+<div class="container-fluid">
     @if (produto is null) {
-        <p>
-            <em>A carregar...</em>
-        </p>
-    } else {
-        <div class="row">
-            <div class="col-md-3">
-                @if (produto.Imagem is not null && produto.Imagem.Length > 0) {
-                    <img src="@($"data:image/png;base64, {Convert.ToBase64String(produto.Imagem)}")" alt="@produto.Nome" style="max-width: 100px; max-height: 100px;"/>
-                } else {
-                    <img src="img/placeholderImg.png" alt="Sem imagem" style="max-width: 100px; max-height: 100px"/>
-                }
-            </div>
-            <div class="col-md-9">
-                <dl class="row">
-                    <dt class="col-sm-3">Stock</dt>
-                    <dd class="col-sm-9">@produto.Stock</dd>
-                    <dt class="col-sm-3">Para Venda</dt>
-                    <dd class="col-sm-9">@(produto.ParaVenda ? "Sim" : "Não")</dd>
-                    <dt class="col-sm-3">Activo</dt>
-                    <dd class="col-sm-9">@(produto.Activo ? "Sim" : "Não")</dd>
-                    <dt class="col-sm-3">Estado</dt>
-                    <dd class="col-sm-9">@produto.Estado</dd>
-                    <dt class="col-sm-3">Ano</dt>
-                    <dd class="col-sm-9">@produto.Ano</dd>
-                    <dt class="col-sm-3">Data Criação</dt>
-                    <dd class="col-sm-9">@produto.DataCriacao.ToString("dd/MM/yyyy")</dd>
-                </dl>
-                <hr/>
-                <dl class="row">
-                    <dt class="col-sm-3">Tipo Colecionável</dt>
-                    <dd class="col-sm-9">@produto.TipoColecionavel?.Nome</dd>
-                    <dt class="col-sm-3">Categoria</dt>
-                    <dd class="col-sm-9">@produto.Categoria?.Nome</dd>
-                    <dt class="col-sm-3">País</dt>
-                    <dd class="col-sm-9">@produto.Pais?.Nome</dd>
-                    <dt class="col-sm-3">Modo Disponibilização</dt>
-                    <dd class="col-sm-9">@produto.ModoDisponibilizacao?.Nome</dd>
-                    <dt class="col-sm-3">Fornecedor</dt>
-                    <dd class="col-sm-9">@produto.Fornecedor?.Nome @produto.Fornecedor?.Apelido (@produto.Fornecedor?.Email)</dd>
-                </dl>
+        <div class="d-flex justify-content-center align-items-center" style="min-height: 400px;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">A carregar...</span>
             </div>
         </div>
-        <hr/>
-        <div>
-            <a href="@($"/produtos/edit?id={produto.Id}")">Editar</a> |
-            <a href="/produtos">Voltar à lista</a>
+    } else {
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="mb-0">
+                    <i class="bi bi-box-seam text-primary"></i> @produto.Nome
+                </h1>
+                <p class="text-muted mb-0">Detalhes do produto</p>
+            </div>
+            <div class="btn-group">
+                <a href="@($"/produtos/edit?id={produto.Id}")" class="btn btn-primary">
+                    <i class="bi bi-pencil"></i> Editar
+                </a>
+                <a href="/produtos" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Imagem e Info Principal -->
+            <div class="col-lg-4 mb-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        @if (produto.Imagem is not null && produto.Imagem.Length > 0) {
+                            <img src="@($"data:image/png;base64, {Convert.ToBase64String(produto.Imagem)}")"
+                                 alt="@produto.Nome" class="img-fluid rounded mb-3" style="max-height: 250px;"/>
+                        } else {
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center mb-3" style="height: 200px;">
+                                <i class="bi bi-image text-muted" style="font-size: 4rem;"></i>
+                            </div>
+                        }
+                        <h4>@produto.Nome</h4>
+                        <p class="text-muted">@produto.Descricao</p>
+
+                        <div class="d-flex justify-content-center gap-2 mb-3">
+                            @if (produto.Estado == "Novo") {
+                                <span class="badge bg-success fs-6">@produto.Estado</span>
+                            } else if (produto.Estado == "Como Novo") {
+                                <span class="badge bg-info fs-6">@produto.Estado</span>
+                            } else if (produto.Estado == "Usado") {
+                                <span class="badge bg-warning fs-6">@produto.Estado</span>
+                            } else {
+                                <span class="badge bg-secondary fs-6">@produto.Estado</span>
+                            }
+
+                            @if (produto.Activo) {
+                                <span class="badge bg-success fs-6">Activo</span>
+                            } else {
+                                <span class="badge bg-danger fs-6">Inactivo</span>
+                            }
+                        </div>
+
+                        <h2 class="text-success mb-0">@produto.PrecoFinal.ToString("C")</h2>
+                        <small class="text-muted">Preço Base: @produto.PrecoBase.ToString("C") + @produto.Percentagem%</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detalhes -->
+            <div class="col-lg-8">
+                <div class="row">
+                    <!-- Info Geral -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="bi bi-info-circle text-primary"></i> Informações</h6>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-sm table-borderless mb-0">
+                                    <tbody>
+                                    <tr>
+                                        <td class="text-muted">Stock</td>
+                                        <td class="fw-bold">
+                                            @if (produto.Stock > 10) {
+                                                <span class="badge bg-success">@produto.Stock unidades</span>
+                                            } else if (produto.Stock > 0) {
+                                                <span class="badge bg-warning">@produto.Stock unidades</span>
+                                            } else {
+                                                <span class="badge bg-danger">Esgotado</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Para Venda</td>
+                                        <td>@(produto.ParaVenda ? "✅ Sim" : "❌ Não")</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Ano</td>
+                                        <td>@(produto.Ano > 0 ? produto.Ano.ToString() : "N/A")</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Data Criação</td>
+                                        <td>@produto.DataCriacao.ToString("dd/MM/yyyy")</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Classificação -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="bi bi-tags text-info"></i> Classificação</h6>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-sm table-borderless mb-0">
+                                    <tbody>
+                                    <tr>
+                                        <td class="text-muted">Tipo</td>
+                                        <td>
+                                            <span class="badge bg-info">@produto.TipoColecionavel?.Nome</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Categoria</td>
+                                        <td>@(produto.Categoria?.Nome ?? "N/A")</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">País</td>
+                                        <td>@(produto.Pais?.Nome ?? "N/A")</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Modo</td>
+                                        <td>@produto.ModoDisponibilizacao?.Nome</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fornecedor -->
+                    <div class="col-12">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="bi bi-person text-warning"></i> Fornecedor</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                        <i class="bi bi-person-fill fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">@produto.Fornecedor?.Nome @produto.Fornecedor?.Apelido</h6>
+                                        <small class="text-muted">@produto.Fornecedor?.Email</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     }
 </div>

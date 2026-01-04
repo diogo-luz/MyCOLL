@@ -6,28 +6,76 @@
 
 <PageTitle>Eliminar Utilizador</PageTitle>
 
-<h1>Eliminar Utilizador</h1>
-
-<p class="text-danger"><strong>Tem a certeza que pretende eliminar este utilizador?</strong></p>
-<div>
-    <hr/>
+<div class="container-fluid">
     @if (utilizador is null) {
-        <p><em>A carregar...</em></p>
+        <div class="d-flex justify-content-center align-items-center" style="min-height: 400px;">
+            <div class="spinner-border text-danger" role="status">
+                <span class="visually-hidden">A carregar...</span>
+            </div>
+        </div>
     } else {
-        <dl class="row">
-            <dt class="col-sm-2">Nome</dt>
-            <dd class="col-sm-10">@utilizador.Nome @utilizador.Apelido</dd>
-            <dt class="col-sm-2">Email</dt>
-            <dd class="col-sm-10">@utilizador.Email</dd>
-            <dt class="col-sm-2">Tipo</dt>
-            <dd class="col-sm-10">@utilizador.TipoUtilizador</dd>
-            <dt class="col-sm-2">Roles</dt>
-            <dd class="col-sm-10">@string.Join(", ", userRoles)</dd>
-        </dl>
-        <EditForm method="post" Model="utilizador" OnValidSubmit="DeleteUtilizador" FormName="delete">
-            <button type="submit" class="btn btn-danger" disabled="@(utilizador is null)">Eliminar</button> |
-            <a href="/utilizadores">Cancelar</a>
-        </EditForm>
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="mb-0 text-danger">
+                    <i class="bi bi-exclamation-triangle"></i> Eliminar Utilizador
+                </h1>
+                <p class="text-muted mb-0">Esta ação não pode ser revertida</p>
+            </div>
+            <a href="/utilizadores" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-5">
+                <div class="card border-danger shadow-sm">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0"><i class="bi bi-trash"></i> Confirmar Eliminação</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <strong>Atenção!</strong> Tem a certeza que pretende eliminar este utilizador?
+                        </div>
+
+                        @if (utilizador.Fotografia is not null && utilizador.Fotografia.Length > 0) {
+                            <img src="@($"data:image/png;base64, {Convert.ToBase64String(utilizador.Fotografia)}")" class="rounded-circle mb-3" style="width: 80px; height: 80px; object-fit: cover;"/>
+                        } else {
+                            <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                <i class="bi bi-person-fill fs-2"></i>
+                            </div>
+                        }
+
+                        <h5>@utilizador.Nome @utilizador.Apelido</h5>
+                        <p class="text-muted">@utilizador.Email</p>
+
+                        <div class="mb-3">
+                            @if (utilizador.TipoUtilizador == "Cliente") {
+                                <span class="badge bg-info">Cliente</span>
+                            } else if (utilizador.TipoUtilizador == "Fornecedor") {
+                                <span class="badge bg-warning">Fornecedor</span>
+                            }
+                            @foreach (var role in userRoles) {
+                                <span class="badge bg-primary">@role</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light">
+                        <EditForm method="post" Model="utilizador" OnValidSubmit="DeleteUtilizador" FormName="delete">
+                            <div class="d-flex gap-2 justify-content-center">
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="bi bi-trash"></i> Sim, Eliminar
+                                </button>
+                                <a href="/utilizadores" class="btn btn-outline-secondary">
+                                    <i class="bi bi-x-lg"></i> Cancelar
+                                </a>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
     }
 </div>
 
@@ -42,7 +90,7 @@
             NavigationManager.NavigateTo("notfound");
             return;
         }
-        
+
         using var context = DbFactory.CreateDbContext();
         utilizador = await context.Users.FirstOrDefaultAsync(u => u.Id == Id);
 
@@ -50,18 +98,19 @@
             NavigationManager.NavigateTo("notfound");
             return;
         }
-        
+
         userRoles = await UserManager.GetRolesAsync(utilizador);
     }
 
     private async Task DeleteUtilizador() {
         if (utilizador is null) return;
-        
+
         var userToDelete = await UserManager.FindByIdAsync(utilizador.Id);
         if (userToDelete is not null) {
             await UserManager.DeleteAsync(userToDelete);
         }
-        
+
         NavigationManager.NavigateTo("/utilizadores");
     }
+
 }

@@ -7,30 +7,95 @@
 
 <PageTitle>Detalhes Encomenda</PageTitle>
 
-<h1>Detalhes da Encomenda</h1>
-
-<div>
-    <hr/>
+<div class="container-fluid">
     @if (encomenda is null) {
-        <p>
-            <em>A carregar...</em>
-        </p>
+        <div class="d-flex justify-content-center align-items-center" style="min-height: 400px;">
+            <div class="spinner-border text-success" role="status">
+                <span class="visually-hidden">A carregar...</span>
+            </div>
+        </div>
     } else {
-        <dl class="row">
-            <dt class="col-sm-2">Data Encomenda</dt>
-            <dd class="col-sm-10">@encomenda.DataEncomenda.ToString("dd/MM/yyyy")</dd>
-            <dt class="col-sm-2">Estado</dt>
-            <dd class="col-sm-10">@encomenda.Estado</dd>
-            <dt class="col-sm-2">Total</dt>
-            <dd class="col-sm-10">@encomenda.Total.ToString("C")</dd>
-            <dt class="col-sm-2">Observações</dt>
-            <dd class="col-sm-10">@encomenda.Observacoes</dd>
-            <dt class="col-sm-2">Cliente</dt>
-            <dd class="col-sm-10">@encomenda.Cliente?.Nome @encomenda.Cliente?.Apelido (@encomenda.Cliente?.Email)</dd>
-        </dl>
-        <div>
-            <a href="@($"/encomendas/edit?id={encomenda.Id}")">Editar</a> |
-            <a href="/encomendas">Voltar à lista</a>
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="mb-0">
+                    <i class="bi bi-cart-check text-success"></i> Encomenda #@encomenda.Id
+                </h1>
+                <p class="text-muted mb-0">Detalhes da encomenda</p>
+            </div>
+            <div class="btn-group">
+                <a href="@($"/encomendas/edit?id={encomenda.Id}")" class="btn btn-primary">
+                    <i class="bi bi-pencil"></i> Editar
+                </a>
+                <a href="/encomendas" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Info Principal -->
+            <div class="col-lg-4 mb-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            @if (encomenda.Estado == "Pendente") {
+                                <span class="badge bg-warning fs-4 p-3">Pendente</span>
+                            } else if (encomenda.Estado == "Confirmada") {
+                                <span class="badge bg-info fs-4 p-3">Confirmada</span>
+                            } else if (encomenda.Estado == "Expedida") {
+                                <span class="badge bg-primary fs-4 p-3">Expedida</span>
+                            } else if (encomenda.Estado == "Entregue") {
+                                <span class="badge bg-success fs-4 p-3">Entregue</span>
+                            } else if (encomenda.Estado == "Cancelada") {
+                                <span class="badge bg-danger fs-4 p-3">Cancelada</span>
+                            } else {
+                                <span class="badge bg-secondary fs-4 p-3">@encomenda.Estado</span>
+                            }
+                        </div>
+                        <h2 class="text-success mb-0">@encomenda.Total.ToString("C")</h2>
+                        <small class="text-muted">@encomenda.DataEncomenda.ToString("dd/MM/yyyy HH:mm")</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cliente -->
+            <div class="col-lg-4 mb-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0"><i class="bi bi-person text-primary"></i> Cliente</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                <i class="bi bi-person-fill fs-4"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">@encomenda.Cliente?.Nome @encomenda.Cliente?.Apelido</h6>
+                                <small class="text-muted">@encomenda.Cliente?.Email</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Observações -->
+            <div class="col-lg-4 mb-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0"><i class="bi bi-chat-dots text-info"></i> Observações</h6>
+                    </div>
+                    <div class="card-body">
+                        @if (!string.IsNullOrEmpty(encomenda.Observacoes)) {
+                            <p class="mb-0">@encomenda.Observacoes</p>
+                        } else {
+                            <p class="text-muted mb-0">
+                                <em>Sem observações</em>
+                            </p>
+                        }
+                    </div>
+                </div>
+            </div>
         </div>
     }
 </div>

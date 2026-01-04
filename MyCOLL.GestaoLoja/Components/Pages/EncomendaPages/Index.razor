@@ -8,33 +8,109 @@
 
 <PageTitle>Encomendas</PageTitle>
 
-<h1>Encomendas</h1>
-
-@* <p>
-    <a href="encomendas/create">Criar nova encomenda</a>
-</p> *@
-
-<QuickGrid Class="table" Items="encomendas.AsQueryable()">
-    <PropertyColumn Property="e => e.DataEncomenda" Title="Data"/>
-    <PropertyColumn Property="e => e.Estado" Title="Estado"/>
-    <PropertyColumn Property="e => e.Total" Title="Total (€)"/>
-    <TemplateColumn Context="e" Title="Cliente">
-        @(e.Cliente?.Nome) @(e.Cliente?.Apelido)
-    </TemplateColumn>
-    <PropertyColumn Property="e => e.Observacoes" Title="Observações"/>
-
-    <TemplateColumn Context="encomenda" Title="Ações">
-        <a href="@($"encomendas/edit?id={encomenda.Id}")">
-            <i class="bi bi-pencil-square"></i>
-        </a> |
-        <a href="@($"encomendas/details?id={encomenda.Id}")">
-            <i class="bi bi-eye-fill"></i>
-        </a> |
-        <a href="@($"encomendas/delete?id={encomenda.Id}")">
-            <i class="bi bi-trash-fill"></i>
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-0">
+                <i class="bi bi-cart-check text-success"></i> Encomendas
+            </h1>
+            <p class="text-muted mb-0">Gestão de encomendas de clientes</p>
+        </div>
+        <a href="encomendas/create" class="btn btn-success">
+            <i class="bi bi-plus-lg"></i> Nova Encomenda
         </a>
-    </TemplateColumn>
-</QuickGrid>
+    </div>
+
+    <!-- Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-primary h-100">
+                <div class="card-body text-center">
+                    <h3 class="text-primary">@encomendas.Count</h3>
+                    <small class="text-muted">Total</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-warning h-100">
+                <div class="card-body text-center">
+                    <h3 class="text-warning">@encomendas.Count(e => e.Estado == "Pendente")</h3>
+                    <small class="text-muted">Pendentes</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-info h-100">
+                <div class="card-body text-center">
+                    <h3 class="text-info">@encomendas.Count(e => e.Estado == "Confirmada" || e.Estado == "Expedida")</h3>
+                    <small class="text-muted">Em Processamento</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-success h-100">
+                <div class="card-body text-center">
+                    <h3 class="text-success">@encomendas.Where(e => e.Estado == "Entregue").Sum(e => e.Total).ToString("C")</h3>
+                    <small class="text-muted">Total Entregue</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="bi bi-table"></i> Lista de Encomendas</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <QuickGrid Class="table table-hover mb-0" Items="encomendas.AsQueryable()">
+                    <TemplateColumn Context="e" Title="ID">
+                        <span class="badge bg-secondary">#@e.Id</span>
+                    </TemplateColumn>
+                    <TemplateColumn Context="e" Title="Data">
+                        @e.DataEncomenda.ToString("dd/MM/yyyy")
+                    </TemplateColumn>
+                    <TemplateColumn Context="e" Title="Cliente">
+                        @e.Cliente?.Nome @e.Cliente?.Apelido
+                    </TemplateColumn>
+                    <TemplateColumn Context="e" Title="Total">
+                        <span class="fw-bold text-success">@e.Total.ToString("C")</span>
+                    </TemplateColumn>
+                    <TemplateColumn Context="e" Title="Estado">
+                        @if (e.Estado == "Pendente") {
+                            <span class="badge bg-warning">@e.Estado</span>
+                        } else if (e.Estado == "Confirmada") {
+                            <span class="badge bg-info">@e.Estado</span>
+                        } else if (e.Estado == "Expedida") {
+                            <span class="badge bg-primary">@e.Estado</span>
+                        } else if (e.Estado == "Entregue") {
+                            <span class="badge bg-success">@e.Estado</span>
+                        } else if (e.Estado == "Rejeitada") {
+                            <span class="badge bg-danger">@e.Estado</span>
+                        } else {
+                            <span class="badge bg-secondary">@e.Estado</span>
+                        }
+                    </TemplateColumn>
+                    <TemplateColumn Context="e" Title="Ações">
+                        <div class="btn-group btn-group-sm">
+                            <a href="@($"encomendas/edit?id={e.Id}")" class="btn btn-outline-primary" title="Editar">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <a href="@($"encomendas/details?id={e.Id}")" class="btn btn-outline-info" title="Detalhes">
+                                <i class="bi bi-eye-fill"></i>
+                            </a>
+                            <a href="@($"encomendas/delete?id={e.Id}")" class="btn btn-outline-danger" title="Eliminar">
+                                <i class="bi bi-trash-fill"></i>
+                            </a>
+                        </div>
+                    </TemplateColumn>
+                </QuickGrid>
+            </div>
+        </div>
+    </div>
+</div>
 
 @code {
     private ApplicationDbContext context = default!;
@@ -42,7 +118,10 @@
 
     protected override async Task OnInitializedAsync() {
         context = DbFactory.CreateDbContext();
-        encomendas = await context.Encomendas.Include(e => e.Cliente).ToListAsync();
+        encomendas = await context.Encomendas
+            .Include(e => e.Cliente)
+            .OrderByDescending(e => e.DataEncomenda)
+            .ToListAsync();
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();

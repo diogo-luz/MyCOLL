@@ -6,95 +6,148 @@
 
 <PageTitle>Criar Utilizador</PageTitle>
 
-<h1>Criar Utilizador</h1>
-<hr/>
-
-<div class="row">
-    <div class="col-md-6">
-        <EditForm Model="modelo" OnValidSubmit="CreateUtilizador" FormName="create">
-            <DataAnnotationsValidator/>
-            <ValidationSummary class="text-danger" role="alert"/>
-            
-            @if (!string.IsNullOrEmpty(errorMessage)) {
-                <div class="alert alert-danger">@errorMessage</div>
-            }
-            
-            <div class="mb-3">
-                <span class="text-danger">*</span>
-                <label for="nome" class="form-label">Nome:</label>
-                <InputText id="nome" @bind-Value="modelo.Nome" class="form-control" aria-required="true"/>
-            </div>
-            <div class="mb-3">
-                <label for="apelido" class="form-label">Apelido:</label>
-                <InputText id="apelido" @bind-Value="modelo.Apelido" class="form-control"/>
-            </div>
-            <div class="mb-3">
-                <span class="text-danger">*</span>
-                <label for="email" class="form-label">Email:</label>
-                <InputText id="email" @bind-Value="modelo.Email" class="form-control" aria-required="true"/>
-            </div>
-            <div class="mb-3">
-                <span class="text-danger">*</span>
-                <label for="password" class="form-label">Password:</label>
-                <InputText id="password" @bind-Value="modelo.Password" class="form-control" type="password" aria-required="true"/>
-                <small class="text-muted">Mínimo 6 caracteres, pelo menos uma maiúscula e um número.</small>
-            </div>
-            <div class="mb-3">
-                <label for="nif" class="form-label">NIF:</label>
-                <InputNumber id="nif" @bind-Value="modelo.NIF" class="form-control"/>
-            </div>
-            <div class="mb-3">
-                <label for="rua" class="form-label">Rua:</label>
-                <InputText id="rua" @bind-Value="modelo.Rua" class="form-control"/>
-            </div>
-            <div class="mb-3">
-                <label for="codigopostal" class="form-label">Código Postal:</label>
-                <InputText id="codigopostal" @bind-Value="modelo.CodigoPostal" class="form-control"/>
-            </div>
-            <div class="mb-3">
-                <label for="localidade" class="form-label">Localidade:</label>
-                <InputText id="localidade" @bind-Value="modelo.Localidade" class="form-control"/>
-            </div>
-            <div class="mb-3">
-                <label for="pais" class="form-label">País:</label>
-                <InputText id="pais" @bind-Value="modelo.Pais" class="form-control"/>
-            </div>
-            <div class="mb-3">
-                <label for="tipo" class="form-label">Tipo de Utilizador:</label>
-                <InputSelect id="tipo" class="form-select" @bind-Value="modelo.TipoUtilizador">
-                    <option value="">Escolha um tipo</option>
-                    <option value="Cliente">Cliente</option>
-                    <option value="Fornecedor">Fornecedor</option>
-                </InputSelect>
-            </div>
-            <div class="mb-3 form-check">
-                <InputCheckbox id="activo" @bind-Value="modelo.Activo" class="form-check-input"/>
-                <label for="activo" class="form-check-label">Conta Activa</label>
-            </div>
-            <div class="mb-3 form-check">
-                <InputCheckbox id="emailConfirmed" @bind-Value="modelo.EmailConfirmed" class="form-check-input"/>
-                <label for="emailConfirmed" class="form-check-label">Email Confirmado</label>
-            </div>
-            
-            <h4 class="mt-4">Roles</h4>
-            <div class="mb-3">
-                @foreach (var role in todasRoles) {
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="role_@role" 
-                               checked="@selectedRoles.Contains(role)"
-                               @onchange="@(e => ToggleRole(role, (bool)e.Value!))"/>
-                        <label class="form-check-label" for="role_@role">@role</label>
-                    </div>
-                }
-            </div>
-            
-            <button type="submit" class="btn btn-primary">Criar</button>
-        </EditForm>
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-0">
+                <i class="bi bi-person-plus text-success"></i> Novo Utilizador
+            </h1>
+            <p class="text-muted mb-0">Adicionar um novo utilizador ao sistema</p>
+        </div>
+        <a href="/utilizadores" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
     </div>
-</div>
 
-<div class="mt-3">
-    <a href="/utilizadores">Voltar à lista</a>
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="bi bi-person"></i> Dados do Utilizador</h5>
+                </div>
+                <div class="card-body">
+                    <EditForm Model="modelo" OnValidSubmit="CreateUtilizador" FormName="create">
+                        <DataAnnotationsValidator/>
+                        <ValidationSummary class="alert alert-danger" role="alert"/>
+
+                        @if (!string.IsNullOrEmpty(errorMessage)) {
+                            <div class="alert alert-danger">@errorMessage</div>
+                        }
+
+                        <div class="row">
+                            <!-- Dados Pessoais -->
+                            <div class="col-md-6">
+                                <h6 class="text-muted mb-3"><i class="bi bi-person-vcard"></i> Dados Pessoais</h6>
+
+                                <div class="mb-3">
+                                    <label for="nome" class="form-label">Nome: <span class="text-danger">*</span></label>
+                                    <InputText id="nome" @bind-Value="modelo.Nome" class="form-control" placeholder="Nome"/>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="apelido" class="form-label">Apelido:</label>
+                                    <InputText id="apelido" @bind-Value="modelo.Apelido" class="form-control" placeholder="Apelido"/>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email: <span class="text-danger">*</span></label>
+                                    <InputText id="email" @bind-Value="modelo.Email" class="form-control" placeholder="email@exemplo.com"/>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Password: <span class="text-danger">*</span></label>
+                                    <InputText id="password" @bind-Value="modelo.Password" class="form-control" type="password"/>
+                                    <small class="text-muted">Mínimo 6 caracteres, maiúscula e número.</small>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="nif" class="form-label">NIF:</label>
+                                    <InputNumber id="nif" @bind-Value="modelo.NIF" class="form-control"/>
+                                </div>
+                            </div>
+
+                            <!-- Morada e Configuração -->
+                            <div class="col-md-6">
+                                <h6 class="text-muted mb-3"><i class="bi bi-geo-alt"></i> Morada</h6>
+
+                                <div class="mb-3">
+                                    <label for="rua" class="form-label">Rua:</label>
+                                    <InputText id="rua" @bind-Value="modelo.Rua" class="form-control"/>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="mb-3">
+                                            <label for="codigopostal" class="form-label">Código Postal:</label>
+                                            <InputText id="codigopostal" @bind-Value="modelo.CodigoPostal" class="form-control" placeholder="0000-000"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="mb-3">
+                                            <label for="localidade" class="form-label">Localidade:</label>
+                                            <InputText id="localidade" @bind-Value="modelo.Localidade" class="form-control"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="pais" class="form-label">País:</label>
+                                    <InputText id="pais" @bind-Value="modelo.Pais" class="form-control"/>
+                                </div>
+
+                                <h6 class="text-muted mb-3 mt-4"><i class="bi bi-gear"></i> Configuração</h6>
+
+                                <div class="mb-3">
+                                    <label for="tipo" class="form-label">Tipo de Utilizador:</label>
+                                    <InputSelect id="tipo" class="form-select" @bind-Value="modelo.TipoUtilizador">
+                                        <option value="">Escolha um tipo</option>
+                                        <option value="Cliente">Cliente</option>
+                                        <option value="Fornecedor">Fornecedor</option>
+                                    </InputSelect>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="mb-3 form-check">
+                                            <InputCheckbox id="activo" @bind-Value="modelo.Activo" class="form-check-input"/>
+                                            <label for="activo" class="form-check-label">Conta Activa</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="mb-3 form-check">
+                                            <InputCheckbox id="emailConfirmed" @bind-Value="modelo.EmailConfirmed" class="form-check-input"/>
+                                            <label for="emailConfirmed" class="form-check-label">Email Confirmado</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Roles -->
+                        <h6 class="text-muted mb-3 mt-3"><i class="bi bi-shield-check"></i> Roles</h6>
+                        <div class="row mb-3">
+                            @foreach (var role in todasRoles) {
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="role_@role"
+                                               checked="@selectedRoles.Contains(role)"
+                                               @onchange="@(e => ToggleRole(role, (bool)e.Value!))"/>
+                                        <label class="form-check-label" for="role_@role">
+                                            <span class="badge bg-primary">@role</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <hr/>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-lg"></i> Criar Utilizador
+                            </button>
+                            <a href="/utilizadores" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg"></i> Cancelar
+                            </a>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @code {
@@ -117,7 +170,7 @@
 
     private async Task CreateUtilizador() {
         errorMessage = null;
-        
+
         var user = new ApplicationUser {
             UserName = modelo.Email,
             Email = modelo.Email,
@@ -132,13 +185,14 @@
             Activo = modelo.Activo,
             EmailConfirmed = modelo.EmailConfirmed
         };
-        
+
         var result = await UserManager.CreateAsync(user, modelo.Password ?? "");
-        
+
         if (result.Succeeded) {
             if (selectedRoles.Count > 0) {
                 await UserManager.AddToRolesAsync(user, selectedRoles);
             }
+
             NavigationManager.NavigateTo("/utilizadores");
         } else {
             errorMessage = string.Join("; ", result.Errors.Select(e => e.Description));
@@ -159,4 +213,5 @@
         public bool Activo { get; set; } = true;
         public bool EmailConfirmed { get; set; } = true;
     }
+
 }

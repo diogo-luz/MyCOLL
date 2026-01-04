@@ -1,80 +1,98 @@
 @page "/paises/create"
 @using Microsoft.EntityFrameworkCore
 @using MyCOLL.Data.Entities
-@inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
+@using MyCOLL.Data.Data
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
 <PageTitle>Criar País</PageTitle>
 
-<h1>Criar País</h1>
-<hr/>
-<div class="row">
-    <div class="col-md-4">
-        <EditForm method="post" Model="Pais" OnValidSubmit="AddPais" FormName="create">
-            <DataAnnotationsValidator/>
-            <ValidationSummary class="text-danger" role="alert"/>
-            <div class="mb-3">
-                <span class="text-danger">*</span>
-                <label for="nome" class="form-label">Nome:</label>
-                <InputText id="nome" @bind-Value="Pais.Nome" class="form-control" aria-required="true"/>
-                <ValidationMessage For="() => Pais.Nome" class="text-danger"/>
-            </div>
-            <div class="mb-3">
-                <label for="codigoiso" class="form-label">Código ISO:</label>
-                <InputText id="codigoiso" @bind-Value="Pais.CodigoISO" class="form-control"/>
-                <ValidationMessage For="() => Pais.CodigoISO" class="text-danger"/>
-            </div>
-            <div class="mb-3">
-                <label for="ordem" class="form-label">Ordem:</label>
-                <InputNumber id="ordem" @bind-Value="Pais.Ordem" class="form-control"/>
-                <ValidationMessage For="() => Pais.Ordem" class="text-danger"/>
-            </div>
-            <div class="mb-3">
-                <label for="bandeira" class="form-label">Bandeira:</label>
-                <InputFile id="bandeira" OnChange="OnImageChange" class="form-control"
-                           accept=".png, .jpg, .jpeg"/>
-                @if (previewUrl is not null) {
-                    <img src="@previewUrl" style="max-width: 200px; max-height: 200px; margin-top: 10px;"/>
-                }
-                <ValidationMessage For="() => Pais.Bandeira" class="text-danger"/>
-            </div>
-            <button type="submit" class="btn btn-primary">Criar</button>
-        </EditForm>
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-0">
+                <i class="bi bi-plus-circle text-success"></i> Novo País
+            </h1>
+            <p class="text-muted mb-0">Adicionar um novo país</p>
+        </div>
+        <a href="/paises" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
     </div>
-</div>
 
-<div>
-    <a href="/paises">Voltar à lista</a>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="bi bi-pencil"></i> Dados do País</h5>
+                </div>
+                <div class="card-body">
+                    <EditForm method="post" Model="Pais" OnValidSubmit="AddPais" FormName="create">
+                        <DataAnnotationsValidator/>
+                        <ValidationSummary class="alert alert-danger" role="alert"/>
+
+                        <div class="mb-3">
+                            <label for="nome" class="form-label">Nome: <span class="text-danger">*</span></label>
+                            <InputText id="nome" @bind-Value="Pais.Nome" class="form-control" placeholder="Nome do país"/>
+                            <ValidationMessage For="() => Pais.Nome" class="text-danger"/>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="codigoiso" class="form-label">Código ISO:</label>
+                            <InputText id="codigoiso" @bind-Value="Pais.CodigoISO" class="form-control" placeholder="PT, ES, FR..."/>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="ordem" class="form-label">Ordem:</label>
+                            <InputNumber id="ordem" @bind-Value="Pais.Ordem" class="form-control"/>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="bandeira" class="form-label">Bandeira:</label>
+                            <InputFile id="bandeira" OnChange="OnImageChange" class="form-control" accept=".png, .jpg, .jpeg"/>
+                            @if (previewUrl is not null) {
+                                <div class="mt-2">
+                                    <img src="@previewUrl" class="img-thumbnail" style="max-width: 100px;"/>
+                                </div>
+                            }
+                        </div>
+
+                        <hr/>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-lg"></i> Criar País
+                            </button>
+                            <a href="/paises" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg"></i> Cancelar
+                            </a>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @code {
     [SupplyParameterFromForm] private Pais Pais { get; set; } = new();
-
     private string? previewUrl;
 
     private async Task OnImageChange(InputFileChangeEventArgs e) {
         var file = e.File;
-
-        // Definir limite de 5MB
-        var maxSize = 5 * 1024 * 1024; // 5MB
-
-        if (file.Size > maxSize) {
-            throw new Exception("Imagem muito grande. O limite é de 5MB.");
-        }
+        var maxSize = 5 * 1024 * 1024;
+        if (file.Size > maxSize) return;
 
         using var stream = new MemoryStream();
-        await file.OpenReadStream(maxSize).CopyToAsync(stream); // <-- max size aqui
-        Pais.Bandeira = stream.ToArray(); // so guarda os bytes
+        await file.OpenReadStream(maxSize).CopyToAsync(stream);
+        Pais.Bandeira = stream.ToArray();
 
-        //Cria pré-visualização
-        //depois verificar a melhor forma de fazer isto
         using var previewStream = new MemoryStream();
-        await file.OpenReadStream(maxSize).CopyToAsync(previewStream); // <-- max size aqui
-        var base64 = Convert.ToBase64String(previewStream.ToArray()); //converter para base64 a nossa imagem
-        previewUrl = $"data:{file.ContentType};base64,{base64}"; //enviar com o formato que o browser entende como sendo imagem
+        await file.OpenReadStream(maxSize).CopyToAsync(previewStream);
+        var base64 = Convert.ToBase64String(previewStream.ToArray());
+        previewUrl = $"data:{file.ContentType};base64,{base64}";
     }
 
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddPais() {
         using var context = DbFactory.CreateDbContext();
         context.Paises.Add(Pais);

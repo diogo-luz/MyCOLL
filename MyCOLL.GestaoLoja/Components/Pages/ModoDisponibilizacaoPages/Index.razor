@@ -4,38 +4,72 @@
 @using MyCOLL.Data.Entities
 @using MyCOLL.Data.Data
 @implements IAsyncDisposable
-@inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
 
 <PageTitle>Modos de Disponibilização</PageTitle>
 
-<h1>Modos de Disponibilização</h1>
-
-<p>
-    <a href="modosdisponibilizacao/create">Criar novo modo</a>
-</p>
-
-<QuickGrid Class="table" Items="context.ModosDisponibilizacao">
-    <PropertyColumn Property="m => m.Nome" Title="Nome"/>
-    <PropertyColumn Property="m => m.Descricao" Title="Descrição"/>
-
-    <TemplateColumn Context="m" Title="Ações">
-        <a href="@($"modosdisponibilizacao/edit?id={m.Id}")">
-            <i class="bi bi-pencil-square"></i>
-        </a> |
-        <a href="@($"modosdisponibilizacao/details?id={m.Id}")">
-            <i class="bi bi-eye-fill"></i>
-        </a> |
-        <a href="@($"modosdisponibilizacao/delete?id={m.Id}")">
-            <i class="bi bi-trash-fill"></i>
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-0">
+                <i class="bi bi-box-arrow-in-right text-secondary"></i> Modos de Disponibilização
+            </h1>
+            <p class="text-muted mb-0">Gestão de modos de disponibilização</p>
+        </div>
+        <a href="modosdisponibilizacao/create" class="btn btn-secondary">
+            <i class="bi bi-plus-lg"></i> Novo Modo
         </a>
-    </TemplateColumn>
-</QuickGrid>
+    </div>
+
+    <!-- Stats -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card border-secondary h-100">
+                <div class="card-body text-center">
+                    <h3 class="text-secondary">@modos.Count</h3>
+                    <small class="text-muted">Total de Modos</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="bi bi-table"></i> Lista de Modos</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <QuickGrid Class="table table-hover mb-0" Items="modos.AsQueryable()">
+                    <PropertyColumn Property="m => m.Nome" Title="Nome"/>
+                    <PropertyColumn Property="m => m.Descricao" Title="Descrição"/>
+                    <TemplateColumn Context="m" Title="Ações">
+                        <div class="btn-group btn-group-sm">
+                            <a href="@($"modosdisponibilizacao/edit?id={m.Id}")" class="btn btn-outline-primary" title="Editar">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <a href="@($"modosdisponibilizacao/details?id={m.Id}")" class="btn btn-outline-info" title="Detalhes">
+                                <i class="bi bi-eye-fill"></i>
+                            </a>
+                            <a href="@($"modosdisponibilizacao/delete?id={m.Id}")" class="btn btn-outline-danger" title="Eliminar">
+                                <i class="bi bi-trash-fill"></i>
+                            </a>
+                        </div>
+                    </TemplateColumn>
+                </QuickGrid>
+            </div>
+        </div>
+    </div>
+</div>
 
 @code {
     private ApplicationDbContext context = default!;
+    private List<ModoDisponibilizacao> modos = new();
 
-    protected override void OnInitialized() {
+    protected override async Task OnInitializedAsync() {
         context = DbFactory.CreateDbContext();
+        modos = await context.ModosDisponibilizacao.ToListAsync();
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();

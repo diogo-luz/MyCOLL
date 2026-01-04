@@ -4,46 +4,83 @@
 @using MyCOLL.Data.Entities
 @using MyCOLL.Data.Data
 @implements IAsyncDisposable
-@inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
 
 <PageTitle>Tipos de Colecionáveis</PageTitle>
 
-<h1>Tipos de Colecionáveis</h1>
-
-<p>
-    <a href="tiposcolecionaveis/create">Criar novo tipo</a>
-</p>
-
-<QuickGrid Class="table" Items="context.TiposColecionaveis">
-    <TemplateColumn Context="t" Title="Imagem" Class="col-1">
-        @if (t.Imagem is not null && t.Imagem.Length > 0) {
-            <img src="@($"data:image/png;base64, {Convert.ToBase64String(t.Imagem)}")" alt="@t.Nome" style="max-width: 100px; max-height: 100px;"/>
-        } else {
-            <img src="img/placeholderImg.png" alt="Sem imagem" style="max-width: 100px; max-height: 100px"/>
-        }
-    </TemplateColumn>
-
-    <PropertyColumn Property="t => t.Nome" Title="Nome"/>
-    <PropertyColumn Property="t => t.Ordem" Title="Ordem"/>
-
-    <TemplateColumn Context="t" Title="Ações">
-        <a href="@($"tiposcolecionaveis/edit?id={t.Id}")">
-            <i class="bi bi-pencil-square"></i>
-        </a> |
-        <a href="@($"tiposcolecionaveis/details?id={t.Id}")">
-            <i class="bi bi-eye-fill"></i>
-        </a> |
-        <a href="@($"tiposcolecionaveis/delete?id={t.Id}")">
-            <i class="bi bi-trash-fill"></i>
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-0">
+                <i class="bi bi-collection text-info"></i> Tipos de Colecionáveis
+            </h1>
+            <p class="text-muted mb-0">Gestão de tipos de colecionáveis</p>
+        </div>
+        <a href="tiposcolecionaveis/create" class="btn btn-info text-white">
+            <i class="bi bi-plus-lg"></i> Novo Tipo
         </a>
-    </TemplateColumn>
-</QuickGrid>
+    </div>
+
+    <!-- Stats -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card border-info h-100">
+                <div class="card-body text-center">
+                    <h3 class="text-info">@tipos.Count</h3>
+                    <small class="text-muted">Total de Tipos</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="bi bi-table"></i> Lista de Tipos</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <QuickGrid Class="table table-hover mb-0" Items="tipos.AsQueryable()">
+                    <TemplateColumn Context="t" Title="Imagem" Class="col-1">
+                        @if (t.Imagem is not null && t.Imagem.Length > 0) {
+                            <img src="@($"data:image/png;base64, {Convert.ToBase64String(t.Imagem)}")" alt="@t.Nome" class="rounded" style="max-width: 50px; max-height: 50px; object-fit: cover;"/>
+                        } else {
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                <i class="bi bi-image text-muted"></i>
+                            </div>
+                        }
+                    </TemplateColumn>
+                    <PropertyColumn Property="t => t.Nome" Title="Nome"/>
+                    <TemplateColumn Context="t" Title="Ordem">
+                        <span class="badge bg-secondary">@t.Ordem</span>
+                    </TemplateColumn>
+                    <TemplateColumn Context="t" Title="Ações">
+                        <div class="btn-group btn-group-sm">
+                            <a href="@($"tiposcolecionaveis/edit?id={t.Id}")" class="btn btn-outline-primary" title="Editar">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <a href="@($"tiposcolecionaveis/details?id={t.Id}")" class="btn btn-outline-info" title="Detalhes">
+                                <i class="bi bi-eye-fill"></i>
+                            </a>
+                            <a href="@($"tiposcolecionaveis/delete?id={t.Id}")" class="btn btn-outline-danger" title="Eliminar">
+                                <i class="bi bi-trash-fill"></i>
+                            </a>
+                        </div>
+                    </TemplateColumn>
+                </QuickGrid>
+            </div>
+        </div>
+    </div>
+</div>
 
 @code {
     private ApplicationDbContext context = default!;
+    private List<TipoColecionavel> tipos = new();
 
-    protected override void OnInitialized() {
+    protected override async Task OnInitializedAsync() {
         context = DbFactory.CreateDbContext();
+        tipos = await context.TiposColecionaveis.OrderBy(t => t.Ordem).ToListAsync();
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
