@@ -1,53 +1,76 @@
 @page "/tiposcolecionaveis/details"
 @using Microsoft.EntityFrameworkCore
 @using MyCOLL.Data.Entities
-@inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
+@using MyCOLL.Data.Data
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
 <PageTitle>Detalhes Tipo de Colecionável</PageTitle>
 
-<h1>Detalhes do Tipo de Colecionável</h1>
-
-<div>
-    <hr/>
-    @if (tipocolecionavel is null) {
-        <p>
-            <em>A carregar...</em>
-        </p>
+<div class="container-fluid">
+    @if (tipoColecionavel is null) {
+        <div class="d-flex justify-content-center align-items-center" style="min-height: 400px;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">A carregar...</span>
+            </div>
+        </div>
     } else {
-        <dl class="row">
-            <dt class="col-sm-2">Nome</dt>
-            <dd class="col-sm-10">@tipocolecionavel.Nome</dd>
-            <dt class="col-sm-2">Ordem</dt>
-            <dd class="col-sm-10">@tipocolecionavel.Ordem</dd>
-            <dt class="col-sm-2">URL Imagem</dt>
-            <dd class="col-sm-10">@tipocolecionavel.UrlImagem</dd>
-            <dt class="col-sm-2">Imagem</dt>
-            <dd class="col-sm-10">
-                @if (tipocolecionavel.Imagem is not null && tipocolecionavel.Imagem.Length > 0) {
-                    <img src="@($"data:image/png;base64, {Convert.ToBase64String(tipocolecionavel.Imagem)}")" alt="@tipocolecionavel.Nome" style="max-width: 100px; max-height: 100px;"/>
-                } else {
-                    <img src="img/placeholderImg.png" alt="Sem imagem" style="max-width: 100px; max-height: 100px"/>
-                }
-            </dd>
-        </dl>
-        <div>
-            <a href="@($"/tiposcolecionaveis/edit?id={tipocolecionavel.Id}")">Editar</a> |
-            <a href="/tiposcolecionaveis">Voltar à lista</a>
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="mb-0">
+                    <i class="bi bi-collection text-primary"></i> @tipoColecionavel.Nome
+                </h1>
+                <p class="text-muted mb-0">Detalhes do tipo de colecionável</p>
+            </div>
+            <div class="btn-group">
+                <a href="@($"/tiposcolecionaveis/edit?id={tipoColecionavel.Id}")" class="btn btn-primary">
+                    <i class="bi bi-pencil"></i> Editar
+                </a>
+                <a href="/tiposcolecionaveis" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card shadow-sm text-center">
+                    <div class="card-body">
+                        @if (tipoColecionavel.Imagem is not null && tipoColecionavel.Imagem.Length > 0) {
+                            <img src="@($"data:image/png;base64,{Convert.ToBase64String(tipoColecionavel.Imagem)}")"
+                                 class="img-fluid rounded mb-3" style="max-height: 200px;"/>
+                        } else {
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center mx-auto mb-3" style="height: 150px; width: 150px;">
+                                <i class="bi bi-image text-muted" style="font-size: 4rem;"></i>
+                            </div>
+                        }
+
+                        <h3 class="mb-2">@tipoColecionavel.Nome</h3>
+                        <span class="badge bg-secondary mb-3">Ordem: @tipoColecionavel.Ordem</span>
+
+                        @if (!string.IsNullOrEmpty(tipoColecionavel.UrlImagem)) {
+                            <p class="text-muted small mb-0">
+                                <i class="bi bi-link"></i> @tipoColecionavel.UrlImagem
+                            </p>
+                        }
+                    </div>
+                </div>
+            </div>
         </div>
     }
 </div>
 
 @code {
-    private TipoColecionavel? tipocolecionavel;
+    private TipoColecionavel? tipoColecionavel;
 
     [SupplyParameterFromQuery] private int Id { get; set; }
 
     protected override async Task OnInitializedAsync() {
         using var context = DbFactory.CreateDbContext();
-        tipocolecionavel = await context.TiposColecionaveis.FirstOrDefaultAsync(m => m.Id == Id);
+        tipoColecionavel = await context.TiposColecionaveis.FirstOrDefaultAsync(m => m.Id == Id);
 
-        if (tipocolecionavel is null) {
+        if (tipoColecionavel is null) {
             NavigationManager.NavigateTo("notfound");
         }
     }

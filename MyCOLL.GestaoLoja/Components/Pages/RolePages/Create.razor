@@ -4,32 +4,57 @@
 
 <PageTitle>Criar Role</PageTitle>
 
-<h1>Criar Nova Role</h1>
-<hr/>
-
-<div class="row">
-    <div class="col-md-4">
-        <EditForm Model="modelo" OnValidSubmit="CreateRole" FormName="create">
-            <DataAnnotationsValidator/>
-            <ValidationSummary class="text-danger" role="alert"/>
-            
-            @if (!string.IsNullOrEmpty(errorMessage)) {
-                <div class="alert alert-danger">@errorMessage</div>
-            }
-            
-            <div class="mb-3">
-                <span class="text-danger">*</span>
-                <label for="nome" class="form-label">Nome da Role:</label>
-                <InputText id="nome" @bind-Value="modelo.Nome" class="form-control" aria-required="true"/>
-            </div>
-            
-            <button type="submit" class="btn btn-primary">Criar</button>
-        </EditForm>
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-0">
+                <i class="bi bi-shield-plus text-success"></i> Nova Role
+            </h1>
+            <p class="text-muted mb-0">Adicionar uma nova role ao sistema</p>
+        </div>
+        <a href="/roles" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
     </div>
-</div>
 
-<div class="mt-3">
-    <a href="/roles">Voltar à lista</a>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="bi bi-shield-lock"></i> Dados da Role</h5>
+                </div>
+                <div class="card-body">
+                    <EditForm Model="modelo" OnValidSubmit="CreateRole" FormName="create">
+                        <DataAnnotationsValidator/>
+                        <ValidationSummary class="alert alert-danger" role="alert"/>
+
+                        @if (!string.IsNullOrEmpty(errorMessage)) {
+                            <div class="alert alert-danger">
+                                <i class="bi bi-exclamation-octagon me-2"></i> @errorMessage
+                            </div>
+                        }
+
+                        <div class="mb-3">
+                            <label for="nome" class="form-label">Nome da Role: <span class="text-danger">*</span></label>
+                            <InputText id="nome" @bind-Value="modelo.Nome" class="form-control" placeholder="Ex: Gestor"/>
+                            <small class="text-muted">O nome deve ser único.</small>
+                        </div>
+
+                        <hr/>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-lg"></i> Criar Role
+                            </button>
+                            <a href="/roles" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg"></i> Cancelar
+                            </a>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @code {
@@ -38,20 +63,20 @@
 
     private async Task CreateRole() {
         errorMessage = null;
-        
+
         if (string.IsNullOrWhiteSpace(modelo.Nome)) {
             errorMessage = "O nome da role é obrigatório.";
             return;
         }
-        
+
         var roleExists = await RoleManager.RoleExistsAsync(modelo.Nome);
         if (roleExists) {
             errorMessage = "Já existe uma role com este nome.";
             return;
         }
-        
+
         var result = await RoleManager.CreateAsync(new IdentityRole(modelo.Nome));
-        
+
         if (result.Succeeded) {
             NavigationManager.NavigateTo("/roles");
         } else {
@@ -62,4 +87,5 @@
     private class CreateRoleModel {
         public string? Nome { get; set; }
     }
+
 }

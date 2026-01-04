@@ -1,49 +1,72 @@
 @page "/paises/delete"
 @using Microsoft.EntityFrameworkCore
 @using MyCOLL.Data.Entities
-@inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
+@using MyCOLL.Data.Data
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
 <PageTitle>Eliminar País</PageTitle>
 
-<h1>Eliminar País</h1>
-
-<p class="text-danger">
-    <strong>Tem a certeza que pretende eliminar este país?</strong>
-</p>
-<div>
-    <hr/>
+<div class="container-fluid">
     @if (pais is null) {
-        <p>
-            <em>A carregar...</em>
-        </p>
+        <div class="d-flex justify-content-center align-items-center" style="min-height: 400px;">
+            <div class="spinner-border text-danger" role="status">
+                <span class="visually-hidden">A carregar...</span>
+            </div>
+        </div>
     } else {
-        <dl class="row">
-            <dt class="col-sm-2">Nome</dt>
-            <dd class="col-sm-10">@pais.Nome</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">Código ISO</dt>
-            <dd class="col-sm-10">@pais.CodigoISO</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">Ordem</dt>
-            <dd class="col-sm-10">@pais.Ordem</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">Bandeira</dt>
-            <dd class="col-sm-10">
-                @if (pais.Bandeira is not null && pais.Bandeira.Length > 0) {
-                    <img src="@($"data:image/png;base64, {Convert.ToBase64String(pais.Bandeira)}")" alt="@pais.Nome" style="max-width: 100px; max-height: 100px;"/>
-                } else {
-                    <img src="img/placeholderImg.png" alt="Sem imagem" style="max-width: 100px; max-height: 100px"/>
-                }
-            </dd>
-        </dl>
-        <EditForm method="post" Model="pais" OnValidSubmit="DeletePais" FormName="delete">
-            <button type="submit" class="btn btn-danger" disabled="@(pais is null)">Eliminar</button> |
-            <a href="/paises">Cancelar</a>
-        </EditForm>
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="mb-0 text-danger">
+                    <i class="bi bi-exclamation-triangle"></i> Eliminar País
+                </h1>
+                <p class="text-muted mb-0">Esta ação não pode ser revertida</p>
+            </div>
+            <a href="/paises" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-5">
+                <div class="card border-danger shadow-sm">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0"><i class="bi bi-trash"></i> Confirmar Eliminação</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <strong>Atenção!</strong> Tem a certeza que pretende eliminar este país?
+                        </div>
+
+                        @if (pais.Bandeira is not null && pais.Bandeira.Length > 0) {
+                            <img src="@($"data:image/png;base64,{Convert.ToBase64String(pais.Bandeira)}")"
+                                 class="border mb-3" style="max-height: 80px;"/>
+                        } else {
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center mx-auto mb-3" style="height: 80px; width: 80px;">
+                                <i class="bi bi-flag text-muted fs-3"></i>
+                            </div>
+                        }
+
+                        <h4>@pais.Nome</h4>
+                        <span class="badge bg-secondary">Ordem: @pais.Ordem</span>
+                    </div>
+                    <div class="card-footer bg-light">
+                        <EditForm method="post" Model="pais" OnValidSubmit="DeletePais" FormName="delete">
+                            <div class="d-flex gap-2 justify-content-center">
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="bi bi-trash"></i> Sim, Eliminar
+                                </button>
+                                <a href="/paises" class="btn btn-outline-secondary">
+                                    <i class="bi bi-x-lg"></i> Cancelar
+                                </a>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
     }
 </div>
 

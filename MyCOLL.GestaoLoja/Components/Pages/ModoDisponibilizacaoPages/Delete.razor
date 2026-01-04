@@ -1,55 +1,86 @@
 @page "/modosdisponibilizacao/delete"
 @using Microsoft.EntityFrameworkCore
 @using MyCOLL.Data.Entities
-@inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
+@using MyCOLL.Data.Data
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
 <PageTitle>Eliminar Modo de Disponibilização</PageTitle>
 
-<h1>Eliminar Modo de Disponibilização</h1>
-
-<p class="text-danger">
-    <strong>Tem a certeza que pretende eliminar este modo?</strong>
-</p>
-<div>
-    <hr/>
-    @if (mododisponibilizacao is null) {
-        <p>
-            <em>A carregar...</em>
-        </p>
+<div class="container-fluid">
+    @if (modoDisponibilizacao is null) {
+        <div class="d-flex justify-content-center align-items-center" style="min-height: 400px;">
+            <div class="spinner-border text-danger" role="status">
+                <span class="visually-hidden">A carregar...</span>
+            </div>
+        </div>
     } else {
-        <dl class="row">
-            <dt class="col-sm-2">Nome</dt>
-            <dd class="col-sm-10">@mododisponibilizacao.Nome</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">Descrição</dt>
-            <dd class="col-sm-10">@mododisponibilizacao.Descricao</dd>
-        </dl>
-        <EditForm method="post" Model="mododisponibilizacao" OnValidSubmit="DeleteModoDisponibilizacao" FormName="delete">
-            <button type="submit" class="btn btn-danger" disabled="@(mododisponibilizacao is null)">Eliminar</button> |
-            <a href="/modosdisponibilizacao">Cancelar</a>
-        </EditForm>
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="mb-0 text-danger">
+                    <i class="bi bi-exclamation-triangle"></i> Eliminar Modo
+                </h1>
+                <p class="text-muted mb-0">Esta ação não pode ser revertida</p>
+            </div>
+            <a href="/modosdisponibilizacao" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-5">
+                <div class="card border-danger shadow-sm">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0"><i class="bi bi-trash"></i> Confirmar Eliminação</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <strong>Atenção!</strong> Tem a certeza que pretende eliminar este modo?
+                        </div>
+
+                        <div class="mb-4">
+                            <i class="bi bi-box-seam text-danger" style="font-size: 3rem;"></i>
+                            <h4>@modoDisponibilizacao.Nome</h4>
+                            <p class="text-muted">@modoDisponibilizacao.Descricao</p>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light">
+                        <EditForm method="post" Model="modoDisponibilizacao" OnValidSubmit="DeleteModoDisponibilizacao" FormName="delete">
+                            <div class="d-flex gap-2 justify-content-center">
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="bi bi-trash"></i> Sim, Eliminar
+                                </button>
+                                <a href="/modosdisponibilizacao" class="btn btn-outline-secondary">
+                                    <i class="bi bi-x-lg"></i> Cancelar
+                                </a>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
     }
 </div>
 
 @code {
-    private ModoDisponibilizacao? mododisponibilizacao;
+    private ModoDisponibilizacao? modoDisponibilizacao;
 
     [SupplyParameterFromQuery] private int Id { get; set; }
 
     protected override async Task OnInitializedAsync() {
         using var context = DbFactory.CreateDbContext();
-        mododisponibilizacao = await context.ModosDisponibilizacao.FirstOrDefaultAsync(m => m.Id == Id);
+        modoDisponibilizacao = await context.ModosDisponibilizacao.FirstOrDefaultAsync(m => m.Id == Id);
 
-        if (mododisponibilizacao is null) {
+        if (modoDisponibilizacao is null) {
             NavigationManager.NavigateTo("notfound");
         }
     }
 
     private async Task DeleteModoDisponibilizacao() {
         using var context = DbFactory.CreateDbContext();
-        context.ModosDisponibilizacao.Remove(mododisponibilizacao!);
+        context.ModosDisponibilizacao.Remove(modoDisponibilizacao!);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/modosdisponibilizacao");
     }

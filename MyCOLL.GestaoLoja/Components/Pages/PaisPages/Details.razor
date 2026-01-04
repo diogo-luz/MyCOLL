@@ -1,39 +1,60 @@
 @page "/paises/details"
 @using Microsoft.EntityFrameworkCore
 @using MyCOLL.Data.Entities
-@inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
+@using MyCOLL.Data.Data
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
 <PageTitle>Detalhes País</PageTitle>
 
-<h1>Detalhes do País</h1>
-
-<div>
-    <hr/>
+<div class="container-fluid">
     @if (pais is null) {
-        <p>
-            <em>A carregar...</em>
-        </p>
+        <div class="d-flex justify-content-center align-items-center" style="min-height: 400px;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">A carregar...</span>
+            </div>
+        </div>
     } else {
-        <dl class="row">
-            <dt class="col-sm-2">Nome</dt>
-            <dd class="col-sm-10">@pais.Nome</dd>
-            <dt class="col-sm-2">Código ISO</dt>
-            <dd class="col-sm-10">@pais.CodigoISO</dd>
-            <dt class="col-sm-2">Ordem</dt>
-            <dd class="col-sm-10">@pais.Ordem</dd>
-            <dt class="col-sm-2">Bandeira</dt>
-            <dd class="col-sm-10">
-                @if (pais.Bandeira is not null && pais.Bandeira.Length > 0) {
-                    <img src="@($"data:image/png;base64, {Convert.ToBase64String(pais.Bandeira)}")" alt="@pais.Nome" style="max-width: 100px; max-height: 100px;"/>
-                } else {
-                    <img src="img/placeholderImg.png" alt="Sem imagem" style="max-width: 100px; max-height: 100px"/>
-                }
-            </dd>
-        </dl>
-        <div>
-            <a href="@($"/paises/edit?id={pais.Id}")">Editar</a> |
-            <a href="/paises">Voltar à lista</a>
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="mb-0">
+                    <i class="bi bi-globe-europe-africa text-primary"></i> @pais.Nome
+                </h1>
+                <p class="text-muted mb-0">Detalhes do país</p>
+            </div>
+            <div class="btn-group">
+                <a href="@($"/paises/edit?id={pais.Id}")" class="btn btn-primary">
+                    <i class="bi bi-pencil"></i> Editar
+                </a>
+                <a href="/paises" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card shadow-sm text-center">
+                    <div class="card-body">
+                        @if (pais.Bandeira is not null && pais.Bandeira.Length > 0) {
+                            <img src="@($"data:image/png;base64,{Convert.ToBase64String(pais.Bandeira)}")"
+                                 class="img-fluid border mb-3" style="max-height: 150px;"/>
+                        } else {
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center mx-auto mb-3" style="height: 120px; width: 120px;">
+                                <i class="bi bi-flag text-muted" style="font-size: 3rem;"></i>
+                            </div>
+                        }
+
+                        <h3 class="mb-2">@pais.Nome</h3>
+                        @if (!string.IsNullOrEmpty(pais.CodigoISO)) {
+                            <span class="badge bg-info fs-6 mb-3">ISO: @pais.CodigoISO</span>
+                        }
+                        <br/>
+                        <span class="badge bg-secondary mb-3">Ordem: @pais.Ordem</span>
+                    </div>
+                </div>
+            </div>
         </div>
     }
 </div>

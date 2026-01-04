@@ -1,69 +1,92 @@
 @page "/tiposcolecionaveis/delete"
 @using Microsoft.EntityFrameworkCore
 @using MyCOLL.Data.Entities
-@inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
+@using MyCOLL.Data.Data
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
 <PageTitle>Eliminar Tipo de Colecionável</PageTitle>
 
-<h1>Eliminar Tipo de Colecionável</h1>
-
-<p class="text-danger">
-    <strong>Tem a certeza que pretende eliminar este tipo?</strong>
-</p>
-<div>
-    <hr/>
-    @if (tipocolecionavel is null) {
-        <p>
-            <em>A carregar...</em>
-        </p>
+<div class="container-fluid">
+    @if (tipoColecionavel is null) {
+        <div class="d-flex justify-content-center align-items-center" style="min-height: 400px;">
+            <div class="spinner-border text-danger" role="status">
+                <span class="visually-hidden">A carregar...</span>
+            </div>
+        </div>
     } else {
-        <dl class="row">
-            <dt class="col-sm-2">Nome</dt>
-            <dd class="col-sm-10">@tipocolecionavel.Nome</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">Ordem</dt>
-            <dd class="col-sm-10">@tipocolecionavel.Ordem</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">URL Imagem</dt>
-            <dd class="col-sm-10">@tipocolecionavel.UrlImagem</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">Imagem</dt>
-            <dd class="col-sm-10">
-                @if (tipocolecionavel.Imagem is not null && tipocolecionavel.Imagem.Length > 0) {
-                    <img src="@($"data:image/png;base64, {Convert.ToBase64String(tipocolecionavel.Imagem)}")" alt="@tipocolecionavel.Nome" style="max-width: 100px; max-height: 100px;"/>
-                } else {
-                    <img src="img/placeholderImg.png" alt="Sem imagem" style="max-width: 100px; max-height: 100px"/>
-                }
-            </dd>
-        </dl>
-        <EditForm method="post" Model="tipocolecionavel" OnValidSubmit="DeleteTipoColecionavel" FormName="delete">
-            <button type="submit" class="btn btn-danger" disabled="@(tipocolecionavel is null)">Eliminar</button> |
-            <a href="/tiposcolecionaveis">Cancelar</a>
-        </EditForm>
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="mb-0 text-danger">
+                    <i class="bi bi-exclamation-triangle"></i> Eliminar Tipo
+                </h1>
+                <p class="text-muted mb-0">Esta ação não pode ser revertida</p>
+            </div>
+            <a href="/tiposcolecionaveis" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-5">
+                <div class="card border-danger shadow-sm">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0"><i class="bi bi-trash"></i> Confirmar Eliminação</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <strong>Atenção!</strong> Tem a certeza que pretende eliminar este tipo de colecionável?
+                        </div>
+
+                        @if (tipoColecionavel.Imagem is not null && tipoColecionavel.Imagem.Length > 0) {
+                            <img src="@($"data:image/png;base64,{Convert.ToBase64String(tipoColecionavel.Imagem)}")"
+                                 class="rounded mb-3" style="max-height: 100px;"/>
+                        } else {
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center mx-auto mb-3" style="height: 100px; width: 100px;">
+                                <i class="bi bi-image text-muted fs-3"></i>
+                            </div>
+                        }
+
+                        <h4>@tipoColecionavel.Nome</h4>
+                        <span class="badge bg-secondary">Ordem: @tipoColecionavel.Ordem</span>
+                    </div>
+                    <div class="card-footer bg-light">
+                        <EditForm method="post" Model="tipoColecionavel" OnValidSubmit="DeleteTipoColecionavel" FormName="delete">
+                            <div class="d-flex gap-2 justify-content-center">
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="bi bi-trash"></i> Sim, Eliminar
+                                </button>
+                                <a href="/tiposcolecionaveis" class="btn btn-outline-secondary">
+                                    <i class="bi bi-x-lg"></i> Cancelar
+                                </a>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
     }
 </div>
 
 @code {
-    private TipoColecionavel? tipocolecionavel;
+    private TipoColecionavel? tipoColecionavel;
 
     [SupplyParameterFromQuery] private int Id { get; set; }
 
     protected override async Task OnInitializedAsync() {
         using var context = DbFactory.CreateDbContext();
-        tipocolecionavel = await context.TiposColecionaveis.FirstOrDefaultAsync(m => m.Id == Id);
+        tipoColecionavel = await context.TiposColecionaveis.FirstOrDefaultAsync(m => m.Id == Id);
 
-        if (tipocolecionavel is null) {
+        if (tipoColecionavel is null) {
             NavigationManager.NavigateTo("notfound");
         }
     }
 
     private async Task DeleteTipoColecionavel() {
         using var context = DbFactory.CreateDbContext();
-        context.TiposColecionaveis.Remove(tipocolecionavel!);
+        context.TiposColecionaveis.Remove(tipoColecionavel!);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/tiposcolecionaveis");
     }

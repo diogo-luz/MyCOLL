@@ -7,158 +7,237 @@
 
 <PageTitle>Editar Produto</PageTitle>
 
-<h1>Editar Produto</h1>
-
-<hr/>
+<div class="container-fluid">
 @if (Produto is null) {
-    <p>
-        <em>Loading...</em>
-    </p>
+    <div class="d-flex justify-content-center align-items-center" style="min-height: 400px;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">A carregar...</span>
+        </div>
+    </div>
 } else {
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-0">
+                <i class="bi bi-pencil-square text-primary"></i> Editar Produto
+            </h1>
+            <p class="text-muted mb-0">Alterar dados do produto</p>
+        </div>
+        <a href="/produtos" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-lg-8">
             <EditForm method="post" Model="Produto" OnValidSubmit="UpdateProduto" FormName="edit">
                 <DataAnnotationsValidator/>
-                <ValidationSummary role="alert"/>
+                <ValidationSummary class="alert alert-danger" role="alert"/>
                 <input type="hidden" name="Produto.Id" value="@Produto.Id"/>
-                <div class="mb-3">
-                    <span class="text-danger">*</span>
-                    <label for="nome" class="form-label">Nome:</label>
-                    <InputText id="nome" @bind-Value="Produto.Nome" class="form-control" aria-required="true"/>
-                    <ValidationMessage For="() => Produto.Nome" class="text-danger"/>
-                </div>
-                <div class="mb-3">
-                    <span class="text-danger">*</span>
-                    <label for="descricao" class="form-label">Descrição:</label>
-                    <InputText id="descricao" @bind-Value="Produto.Descricao" class="form-control" aria-required="true"/>
-                    <ValidationMessage For="() => Produto.Descricao" class="text-danger"/>
-                </div>
-                <div class="mb-3">
-                    <span class="text-danger">*</span>
-                    <label for="precobase" class="form-label">Preço Base:</label>
-                    <InputNumber id="precobase" @bind-Value="Produto.PrecoBase" class="form-control" aria-required="true"/>
-                    <ValidationMessage For="() => Produto.PrecoBase" class="text-danger"/>
-                </div>
-                <div class="mb-3">
-                    <label for="percentagem" class="form-label">Percentagem:</label>
-                    <InputNumber id="percentagem" @bind-Value="Produto.Percentagem" class="form-control"/>
-                    <ValidationMessage For="() => Produto.Percentagem" class="text-danger"/>
+
+                <!-- Info Geral -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0"><i class="bi bi-info-circle"></i> Informações Gerais</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="nome" class="form-label">Nome: <span class="text-danger">*</span></label>
+                            <InputText id="nome" @bind-Value="Produto.Nome" class="form-control" placeholder="Nome do produto"/>
+                            <ValidationMessage For="() => Produto.Nome" class="text-danger"/>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="descricao" class="form-label">Descrição: <span class="text-danger">*</span></label>
+                            <InputTextArea id="descricao" @bind-Value="Produto.Descricao" class="form-control" rows="3" placeholder="Descrição detalhada"/>
+                            <ValidationMessage For="() => Produto.Descricao" class="text-danger"/>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="precobase" class="form-label">Preço Base (€): <span class="text-danger">*</span></label>
+                                <InputNumber id="precobase" @bind-Value="Produto.PrecoBase" class="form-control"/>
+                                <ValidationMessage For="() => Produto.PrecoBase" class="text-danger"/>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="percentagem" class="form-label">Margem (%):</label>
+                                <InputNumber id="percentagem" @bind-Value="Produto.Percentagem" class="form-control"/>
+                                <ValidationMessage For="() => Produto.Percentagem" class="text-danger"/>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="stock" class="form-label">Stock:</label>
+                                <InputNumber id="stock" @bind-Value="Produto.Stock" class="form-control"/>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="ano" class="form-label">Ano:</label>
+                                <InputNumber id="ano" @bind-Value="Produto.Ano" class="form-control"/>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="estado" class="form-label">Estado:</label>
+                                <InputSelect id="estado" class="form-select" @bind-Value="Produto.Estado">
+                                    <option value="Novo">Novo</option>
+                                    <option value="Como Novo">Como Novo</option>
+                                    <option value="Usado">Usado</option>
+                                    <option value="Danificado">Danificado</option>
+                                    <option value="Restaurado">Restaurado</option>
+                                </InputSelect>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label for="stock" class="form-label">Stock:</label>
-                    <InputNumber id="stock" @bind-Value="Produto.Stock" class="form-control"/>
-                    <ValidationMessage For="() => Produto.Stock" class="text-danger"/>
+                <!-- Classificação -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0"><i class="bi bi-tags"></i> Classificação</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="categoriaid" class="form-label">Categoria:</label>
+                                <InputSelect id="categoriaid" class="form-select" @bind-Value="Produto.CategoriaId">
+                                    <option value="">Escolha uma categoria</option>
+                                    @foreach (var item in categorias) {
+                                        <option value="@item.Id">@item.Nome</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="tipocolecionavelid" class="form-label">Tipo Colecionável: <span class="text-danger">*</span></label>
+                                <InputSelect id="tipocolecionavelid" class="form-select" @bind-Value="Produto.TipoColecionavelId">
+                                    @foreach (var item in tiposColecionaveis) {
+                                        <option value="@item.Id">@item.Nome</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="() => Produto.TipoColecionavelId" class="text-danger"/>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="paisid" class="form-label">País:</label>
+                                <InputSelect id="paisid" class="form-select" @bind-Value="Produto.PaisId">
+                                    <option value="">Escolha um país</option>
+                                    @foreach (var item in paises) {
+                                        <option value="@item.Id">@item.Nome</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="mododisponibilizacaoid" class="form-label">Modo Disponibilização: <span class="text-danger">*</span></label>
+                                <InputSelect id="mododisponibilizacaoid" class="form-select" @bind-Value="Produto.ModoDisponibilizacaoId">
+                                    @foreach (var item in modosDisponibilizacao) {
+                                        <option value="@item.Id">@item.Nome</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="fornecedorid" class="form-label">Fornecedor: <span class="text-danger">*</span></label>
+                            <InputSelect id="fornecedorid" class="form-select" @bind-Value="Produto.FornecedorId">
+                                <option value="">Escolha um fornecedor</option>
+                                @foreach (var item in fornecedores) {
+                                    <option value="@item.Id">@item.Nome @item.Apelido (@item.Email)</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="() => Produto.FornecedorId" class="text-danger"/>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="paravenda" class="form-label">Para Venda:</label>
-                    <InputCheckbox id="paravenda" @bind-Value="Produto.ParaVenda" class="form-check-input"/>
-                    <ValidationMessage For="() => Produto.ParaVenda" class="text-danger"/>
+
+                <!-- Imagem, Configuração e Submit -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0"><i class="bi bi-image"></i> Imagem</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="urlimagem" class="form-label">URL Imagem:</label>
+                            <InputText id="urlimagem" @bind-Value="Produto.UrlImagem" class="form-control" placeholder="https://..."/>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="imagem" class="form-label">Alterar Imagem:</label>
+                            <InputFile id="imagem" OnChange="OnImageChange" class="form-control" accept=".png, .jpg, .jpeg"/>
+                            <div class="mt-2 text-center bg-light p-2 rounded">
+                                @if (previewUrl is not null) {
+                                    <img src="@previewUrl" class="img-fluid" style="max-height: 200px;"/>
+                                } else if (Produto.Imagem is not null && Produto.Imagem.Length > 0) {
+                                    <img src="@($"data:image/png;base64,{Convert.ToBase64String(Produto.Imagem)}")" class="img-fluid" style="max-height: 200px;"/>
+                                } else {
+                                    <div class="d-flex align-items-center justify-content-center" style="height: 150px;">
+                                        <span class="text-muted"><i class="bi bi-image"></i> Sem imagem</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="activo" class="form-label">Activo:</label>
-                    <InputCheckbox id="activo" @bind-Value="Produto.Activo" class="form-check-input"/>
-                    <ValidationMessage For="() => Produto.Activo" class="text-danger"/>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0"><i class="bi bi-gear"></i> Definições</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-check form-switch">
+                                    <InputCheckbox id="paravenda" @bind-Value="Produto.ParaVenda" class="form-check-input"/>
+                                    <label for="paravenda" class="form-check-label">Disponível para Venda</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check form-switch">
+                                    <InputCheckbox id="activo" @bind-Value="Produto.Activo" class="form-check-input"/>
+                                    <label for="activo" class="form-check-label">Produto Activo</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="datacriacao" class="form-label">Data Criação:</label>
+                                <InputDate id="datacriacao" @bind-Value="Produto.DataCriacao" class="form-control"/>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="estado" class="form-label">Estado:</label>
-                    <InputSelect id="estado" class="form-select" @bind-Value="Produto.Estado">
-                        <option value="Novo">Novo</option>
-                        <option value="Como Novo">Como Novo</option>
-                        <option value="Usado">Usado</option>
-                        <option value="Danificado">Danificado</option>
-                        <option value="Restaurado">Restaurado</option>
-                    </InputSelect>
-                    <ValidationMessage For="() => Produto.Estado" class="text-danger"/>
+
+                <div class="d-flex gap-2 mb-5">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg"></i> Guardar Alterações
+                    </button>
+                    <a href="/produtos" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-lg"></i> Cancelar
+                    </a>
                 </div>
-                <div class="mb-3">
-                    <label for="ano" class="form-label">Ano:</label>
-                    <InputNumber id="ano" @bind-Value="Produto.Ano" class="form-control"/>
-                    <ValidationMessage For="() => Produto.Ano" class="text-danger"/>
-                </div>
-                <div class="mb-3">
-                    <label for="urlimagem" class="form-label">URL Imagem:</label>
-                    <InputText id="urlimagem" @bind-Value="Produto.UrlImagem" class="form-control"/>
-                    <ValidationMessage For="() => Produto.UrlImagem" class="text-danger"/>
-                </div>
-                <div class="mb-3">
-                    <label for="imagem" class="form-label">Imagem:</label>
-                    <InputFile id="imagem" OnChange="OnImageChange" class="form-control" accept=".png, .jpg, .jpeg"/>
-                    @if (previewUrl is not null) {
-                        <img src="@previewUrl" style="max-width: 200px; max-height: 200px; margin-top: 10px;"/>
-                    } else {
-                        if (Produto.Imagem is not null && Produto.Imagem.Length > 0) {
-                            <img src="@($"data:image/png;base64,{Convert.ToBase64String(Produto.Imagem)}")" alt="@Produto.Nome" style="max-width: 200px; max-height: 200px; margin-top: 10px"/>
-                        } else {
-                            <img src="img/placeholderImg.png" alt="Sem imagem" style="max-width: 200px; max-height: 200px; margin-top: 10px"/>
-                        }
-                    }
-                    <ValidationMessage For="() => Produto.Imagem" class="text-danger"/>
-                </div>
-                <div class="mb-3">
-                    <label for="datacriacao" class="form-label">Data Criação:</label>
-                    <InputDate id="datacriacao" @bind-Value="Produto.DataCriacao" class="form-control"/>
-                    <ValidationMessage For="() => Produto.DataCriacao" class="text-danger"/>
-                </div>
-                <div class="mb-3">
-                    <span class="text-danger">*</span>
-                    <label for="fornecedorid" class="form-label">Fornecedor:</label>
-                    <InputSelect id="fornecedorid" class="form-select" @bind-Value="Produto.FornecedorId">
-                        <option value="">Escolha um fornecedor</option>
-                        @foreach (var item in fornecedores) {
-                            <option value="@item.Id">@item.Nome @item.Apelido (@item.Email)</option>
-                        }
-                    </InputSelect>
-                    <ValidationMessage For="() => Produto.FornecedorId" class="text-danger"/>
-                </div>
-                <div class="mb-3">
-                    <span class="text-danger">*</span>
-                    <label for="tipocolecionavelid" class="form-label">Tipo Colecionável:</label>
-                    <InputSelect id="tipocolecionavelid" class="form-select" @bind-Value="Produto.TipoColecionavelId">
-                        @foreach (var item in tiposColecionaveis) {
-                            <option value="@item.Id">@item.Nome</option>
-                        }
-                    </InputSelect>
-                    <ValidationMessage For="() => Produto.TipoColecionavelId" class="text-danger"/>
-                </div>
-                <div class="mb-3">
-                    <label for="paisid" class="form-label">País:</label>
-                    <InputSelect id="paisid" class="form-select" @bind-Value="Produto.PaisId">
-                        <option value="">Escolha um país</option>
-                        @foreach (var item in paises) {
-                            <option value="@item.Id">@item.Nome</option>
-                        }
-                    </InputSelect>
-                    <ValidationMessage For="() => Produto.PaisId" class="text-danger"/>
-                </div>
-                <div class="mb-3">
-                    <label for="categoriaid" class="form-label">Categoria:</label>
-                    <InputSelect id="categoriaid" class="form-select" @bind-Value="Produto.CategoriaId">
-                        <option value="">Escolha uma categoria</option>
-                        @foreach (var item in categorias) {
-                            <option value="@item.Id">@item.Nome</option>
-                        }
-                    </InputSelect>
-                    <ValidationMessage For="() => Produto.CategoriaId" class="text-danger"/>
-                </div>
-                <div class="mb-3">
-                    <span class="text-danger">*</span>
-                    <label for="mododisponibilizacaoid" class="form-label">Modo Disponibilização:</label>
-                    <InputSelect id="mododisponibilizacaoid" class="form-select" @bind-Value="Produto.ModoDisponibilizacaoId">
-                        @foreach (var item in modosDisponibilizacao) {
-                            <option value="@item.Id">@item.Nome</option>
-                        }
-                    </InputSelect>
-                    <ValidationMessage For="() => Produto.ModoDisponibilizacaoId" class="text-danger"/>
-                </div>
-                <button type="submit" class="btn btn-primary">Guardar</button>
             </EditForm>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card bg-info bg-opacity-10 border-info mb-4 sticky-top" style="top: 20px; z-index: 0;">
+                <div class="card-body">
+                    <h5 class="card-title text-info"><i class="bi bi-lightbulb"></i> Dicas</h5>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <small><i class="bi bi-check2"></i> Mantenha o nome conciso.</small>
+                        </li>
+                        <li class="mb-2">
+                            <small><i class="bi bi-check2"></i> Use imagens de alta qualidade.</small>
+                        </li>
+                        <li class="mb-2">
+                            <small><i class="bi bi-check2"></i> O preço final é calculado automaticamente (Base + Margem).</small>
+                        </li>
+                        <li>
+                            <small><i class="bi bi-check2"></i> Desative o produto se não quiser mostrá-lo.</small>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 }
-
-<div>
-    <a href="/produtos">Voltar à lista</a>
 </div>
 
 @code {
@@ -182,7 +261,8 @@
         var maxSize = 5 * 1024 * 1024; // 5MB
 
         if (file.Size > maxSize) {
-            throw new Exception("Imagem muito grande. O limite é de 5MB.");
+            // Poderia mostrar mensagem de erro
+            return;
         }
 
         using var stream = new MemoryStream();

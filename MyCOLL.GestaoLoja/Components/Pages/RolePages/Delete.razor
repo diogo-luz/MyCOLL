@@ -6,37 +6,89 @@
 
 <PageTitle>Eliminar Role</PageTitle>
 
-<h1>Eliminar Role</h1>
-
-<p class="text-danger"><strong>Tem a certeza que pretende eliminar esta role?</strong></p>
-<div>
-    <hr/>
+<div class="container-fluid">
     @if (role is null) {
-        <p><em>A carregar...</em></p>
-    } else {
-        <dl class="row">
-            <dt class="col-sm-2">Nome</dt>
-            <dd class="col-sm-10">@role.Name</dd>
-            <dt class="col-sm-2">Utilizadores</dt>
-            <dd class="col-sm-10">@userCount utilizador(es) com esta role</dd>
-        </dl>
-        
-        @if (userCount > 0) {
-            <div class="alert alert-warning">
-                <i class="bi bi-exclamation-triangle"></i>
-                <strong>Atenção:</strong> Existem @userCount utilizador(es) com esta role. 
-                Ao eliminar, estes utilizadores perderão esta role.
+        <div class="d-flex justify-content-center align-items-center" style="min-height: 400px;">
+            <div class="spinner-border text-danger" role="status">
+                <span class="visually-hidden">A carregar...</span>
             </div>
-        }
-        
-        @if (!string.IsNullOrEmpty(errorMessage)) {
-            <div class="alert alert-danger">@errorMessage</div>
-        }
-        
-        <EditForm method="post" Model="role" OnValidSubmit="DeleteRole" FormName="delete">
-            <button type="submit" class="btn btn-danger" disabled="@(role is null)">Eliminar</button> |
-            <a href="/roles">Cancelar</a>
-        </EditForm>
+        </div>
+    } else {
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="mb-0 text-danger">
+                    <i class="bi bi-exclamation-triangle"></i> Eliminar Role
+                </h1>
+                <p class="text-muted mb-0">Esta ação pode ter impacto no sistema</p>
+            </div>
+            <a href="/roles" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card border-danger shadow-sm">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0"><i class="bi bi-trash"></i> Confirmar Eliminação</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="alert alert-warning text-start">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <strong>Atenção!</strong> Tem a certeza que pretende eliminar esta role?
+                        </div>
+
+                        <div class="mb-4">
+                            <i class="bi bi-shield-x text-danger" style="font-size: 4rem;"></i>
+                            <h3 class="mt-2">@role.Name</h3>
+                            <p class="text-muted small">ID: @role.Id</p>
+                        </div>
+
+                        @if (userCount > 0) {
+                            <div class="alert alert-danger d-flex align-items-center" role="alert">
+                                <i class="bi bi-people-fill fs-3 me-3"></i>
+                                <div class="text-start">
+                                    <strong>Impacto Crítico:</strong>
+                                    <div>Existem <span class="fw-bold">@userCount</span> utilizador(es) associados a esta role.</div>
+                                    <div class="small">Se eliminar esta role, estes utilizadores perderão as permissões associadas.</div>
+                                </div>
+                            </div>
+                        } else {
+                            <div class="alert alert-success d-flex align-items-center" role="alert">
+                                <i class="bi bi-check-circle fs-3 me-3"></i>
+                                <div class="text-start">
+                                    <strong>Seguro para eliminar:</strong>
+                                    <div>Não existem utilizadores associados a esta role.</div>
+                                </div>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(errorMessage)) {
+                            <div class="alert alert-danger mt-3">@errorMessage</div>
+                        }
+
+                    </div>
+                    <div class="card-footer bg-light">
+                        <EditForm method="post" Model="role" OnValidSubmit="DeleteRole" FormName="delete">
+                            <div class="d-flex gap-2 justify-content-center">
+                                <button type="submit" class="btn btn-danger btn-lg" disabled="@(role.Name == "Admin")">
+                                    <i class="bi bi-trash"></i> Confirmar Eliminação
+                                </button>
+                                <a href="/roles" class="btn btn-outline-secondary btn-lg">
+                                    <i class="bi bi-x-lg"></i> Cancelar
+                                </a>
+                            </div>
+                            @if (role.Name == "Admin") {
+                                <div class="mt-2 text-danger small">
+                                    <i class="bi bi-lock-fill"></i> A role 'Admin' está protegida e não pode ser eliminada.
+                                </div>
+                            }
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
     }
 </div>
 
@@ -52,33 +104,34 @@
             NavigationManager.NavigateTo("notfound");
             return;
         }
-        
+
         role = await RoleManager.FindByIdAsync(Id);
 
         if (role is null) {
             NavigationManager.NavigateTo("notfound");
             return;
         }
-        
+
         var usersInRole = await UserManager.GetUsersInRoleAsync(role.Name!);
         userCount = usersInRole.Count;
     }
 
     private async Task DeleteRole() {
         if (role is null) return;
-        
+
         // Prevent deleting Admin role
         if (role.Name == "Admin") {
             errorMessage = "A role 'Admin' não pode ser eliminada.";
             return;
         }
-        
+
         var result = await RoleManager.DeleteAsync(role);
-        
+
         if (result.Succeeded) {
             NavigationManager.NavigateTo("/roles");
         } else {
             errorMessage = string.Join("; ", result.Errors.Select(e => e.Description));
         }
     }
+
 }
