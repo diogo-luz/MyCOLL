@@ -86,6 +86,8 @@
         }
     }
 
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task UpdateEncomenda() {
         using var context = DbFactory.CreateDbContext();
         context.Attach(Encomenda!).State = EntityState.Modified;

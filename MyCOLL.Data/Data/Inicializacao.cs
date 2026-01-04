@@ -6,7 +6,6 @@ public class Inicializacao {
     public static async Task CriaDadosIniciais(
         UserManager<ApplicationUser> userManager,
         RoleManager<IdentityRole> roleManager) {
-
         // Adicionar default roles
         string[] roles = ["Admin", "Funcionario", "Fornecedor", "Cliente"];
 
@@ -60,6 +59,40 @@ public class Inicializacao {
         if (await userManager.FindByEmailAsync(defaultFuncionario.Email) == null) {
             await userManager.CreateAsync(defaultFuncionario, "Is3C..00");
             await userManager.AddToRoleAsync(defaultFuncionario, "Funcionario");
+        }
+
+        // Adicionar default user - Fornecedor
+        var defaultFornecedor = new ApplicationUser {
+            UserName = "fornecedor@mycoll.com",
+            Email = "fornecedor@mycoll.com",
+            Nome = "Zé",
+            Apelido = "Colecionador",
+            TipoUtilizador = "Fornecedor", // Importante para a tua lógica
+            Activo = true,
+            EmailConfirmed = true,
+            PhoneNumberConfirmed = true
+        };
+
+        if (await userManager.FindByEmailAsync(defaultFornecedor.Email) == null) {
+            await userManager.CreateAsync(defaultFornecedor, "Is3C..00");
+            await userManager.AddToRoleAsync(defaultFornecedor, "Fornecedor");
+        }
+
+        // Adicionar default user - Cliente
+        var defaultCliente = new ApplicationUser {
+            UserName = "cliente@mycoll.com",
+            Email = "cliente@mycoll.com",
+            Nome = "Ana",
+            Apelido = "Compradora",
+            TipoUtilizador = "Cliente",
+            Activo = true,
+            EmailConfirmed = true,
+            PhoneNumberConfirmed = true
+        };
+
+        if (await userManager.FindByEmailAsync(defaultCliente.Email) == null) {
+            await userManager.CreateAsync(defaultCliente, "Is3C..00");
+            await userManager.AddToRoleAsync(defaultCliente, "Cliente");
         }
     }
 }

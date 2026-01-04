@@ -29,7 +29,7 @@
             </div>
             <div class="mb-3">
                 <span class="text-danger">*</span>
-                <label for="precobase" class="form-label">Preço Base:</label>
+                <label for="precobase" class="form-label">Preço / Valor estimado:</label>
                 <InputNumber id="precobase" @bind-Value="Produto.PrecoBase" class="form-control" aria-required="true"/>
                 <ValidationMessage For="() => Produto.PrecoBase" class="text-danger"/>
             </div>
@@ -38,11 +38,7 @@
                 <InputNumber id="percentagem" @bind-Value="Produto.Percentagem" class="form-control"/>
                 <ValidationMessage For="() => Produto.Percentagem" class="text-danger"/>
             </div>
-            <div class="mb-3">
-                <label for="precofinal" class="form-label">Preço Final:</label>
-                <InputNumber id="precofinal" @bind-Value="Produto.PrecoFinal" class="form-control"/>
-                <ValidationMessage For="() => Produto.PrecoFinal" class="text-danger"/>
-            </div>
+
             <div class="mb-3">
                 <label for="stock" class="form-label">Stock:</label>
                 <InputNumber id="stock" @bind-Value="Produto.Stock" class="form-control"/>
@@ -60,7 +56,14 @@
             </div>
             <div class="mb-3">
                 <label for="estado" class="form-label">Estado:</label>
-                <InputText id="estado" @bind-Value="Produto.Estado" class="form-control"/>
+                <InputSelect id="estado" class="form-select" @bind-Value="Produto.Estado">
+                    <option value="">Escolha um estado</option>
+                    <option value="Novo">Novo</option>
+                    <option value="Como Novo">Como Novo</option>
+                    <option value="Usado">Usado</option>
+                    <option value="Danificado">Danificado</option>
+                    <option value="Restaurado">Restaurado</option>
+                </InputSelect>
                 <ValidationMessage For="() => Produto.Estado" class="text-danger"/>
             </div>
             <div class="mb-3">
@@ -173,6 +176,7 @@
     private async Task OnImageChange(InputFileChangeEventArgs e) {
         var file = e.File;
 
+        // Definir limite de 5MB
         var maxSize = 5 * 1024 * 1024; // 5MB
 
         if (file.Size > maxSize) {
@@ -180,16 +184,22 @@
         }
 
         using var stream = new MemoryStream();
-        await file.OpenReadStream(maxSize).CopyToAsync(stream);
-        Produto.Imagem = stream.ToArray();
+        await file.OpenReadStream(maxSize).CopyToAsync(stream); // <-- max size aqui
+        Produto.Imagem = stream.ToArray(); // so guarda os bytes
 
+        //Cria pré-visualização
+        //depois verificar a melhor forma de fazer isto
         using var previewStream = new MemoryStream();
-        await file.OpenReadStream(maxSize).CopyToAsync(previewStream);
-        var base64 = Convert.ToBase64String(previewStream.ToArray());
-        previewUrl = $"data:{file.ContentType};base64,{base64}";
+        await file.OpenReadStream(maxSize).CopyToAsync(previewStream); // <-- max size aqui
+        var base64 = Convert.ToBase64String(previewStream.ToArray()); //converter para base64 a nossa imagem
+        previewUrl = $"data:{file.ContentType};base64,{base64}"; //enviar com o formato que o browser entende como sendo imagem
     }
 
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddProduto() {
+        // Calcular PrecoFinal automaticamente
+        Produto.PrecoFinal = Produto.PrecoBase * (1 + Produto.Percentagem / 100);
+
         using var context = DbFactory.CreateDbContext();
         context.Produtos.Add(Produto);
         await context.SaveChangesAsync();

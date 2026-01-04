@@ -44,11 +44,7 @@
                     <InputNumber id="percentagem" @bind-Value="Produto.Percentagem" class="form-control"/>
                     <ValidationMessage For="() => Produto.Percentagem" class="text-danger"/>
                 </div>
-                <div class="mb-3">
-                    <label for="precofinal" class="form-label">Preço Final:</label>
-                    <InputNumber id="precofinal" @bind-Value="Produto.PrecoFinal" class="form-control"/>
-                    <ValidationMessage For="() => Produto.PrecoFinal" class="text-danger"/>
-                </div>
+
                 <div class="mb-3">
                     <label for="stock" class="form-label">Stock:</label>
                     <InputNumber id="stock" @bind-Value="Produto.Stock" class="form-control"/>
@@ -66,7 +62,13 @@
                 </div>
                 <div class="mb-3">
                     <label for="estado" class="form-label">Estado:</label>
-                    <InputText id="estado" @bind-Value="Produto.Estado" class="form-control"/>
+                    <InputSelect id="estado" class="form-select" @bind-Value="Produto.Estado">
+                        <option value="Novo">Novo</option>
+                        <option value="Como Novo">Como Novo</option>
+                        <option value="Usado">Usado</option>
+                        <option value="Danificado">Danificado</option>
+                        <option value="Restaurado">Restaurado</option>
+                    </InputSelect>
                     <ValidationMessage For="() => Produto.Estado" class="text-danger"/>
                 </div>
                 <div class="mb-3">
@@ -176,6 +178,7 @@
     private async Task OnImageChange(InputFileChangeEventArgs e) {
         var file = e.File;
 
+        // Definir limite de 5MB
         var maxSize = 5 * 1024 * 1024; // 5MB
 
         if (file.Size > maxSize) {
@@ -186,6 +189,7 @@
         await file.OpenReadStream(maxSize).CopyToAsync(stream);
         Produto!.Imagem = stream.ToArray();
 
+        //Cria pré-visualização
         using var previewStream = new MemoryStream();
         await file.OpenReadStream(maxSize).CopyToAsync(previewStream);
         var base64 = Convert.ToBase64String(previewStream.ToArray());
@@ -208,7 +212,12 @@
         }
     }
 
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task UpdateProduto() {
+        // Calcular PrecoFinal automaticamente
+        Produto!.PrecoFinal = Produto.PrecoBase * (1 + Produto.Percentagem / 100);
+
         using var context = DbFactory.CreateDbContext();
         context.Attach(Produto!).State = EntityState.Modified;
 

@@ -1,103 +1,61 @@
 @page "/produtos/delete"
 @using Microsoft.EntityFrameworkCore
 @using MyCOLL.Data.Entities
-@inject IDbContextFactory<MyCOLL.Data.Data.ApplicationDbContext> DbFactory
+@using MyCOLL.Data.Data
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Delete</PageTitle>
+<PageTitle>Eliminar Produto</PageTitle>
 
-<h1>Delete</h1>
+<h1>Eliminar Produto</h1>
 
-<p>Are you sure you want to delete this?</p>
+<p class="text-danger">
+    <strong>Tem a certeza que pretende eliminar este produto?</strong>
+</p>
 <div>
-    <h2>Produto</h2>
     <hr/>
     @if (produto is null) {
         <p>
-            <em>Loading...</em>
+            <em>A carregar...</em>
         </p>
     } else {
-        <dl class="row">
-            <dt class="col-sm-2">Nome</dt>
-            <dd class="col-sm-10">@produto.Nome</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">Descricao</dt>
-            <dd class="col-sm-10">@produto.Descricao</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">PrecoBase</dt>
-            <dd class="col-sm-10">@produto.PrecoBase</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">Percentagem</dt>
-            <dd class="col-sm-10">@produto.Percentagem</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">PrecoFinal</dt>
-            <dd class="col-sm-10">@produto.PrecoFinal</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">Stock</dt>
-            <dd class="col-sm-10">@produto.Stock</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">ParaVenda</dt>
-            <dd class="col-sm-10">@produto.ParaVenda</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">Activo</dt>
-            <dd class="col-sm-10">@produto.Activo</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">Estado</dt>
-            <dd class="col-sm-10">@produto.Estado</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">Ano</dt>
-            <dd class="col-sm-10">@produto.Ano</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">UrlImagem</dt>
-            <dd class="col-sm-10">@produto.UrlImagem</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">Imagem</dt>
-            <dd class="col-sm-10">
+        <div class="row">
+            <div class="col-md-2">
                 @if (produto.Imagem is not null && produto.Imagem.Length > 0) {
-                    <img src="@($"data:image/png;base64, {Convert.ToBase64String(produto.Imagem)}")" alt="@produto.Nome" style="max-width: 100px; max-height: 100px;"/>
+                    <img src="@($"data:image/png;base64,{Convert.ToBase64String(produto.Imagem)}")" alt="@produto.Nome" style="max-width: 100px; max-height: 100px;"/>
                 } else {
-                    <img src="img/placeholderImg.png" alt="Sem imagem" style="max-width: 100px; max-height: 100px"/>
+                    <img src="img/placeholderImg.png" alt="Sem imagem" style="max-width: 100px; max-height: 100px;"/>
                 }
-            </dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">DataCriacao</dt>
-            <dd class="col-sm-10">@produto.DataCriacao</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">FornecedorId</dt>
-            <dd class="col-sm-10">@produto.FornecedorId</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">TipoColecionavelId</dt>
-            <dd class="col-sm-10">@produto.TipoColecionavelId</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">PaisId</dt>
-            <dd class="col-sm-10">@produto.PaisId</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">CategoriaId</dt>
-            <dd class="col-sm-10">@produto.CategoriaId</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">ModoDisponibilizacaoId</dt>
-            <dd class="col-sm-10">@produto.ModoDisponibilizacaoId</dd>
-        </dl>
+            </div>
+            <div class="col-md-10">
+                <dl class="row">
+                    <dt class="col-sm-3">Nome</dt>
+                    <dd class="col-sm-9">
+                        <strong>@produto.Nome</strong>
+                    </dd>
+                    <dt class="col-sm-3">Descrição</dt>
+                    <dd class="col-sm-9">@produto.Descricao</dd>
+                    <dt class="col-sm-3">Preço Final</dt>
+                    <dd class="col-sm-9">@produto.PrecoFinal.ToString("C")</dd>
+                    <dt class="col-sm-3">Stock</dt>
+                    <dd class="col-sm-9">@produto.Stock</dd>
+                    <dt class="col-sm-3">Estado</dt>
+                    <dd class="col-sm-9">@produto.Estado</dd>
+                    <dt class="col-sm-3">Tipo Colecionável</dt>
+                    <dd class="col-sm-9">@produto.TipoColecionavel?.Nome</dd>
+                    <dt class="col-sm-3">Categoria</dt>
+                    <dd class="col-sm-9">@produto.Categoria?.Nome</dd>
+                    <dt class="col-sm-3">País</dt>
+                    <dd class="col-sm-9">@produto.Pais?.Nome</dd>
+                    <dt class="col-sm-3">Fornecedor</dt>
+                    <dd class="col-sm-9">@produto.Fornecedor?.Nome @produto.Fornecedor?.Apelido</dd>
+                </dl>
+            </div>
+        </div>
+        <hr/>
         <EditForm method="post" Model="produto" OnValidSubmit="DeleteProduto" FormName="delete">
-            <button type="submit" class="btn btn-danger" disabled="@(produto is null)">Delete</button> |
-            <a href="/produtos">Back to List</a>
+            <button type="submit" class="btn btn-danger" disabled="@(produto is null)">Eliminar</button> |
+            <a href="/produtos">Cancelar</a>
         </EditForm>
     }
 </div>
@@ -109,7 +67,12 @@
 
     protected override async Task OnInitializedAsync() {
         using var context = DbFactory.CreateDbContext();
-        produto = await context.Produtos.FirstOrDefaultAsync(m => m.Id == Id);
+        produto = await context.Produtos
+            .Include(p => p.TipoColecionavel)
+            .Include(p => p.Categoria)
+            .Include(p => p.Pais)
+            .Include(p => p.Fornecedor)
+            .FirstOrDefaultAsync(m => m.Id == Id);
 
         if (produto is null) {
             NavigationManager.NavigateTo("notfound");
