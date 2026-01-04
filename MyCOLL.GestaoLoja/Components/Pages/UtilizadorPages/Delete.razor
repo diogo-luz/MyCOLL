@@ -1,0 +1,67 @@
+@page "/utilizadores/delete"
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+@inject UserManager<ApplicationUser> UserManager
+@inject NavigationManager NavigationManager
+
+<PageTitle>Eliminar Utilizador</PageTitle>
+
+<h1>Eliminar Utilizador</h1>
+
+<p class="text-danger"><strong>Tem a certeza que pretende eliminar este utilizador?</strong></p>
+<div>
+    <hr/>
+    @if (utilizador is null) {
+        <p><em>A carregar...</em></p>
+    } else {
+        <dl class="row">
+            <dt class="col-sm-2">Nome</dt>
+            <dd class="col-sm-10">@utilizador.Nome @utilizador.Apelido</dd>
+            <dt class="col-sm-2">Email</dt>
+            <dd class="col-sm-10">@utilizador.Email</dd>
+            <dt class="col-sm-2">Tipo</dt>
+            <dd class="col-sm-10">@utilizador.TipoUtilizador</dd>
+            <dt class="col-sm-2">Roles</dt>
+            <dd class="col-sm-10">@string.Join(", ", userRoles)</dd>
+        </dl>
+        <EditForm method="post" Model="utilizador" OnValidSubmit="DeleteUtilizador" FormName="delete">
+            <button type="submit" class="btn btn-danger" disabled="@(utilizador is null)">Eliminar</button> |
+            <a href="/utilizadores">Cancelar</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private ApplicationUser? utilizador;
+    private IList<string> userRoles = new List<string>();
+
+    [SupplyParameterFromQuery] private string? Id { get; set; }
+
+    protected override async Task OnInitializedAsync() {
+        if (string.IsNullOrEmpty(Id)) {
+            NavigationManager.NavigateTo("notfound");
+            return;
+        }
+        
+        using var context = DbFactory.CreateDbContext();
+        utilizador = await context.Users.FirstOrDefaultAsync(u => u.Id == Id);
+
+        if (utilizador is null) {
+            NavigationManager.NavigateTo("notfound");
+            return;
+        }
+        
+        userRoles = await UserManager.GetRolesAsync(utilizador);
+    }
+
+    private async Task DeleteUtilizador() {
+        if (utilizador is null) return;
+        
+        var userToDelete = await UserManager.FindByIdAsync(utilizador.Id);
+        if (userToDelete is not null) {
+            await UserManager.DeleteAsync(userToDelete);
+        }
+        
+        NavigationManager.NavigateTo("/utilizadores");
+    }
+}

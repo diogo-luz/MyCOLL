@@ -1,0 +1,65 @@
+@page "/roles/create"
+@inject RoleManager<IdentityRole> RoleManager
+@inject NavigationManager NavigationManager
+
+<PageTitle>Criar Role</PageTitle>
+
+<h1>Criar Nova Role</h1>
+<hr/>
+
+<div class="row">
+    <div class="col-md-4">
+        <EditForm Model="modelo" OnValidSubmit="CreateRole" FormName="create">
+            <DataAnnotationsValidator/>
+            <ValidationSummary class="text-danger" role="alert"/>
+            
+            @if (!string.IsNullOrEmpty(errorMessage)) {
+                <div class="alert alert-danger">@errorMessage</div>
+            }
+            
+            <div class="mb-3">
+                <span class="text-danger">*</span>
+                <label for="nome" class="form-label">Nome da Role:</label>
+                <InputText id="nome" @bind-Value="modelo.Nome" class="form-control" aria-required="true"/>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Criar</button>
+        </EditForm>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="/roles">Voltar à lista</a>
+</div>
+
+@code {
+    private CreateRoleModel modelo = new();
+    private string? errorMessage;
+
+    private async Task CreateRole() {
+        errorMessage = null;
+        
+        if (string.IsNullOrWhiteSpace(modelo.Nome)) {
+            errorMessage = "O nome da role é obrigatório.";
+            return;
+        }
+        
+        var roleExists = await RoleManager.RoleExistsAsync(modelo.Nome);
+        if (roleExists) {
+            errorMessage = "Já existe uma role com este nome.";
+            return;
+        }
+        
+        var result = await RoleManager.CreateAsync(new IdentityRole(modelo.Nome));
+        
+        if (result.Succeeded) {
+            NavigationManager.NavigateTo("/roles");
+        } else {
+            errorMessage = string.Join("; ", result.Errors.Select(e => e.Description));
+        }
+    }
+
+    private class CreateRoleModel {
+        public string? Nome { get; set; }
+    }
+}

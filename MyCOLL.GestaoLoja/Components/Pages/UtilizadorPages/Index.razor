@@ -1,0 +1,66 @@
+@page "/utilizadores"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+@inject UserManager<ApplicationUser> UserManager
+
+<PageTitle>Utilizadores</PageTitle>
+
+<h1>Gestão de Utilizadores</h1>
+
+<p>
+    <a href="utilizadores/create">Criar novo utilizador</a>
+</p>
+
+<QuickGrid Class="table" Items="utilizadores.AsQueryable()">
+    <TemplateColumn Context="u" Title="Foto" Class="col-1">
+        @if (u.Fotografia is not null && u.Fotografia.Length > 0) {
+            <img src="@($"data:image/png;base64, {Convert.ToBase64String(u.Fotografia)}")" alt="@u.Nome" style="max-width: 50px; max-height: 50px; border-radius: 50%;"/>
+        } else {
+            <i class="bi bi-person-circle" style="font-size: 2rem;"></i>
+        }
+    </TemplateColumn>
+    <PropertyColumn Property="u => u.Nome" Title="Nome"/>
+    <PropertyColumn Property="u => u.Apelido" Title="Apelido"/>
+    <PropertyColumn Property="u => u.Email" Title="Email"/>
+    <PropertyColumn Property="u => u.TipoUtilizador" Title="Tipo"/>
+    <TemplateColumn Context="u" Title="Activo">
+        @if (u.Activo) {
+            <span class="badge bg-success">Activo</span>
+        } else {
+            <span class="badge bg-warning">Inactivo</span>
+        }
+    </TemplateColumn>
+    <TemplateColumn Context="u" Title="Roles">
+        @if (userRoles.ContainsKey(u.Id)) {
+            @string.Join(", ", userRoles[u.Id])
+        }
+    </TemplateColumn>
+    <TemplateColumn Context="u" Title="Ações">
+        <a href="@($"utilizadores/edit?id={u.Id}")">
+            <i class="bi bi-pencil-square"></i>
+        </a> |
+        <a href="@($"utilizadores/details?id={u.Id}")">
+            <i class="bi bi-eye-fill"></i>
+        </a> |
+        <a href="@($"utilizadores/delete?id={u.Id}")">
+            <i class="bi bi-trash-fill"></i>
+        </a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private List<ApplicationUser> utilizadores = new();
+    private Dictionary<string, List<string>> userRoles = new();
+
+    protected override async Task OnInitializedAsync() {
+        using var context = DbFactory.CreateDbContext();
+        utilizadores = await context.Users.OrderBy(u => u.Nome).ToListAsync();
+        
+        // Get roles for each user
+        foreach (var user in utilizadores) {
+            var roles = await UserManager.GetRolesAsync(user);
+            userRoles[user.Id] = roles.ToList();
+        }
+    }
+}

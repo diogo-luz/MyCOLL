@@ -1,0 +1,158 @@
+@page "/utilizadores/edit"
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+@inject UserManager<ApplicationUser> UserManager
+@inject RoleManager<IdentityRole> RoleManager
+@inject NavigationManager NavigationManager
+
+<PageTitle>Editar Utilizador</PageTitle>
+
+<h1>Editar Utilizador</h1>
+<hr/>
+
+@if (utilizador is null) {
+    <p><em>A carregar...</em></p>
+} else {
+    <div class="row">
+        <div class="col-md-6">
+            <EditForm Model="utilizador" OnValidSubmit="UpdateUtilizador" FormName="edit">
+                <DataAnnotationsValidator/>
+                <ValidationSummary class="text-danger" role="alert"/>
+                <input type="hidden" name="utilizador.Id" value="@utilizador.Id"/>
+                
+                <div class="mb-3">
+                    <label for="nome" class="form-label">Nome:</label>
+                    <InputText id="nome" @bind-Value="utilizador.Nome" class="form-control"/>
+                </div>
+                <div class="mb-3">
+                    <label for="apelido" class="form-label">Apelido:</label>
+                    <InputText id="apelido" @bind-Value="utilizador.Apelido" class="form-control"/>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email:</label>
+                    <InputText id="email" @bind-Value="utilizador.Email" class="form-control" readonly/>
+                    <small class="text-muted">O email não pode ser alterado.</small>
+                </div>
+                <div class="mb-3">
+                    <label for="nif" class="form-label">NIF:</label>
+                    <InputNumber id="nif" @bind-Value="utilizador.NIF" class="form-control"/>
+                </div>
+                <div class="mb-3">
+                    <label for="rua" class="form-label">Rua:</label>
+                    <InputText id="rua" @bind-Value="utilizador.Rua" class="form-control"/>
+                </div>
+                <div class="mb-3">
+                    <label for="codigopostal" class="form-label">Código Postal:</label>
+                    <InputText id="codigopostal" @bind-Value="utilizador.CodigoPostal" class="form-control"/>
+                </div>
+                <div class="mb-3">
+                    <label for="localidade" class="form-label">Localidade:</label>
+                    <InputText id="localidade" @bind-Value="utilizador.Localidade" class="form-control"/>
+                </div>
+                <div class="mb-3">
+                    <label for="pais" class="form-label">País:</label>
+                    <InputText id="pais" @bind-Value="utilizador.Pais" class="form-control"/>
+                </div>
+                <div class="mb-3">
+                    <label for="tipo" class="form-label">Tipo de Utilizador:</label>
+                    <InputSelect id="tipo" class="form-select" @bind-Value="utilizador.TipoUtilizador">
+                        <option value="">Escolha um tipo</option>
+                        <option value="Cliente">Cliente</option>
+                        <option value="Fornecedor">Fornecedor</option>
+                    </InputSelect>
+                </div>
+                <div class="mb-3 form-check">
+                    <InputCheckbox id="activo" @bind-Value="utilizador.Activo" class="form-check-input"/>
+                    <label for="activo" class="form-check-label">Conta Activa</label>
+                </div>
+                <div class="mb-3 form-check">
+                    <InputCheckbox id="emailConfirmed" @bind-Value="utilizador.EmailConfirmed" class="form-check-input"/>
+                    <label for="emailConfirmed" class="form-check-label">Email Confirmado</label>
+                </div>
+                
+                <h4 class="mt-4">Roles</h4>
+                <div class="mb-3">
+                    @foreach (var role in todasRoles) {
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="role_@role" 
+                                   checked="@selectedRoles.Contains(role)"
+                                   @onchange="@(e => ToggleRole(role, (bool)e.Value!))"/>
+                            <label class="form-check-label" for="role_@role">@role</label>
+                        </div>
+                    }
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div class="mt-3">
+    <a href="/utilizadores">Voltar à lista</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery] private string? Id { get; set; }
+    
+    private ApplicationUser? utilizador;
+    private List<string> todasRoles = new();
+    private List<string> selectedRoles = new();
+
+    protected override async Task OnInitializedAsync() {
+        if (string.IsNullOrEmpty(Id)) {
+            NavigationManager.NavigateTo("notfound");
+            return;
+        }
+        
+        using var context = DbFactory.CreateDbContext();
+        utilizador = await context.Users.FirstOrDefaultAsync(u => u.Id == Id);
+
+        if (utilizador is null) {
+            NavigationManager.NavigateTo("notfound");
+            return;
+        }
+        
+        todasRoles = await RoleManager.Roles.Select(r => r.Name!).ToListAsync();
+        selectedRoles = (await UserManager.GetRolesAsync(utilizador)).ToList();
+    }
+
+    private void ToggleRole(string role, bool isChecked) {
+        if (isChecked && !selectedRoles.Contains(role)) {
+            selectedRoles.Add(role);
+        } else if (!isChecked && selectedRoles.Contains(role)) {
+            selectedRoles.Remove(role);
+        }
+    }
+
+    private async Task UpdateUtilizador() {
+        if (utilizador is null) return;
+        
+        // Update user properties
+        var userToUpdate = await UserManager.FindByIdAsync(utilizador.Id);
+        if (userToUpdate is null) return;
+        
+        userToUpdate.Nome = utilizador.Nome;
+        userToUpdate.Apelido = utilizador.Apelido;
+        userToUpdate.NIF = utilizador.NIF;
+        userToUpdate.Rua = utilizador.Rua;
+        userToUpdate.CodigoPostal = utilizador.CodigoPostal;
+        userToUpdate.Localidade = utilizador.Localidade;
+        userToUpdate.Pais = utilizador.Pais;
+        userToUpdate.TipoUtilizador = utilizador.TipoUtilizador;
+        userToUpdate.Activo = utilizador.Activo;
+        userToUpdate.EmailConfirmed = utilizador.EmailConfirmed;
+        
+        await UserManager.UpdateAsync(userToUpdate);
+        
+        // Update roles
+        var currentRoles = await UserManager.GetRolesAsync(userToUpdate);
+        var rolesToRemove = currentRoles.Except(selectedRoles);
+        var rolesToAdd = selectedRoles.Except(currentRoles);
+        
+        await UserManager.RemoveFromRolesAsync(userToUpdate, rolesToRemove);
+        await UserManager.AddToRolesAsync(userToUpdate, rolesToAdd);
+        
+        NavigationManager.NavigateTo("/utilizadores");
+    }
+}

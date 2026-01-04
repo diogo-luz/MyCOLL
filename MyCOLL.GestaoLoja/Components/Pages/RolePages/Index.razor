@@ -1,0 +1,43 @@
+@page "/roles"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+
+@inject RoleManager<IdentityRole> RoleManager
+@inject UserManager<ApplicationUser> UserManager
+
+<PageTitle>Roles</PageTitle>
+
+<h1>Gestão de Roles</h1>
+
+<p>
+    <a href="roles/create">Criar nova role</a>
+</p>
+
+<QuickGrid Class="table" Items="roles.AsQueryable()">
+    <PropertyColumn Property="r => r.Name" Title="Nome da Role"/>
+    <TemplateColumn Context="r" Title="Nº Utilizadores">
+        @(userCounts.ContainsKey(r.Name!) ? userCounts[r.Name!] : 0)
+    </TemplateColumn>
+    <TemplateColumn Context="r" Title="Ações">
+        <a href="@($"roles/details?id={r.Id}")">
+            <i class="bi bi-eye-fill"></i>
+        </a> |
+        <a href="@($"roles/delete?id={r.Id}")">
+            <i class="bi bi-trash-fill"></i>
+        </a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private List<IdentityRole> roles = new();
+    private Dictionary<string, int> userCounts = new();
+
+    protected override async Task OnInitializedAsync() {
+        roles = await RoleManager.Roles.OrderBy(r => r.Name).ToListAsync();
+        
+        foreach (var role in roles) {
+            var usersInRole = await UserManager.GetUsersInRoleAsync(role.Name!);
+            userCounts[role.Name!] = usersInRole.Count;
+        }
+    }
+}
