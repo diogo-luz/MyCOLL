@@ -12,20 +12,24 @@ public class EncomendaRepository : IEncomendaRepository {
     }
 
     public async Task<IEnumerable<Encomenda>> GetByClienteAsync(string clienteId) {
+#pragma warning disable CS8620
         return await _context.Encomendas
             .Include(e => e.Itens)
-                .ThenInclude(i => i.Produto)
+            .ThenInclude(i => i.Produto)
             .Where(e => e.ClienteId == clienteId)
             .OrderByDescending(e => e.DataEncomenda)
             .ToListAsync();
+#pragma warning restore CS8620
     }
 
     public async Task<Encomenda?> GetByIdAsync(int id) {
+#pragma warning disable CS8620
         return await _context.Encomendas
             .Include(e => e.Itens)
-                .ThenInclude(i => i.Produto)
+            .ThenInclude(i => i.Produto)
             .Include(e => e.Cliente)
             .FirstOrDefaultAsync(e => e.Id == id);
+#pragma warning restore CS8620
     }
 
     public async Task<Encomenda> AddAsync(Encomenda encomenda) {
