@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MyCOLL.Data.Data;
-//using MyCOLL.API.Repositories;
+using MyCOLL.API.Repositories;
 using MyCOLL.Data.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,12 +21,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-// builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
-// builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
-// builder.Services.AddScoped<ITipoColecionavelRepository, TipoColecionavelRepository>();
-// builder.Services.AddScoped<IPaisRepository, PaisRepository>();
-// builder.Services.AddScoped<IModoDisponibilizacaoRepository, ModoDisponibilizacaoRepository>();
-// builder.Services.AddScoped<IEncomendaRepository, EncomendaRepository>();
+// Registar Repositórios
+// using MyCOLL.API.Repositories;
+builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
+builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+builder.Services.AddScoped<ITipoColecionavelRepository, TipoColecionavelRepository>();
+builder.Services.AddScoped<IPaisRepository, PaisRepository>();
+builder.Services.AddScoped<IModoDisponibilizacaoRepository, ModoDisponibilizacaoRepository>();
+builder.Services.AddScoped<IEncomendaRepository, EncomendaRepository>();
 
 //Vamos adicionar o serviço de autenticação
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
