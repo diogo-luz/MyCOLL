@@ -31,6 +31,9 @@ public class ProdutosController : ControllerBase {
             return NotFound();
         }
 
+        Console.WriteLine(
+            $"[API] GetProduto({id}) -> CatId: {produto.CategoriaId}, CatNome: {produto.Categoria?.Nome}, TipoId: {produto.TipoColecionavelId}, PaisId: {produto.PaisId}");
+
         return MapToDTO(produto);
     }
 

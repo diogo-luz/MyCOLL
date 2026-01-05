@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace MyCOLL.Shared.DTOs;
 
@@ -32,15 +33,19 @@ public class ProdutoDTO {
 
     // IDs de navegação (para edição)
     [Required(ErrorMessage = "A categoria é obrigatória")]
+    [JsonPropertyName("categoriaId")]
     public int? CategoriaId { get; set; }
 
     [Required(ErrorMessage = "O tipo colecionável é obrigatório")]
-    public int? TipoColecionavelId { get; set; } // Pode ser int se FK obrigatória
+    [JsonPropertyName("tipoColecionavelId")]
+    public int? TipoColecionavelId { get; set; }
 
     [Required(ErrorMessage = "O país é obrigatório")]
+    [JsonPropertyName("paisId")]
     public int? PaisId { get; set; }
 
     [Required(ErrorMessage = "O modo de disponibilização é obrigatório")]
+    [JsonPropertyName("modoDisponibilizacaoId")]
     public int? ModoDisponibilizacaoId { get; set; }
 
     // Navegação

@@ -8,68 +8,174 @@
 
 <AuthorizeView Roles="Fornecedor">
     <Authorized>
-        <div class="my-products-container">
-            <div class="header-actions">
-                <h1 class="page-title">🏷️ Meus Produtos</h1>
-                <a href="/produtos/novo" class="btn btn-primary">+ Novo Produto</a>
+        <div class="container-fluid p-0">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="mb-0 fs-2 fw-bold text-dark">
+                        <i class="bi bi-box-seam text-primary me-2"></i>Meus Produtos
+                    </h1>
+                    <p class="text-muted mb-0">Gestão dos seus produtos no catálogo</p>
+                </div>
+                <a href="/produtos/novo" class="btn btn-primary">
+                    <i class="bi bi-plus-lg me-1"></i> Novo Produto
+                </a>
             </div>
 
             @if (_loading) {
-                <div class="loading">A carregar produtos...</div>
-            } else if (!_produtos.Any()) {
-                <div class="empty-state">
-                    <div class="empty-icon">🏷️</div>
-                    <h2>Sem produtos</h2>
-                    <p>Ainda não colocou nenhum produto à venda.</p>
+                <div class="d-flex justify-content-center align-items-center" style="min-height: 300px;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">A carregar...</span>
+                    </div>
                 </div>
             } else {
-                <div class="products-grid">
-                    @foreach (var produto in _produtos) {
-                        <div class="product-card @(produto.Activo ? "" : "inactive")">
-                            <div class="product-image">
-                                @if (!string.IsNullOrEmpty(produto.UrlImagem)) {
-                                    <img src="@produto.UrlImagem" alt="@produto.Nome"/>
-                                } else if (produto.Imagem != null) {
-                                    <img src="data:image/png;base64,@Convert.ToBase64String(produto.Imagem)" alt="@produto.Nome"/>
-                                } else {
-                                    <div class="no-image">Sem Imagem</div>
-                                }
-
-                                <div class="status-overlay">
-                                    @if (produto.Activo) {
-                                        <span class="badge badge-success">Ativo</span>
-                                    } else {
-                                        <span class="badge badge-warning">Pendente/Inativo</span>
-                                    }
-                                </div>
-                            </div>
-
-                            <div class="product-details">
-                                <h3>@produto.Nome</h3>
-                                <div class="price-stock">
-                                    <span class="price">@produto.PrecoFinal.ToString("C")</span>
-                                    <span class="stock">Stock: @produto.Stock</span>
-                                </div>
-                                <div class="product-info">
-                                    <span>@produto.CategoriaNome</span>
-                                    <span>@produto.Estado</span>
-                                </div>
-                            </div>
-
-                            <div class="product-actions">
-                                <a href="/produtos/editar/@produto.Id" class="btn btn-sm btn-outline">Editar</a>
+                <!-- Stats Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="card border-primary h-100 shadow-sm">
+                            <div class="card-body text-center py-4">
+                                <h3 class="text-primary fw-bold mb-1">@_produtos.Count</h3>
+                                <small class="text-muted">Total de Produtos</small>
                             </div>
                         </div>
-                    }
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card border-success h-100 shadow-sm">
+                            <div class="card-body text-center py-4">
+                                <h3 class="text-success fw-bold mb-1">@_produtos.Count(p => p.Activo)</h3>
+                                <small class="text-muted">Ativos</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card border-warning h-100 shadow-sm">
+                            <div class="card-body text-center py-4">
+                                <h3 class="text-warning fw-bold mb-1">@_produtos.Count(p => p.Stock > 0)</h3>
+                                <small class="text-muted">Em Stock</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card border-info h-100 shadow-sm">
+                            <div class="card-body text-center py-4">
+                                <h3 class="text-info fw-bold mb-1">@_produtos.Count(p => p.ParaVenda)</h3>
+                                <small class="text-muted">Para Venda</small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                @if (!_produtos.Any()) {
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body text-center py-5">
+                            <i class="bi bi-inbox display-1 text-muted mb-3"></i>
+                            <h4 class="text-muted">Sem produtos</h4>
+                            <p class="text-muted mb-4">Ainda não colocou nenhum produto à venda.</p>
+                            <a href="/produtos/novo" class="btn btn-primary">
+                                <i class="bi bi-plus-lg me-1"></i> Criar Primeiro Produto
+                            </a>
+                        </div>
+                    </div>
+                } else {
+                    <!-- Products Table -->
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-light py-3">
+                            <h5 class="mb-0 fw-semibold">
+                                <i class="bi bi-table text-primary me-2"></i>Lista de Produtos
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0 align-middle">
+                                    <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 80px;">Imagem</th>
+                                        <th>Nome</th>
+                                        <th>Preço</th>
+                                        <th class="text-center">Stock</th>
+                                        <th>Estado</th>
+                                        <th>Categoria</th>
+                                        <th>Venda</th>
+                                        <th class="text-end">Ações</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    @foreach (var produto in _produtos) {
+                                        <tr class="@(produto.Activo ? "" : "table-secondary")">
+                                            <td>
+                                                @if (produto.Imagem != null && produto.Imagem.Length > 0) {
+                                                    <img src="data:image/png;base64,@Convert.ToBase64String(produto.Imagem)"
+                                                         alt="@produto.Nome"
+                                                         class="rounded shadow-sm"
+                                                         style="width: 50px; height: 50px; object-fit: cover;"/>
+                                                } else if (!string.IsNullOrEmpty(produto.UrlImagem)) {
+                                                    <img src="@produto.UrlImagem"
+                                                         alt="@produto.Nome"
+                                                         class="rounded shadow-sm"
+                                                         style="width: 50px; height: 50px; object-fit: cover;"/>
+                                                } else {
+                                                    <div class="bg-light rounded d-flex align-items-center justify-content-center"
+                                                         style="width: 50px; height: 50px;">
+                                                        <i class="bi bi-image text-muted"></i>
+                                                    </div>
+                                                }
+                                            </td>
+                                            <td class="fw-medium">@produto.Nome</td>
+                                            <td class="fw-bold text-success">@produto.PrecoFinal.ToString("C")</td>
+                                            <td class="text-center">
+                                                @if (produto.Stock > 10) {
+                                                    <span class="badge bg-success">@produto.Stock</span>
+                                                } else if (produto.Stock > 0) {
+                                                    <span class="badge bg-warning text-dark">@produto.Stock</span>
+                                                } else {
+                                                    <span class="badge bg-danger">Esgotado</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (produto.Activo) {
+                                                    <span class="badge bg-success">Ativo</span>
+                                                } else {
+                                                    <span class="badge bg-secondary">Inativo</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">@produto.CategoriaNome</span>
+                                            </td>
+                                            <td>
+                                                @if (produto.ParaVenda) {
+                                                    <i class="bi bi-check-circle-fill text-success"></i>
+                                                } else {
+                                                    <i class="bi bi-x-circle-fill text-muted"></i>
+                                                }
+                                            </td>
+                                            <td class="text-end">
+                                                <div class="btn-group btn-group-sm">
+                                                    <a href="/produtos/editar/@produto.Id"
+                                                       class="btn btn-outline-primary"
+                                                       title="Editar">
+                                                        <i class="bi bi-pencil-square"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                }
             }
         </div>
     </Authorized>
     <NotAuthorized>
-        <div class="container text-center mt-5">
-            <h2>🔒 Acesso Restrito</h2>
-            <p>Apenas fornecedores podem aceder a esta página.</p>
-            <a href="/login" class="btn btn-primary">Entrar</a>
+        <div class="d-flex flex-column align-items-center justify-content-center py-5">
+            <i class="bi bi-shield-lock display-1 text-muted mb-3"></i>
+            <h2 class="fw-bold text-dark">Acesso Restrito</h2>
+            <p class="text-muted mb-4">Apenas fornecedores podem aceder a esta página.</p>
+            <a href="/login" class="btn btn-primary px-4 py-2">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Entrar
+            </a>
         </div>
     </NotAuthorized>
 </AuthorizeView>

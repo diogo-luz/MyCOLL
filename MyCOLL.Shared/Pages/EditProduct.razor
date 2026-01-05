@@ -103,7 +103,7 @@
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label for="categoria" class="form-label fw-medium">Categoria <span class="text-danger">*</span></label>
-                                        <InputSelect id="categoria" @bind-Value="_produto.CategoriaId" class="form-select">
+                                        <InputSelect TValue="int?" id="categoria" @bind-Value="_produto.CategoriaId" class="form-select">
                                             <option value="">-- Selecione --</option>
                                             @foreach (var c in _categorias) {
                                                 <option value="@c.Id">@c.Nome</option>
@@ -113,7 +113,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label for="tipo" class="form-label fw-medium">Tipo Colecionável <span class="text-danger">*</span></label>
-                                        <InputSelect id="tipo" @bind-Value="_produto.TipoColecionavelId" class="form-select">
+                                        <InputSelect TValue="int?" id="tipo" @bind-Value="_produto.TipoColecionavelId" class="form-select">
                                             <option value="">-- Selecione --</option>
                                             @foreach (var t in _tipos) {
                                                 <option value="@t.Id">@t.Nome</option>
@@ -123,7 +123,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label for="pais" class="form-label fw-medium">País <span class="text-danger">*</span></label>
-                                        <InputSelect id="pais" @bind-Value="_produto.PaisId" class="form-select">
+                                        <InputSelect TValue="int?" id="pais" @bind-Value="_produto.PaisId" class="form-select">
                                             <option value="">-- Selecione --</option>
                                             @foreach (var p in _paises) {
                                                 <option value="@p.Id">@p.Nome</option>
@@ -133,7 +133,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label for="modo" class="form-label fw-medium">Modo Disponibilização <span class="text-danger">*</span></label>
-                                        <InputSelect id="modo" @bind-Value="_produto.ModoDisponibilizacaoId" class="form-select">
+                                        <InputSelect TValue="int?" id="modo" @bind-Value="_produto.ModoDisponibilizacaoId" class="form-select">
                                             <option value="">-- Selecione --</option>
                                             @foreach (var m in _modos) {
                                                 <option value="@m.Id">@m.Nome</option>
@@ -282,6 +282,8 @@
                 var produtoExistente = await ProdutoService.GetByIdAsync(Id);
                 if (produtoExistente != null) {
                     _produto = produtoExistente;
+                    Console.WriteLine($"CategoriaId: {_produto.CategoriaId}");
+                    Console.WriteLine($"CategoriaNome: {_produto.CategoriaNome}");
                 } else {
                     Navigation.NavigateTo("/fornecedor/produtos");
                 }
