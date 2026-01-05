@@ -9,7 +9,9 @@
 <div class="cart-container">
     <h1 class="page-title">🛒 O Meu Carrinho</h1>
 
-    @if (!_items.Any()) {
+    @if (_items == null) {
+        <p>A carregar...</p>
+    } else if (!_items.Any()) {
         <div class="empty-cart">
             <div class="empty-icon">🛒</div>
             <h2>O carrinho está vazio</h2>
@@ -23,7 +25,7 @@
                     <div class="cart-item">
                         <div class="item-image">
                             @if (item.Imagem != null) {
-                                <img src="data:image/png;base64,@Convert.ToBase64String(item.Imagem)" alt="@item.Nome" />
+                                <img src="data:image/png;base64,@Convert.ToBase64String(item.Imagem)" alt="@item.Nome"/>
                             } else {
                                 <div class="item-placeholder">🎨</div>
                             }
@@ -79,17 +81,40 @@
 </div>
 
 @code {
-    private List<CarrinhoItem> _items = new();
+    private List<CarrinhoItem>? _items;
     private decimal _total;
     private string? _observacoes;
 
-    protected override async Task OnInitializedAsync() {
-        await LoadCart();
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if (firstRender) {
+            await LoadCart();
+
+            // Importante: Diz ao Blazor que os dados mudaram e ele tem de redesenhar
+            StateHasChanged();
+        }
+
+        if (firstRender) {
+            try {
+                await LoadCart();
+            } catch (Exception) {
+                _items = new List<CarrinhoItem>();
+            }
+
+            StateHasChanged();
+        }
     }
 
     private async Task LoadCart() {
         _items = await CarrinhoService.GetItemsAsync();
-        _total = await CarrinhoService.GetTotalAsync();
+
+        //se vier null faz uma lista vazia
+        _items ??= new List<CarrinhoItem>();
+
+        if (_items.Any()) {
+            _total = await CarrinhoService.GetTotalAsync();
+        } else {
+            _total = 0;
+        }
     }
 
     private async Task UpdateQty(int produtoId, int qty) {

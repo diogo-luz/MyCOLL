@@ -5,6 +5,11 @@ using MyCOLL.Web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Aumentar o limite do SignalR para aguentar imagens Base64
+builder.Services.AddSignalR(e => {
+    e.MaximumReceiveMessageSize = 10 * 1024 * 1024; // Aumentar para 10MB
+});
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();

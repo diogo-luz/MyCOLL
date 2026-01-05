@@ -18,8 +18,12 @@ public class LocalStorageService : ILocalStorageService {
     }
 
     public async Task SetItemAsync<T>(string key, T value) {
-        var json = JsonSerializer.Serialize(value);
-        await _js.InvokeVoidAsync("localStorage.setItem", key, json);
+        try {
+            var json = JsonSerializer.Serialize(value);
+            await _js.InvokeVoidAsync("localStorage.setItem", key, json);
+        } catch {
+            // Ignora se falhar no servidor
+        }
     }
 
     public async Task<T?> GetItemAsync<T>(string key) {
