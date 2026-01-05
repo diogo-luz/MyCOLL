@@ -1,0 +1,29 @@
+.register-card {
+    max-width: 500px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.success-message {
+    background: #c6f6d5;
+    color: #276749;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    line-height: 1.6;
+}
+
+.success-message a {
+    color: #276749;
+    font-weight: 600;
+}
+
+@media (max-width: 480px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}

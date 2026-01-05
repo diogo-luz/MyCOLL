@@ -1,0 +1,86 @@
+@page "/minhas-encomendas"
+@using System.Net.Http.Json
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+@inject HttpClient Http
+@inject ILocalStorageService LocalStorage
+
+<PageTitle>Minhas Encomendas - MyCOLL</PageTitle>
+
+<div class="orders-container">
+    <h1 class="page-title">📦 Minhas Encomendas</h1>
+
+    @if (_loading) {
+        <div class="loading">A carregar encomendas...</div>
+    } else if (!_encomendas.Any()) {
+        <div class="empty-state">
+            <div class="empty-icon">📦</div>
+            <h2>Sem encomendas</h2>
+            <p>Ainda não fez nenhuma encomenda.</p>
+            <a href="/" class="btn-shop">Ir às compras</a>
+        </div>
+    } else {
+        <div class="orders-list">
+            @foreach (var encomenda in _encomendas) {
+                <div class="order-card">
+                    <div class="order-header">
+                        <div class="order-id">
+                            <span class="label">Encomenda</span>
+                            <span class="value">#@encomenda.Id</span>
+                        </div>
+                        <div class="order-date">
+                            <span class="label">Data</span>
+                            <span class="value">@encomenda.DataEncomenda.ToString("dd/MM/yyyy")</span>
+                        </div>
+                        <div class="order-status">
+                            <span class="status-badge @GetStatusClass(encomenda.Estado)">
+                                @encomenda.Estado
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="order-items">
+                        @foreach (var item in encomenda.Itens) {
+                            <div class="order-item">
+                                <span class="item-name">@item.ProdutoNome</span>
+                                <span class="item-qty">x@item.Quantidade</span>
+                                <span class="item-price">@item.Subtotal.ToString("C")</span>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="order-footer">
+                        <span class="order-total">Total: @encomenda.Total.ToString("C")</span>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private List<EncomendaDTO> _encomendas = new();
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync() {
+        try {
+            // Note: This would need the proper HTTP client with auth
+            _encomendas = await Http.GetFromJsonAsync<List<EncomendaDTO>>("api/encomendas/minhas")
+                          ?? new List<EncomendaDTO>();
+        } catch {
+            _encomendas = new List<EncomendaDTO>();
+        }
+
+        _loading = false;
+    }
+
+    private string GetStatusClass(string? estado) => estado?.ToLower() switch {
+        "pendente" => "status-pending",
+        "confirmada" => "status-confirmed",
+        "enviada" => "status-shipped",
+        "entregue" => "status-delivered",
+        "cancelada" => "status-cancelled",
+        _ => ""
+    };
+
+}

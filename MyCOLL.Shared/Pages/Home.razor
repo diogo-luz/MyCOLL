@@ -1,0 +1,93 @@
+@page "/"
+@inject IProdutoService ProdutoService
+@inject ICarrinhoService CarrinhoService
+@inject NavigationManager Nav
+
+<PageTitle>MyCOLL - Colecionáveis</PageTitle>
+
+<div class="home-container">
+    @* Category Slider *@
+    <section class="section-categories">
+        <h2 class="section-title">Explorar por Categoria</h2>
+        <CategorySlider Categorias="_categorias"
+                        SelectedId="_selectedCategoriaId"
+                        OnCategorySelected="OnCategorySelected"/>
+    </section>
+
+    @* Products Grid *@
+    <section class="section-products">
+        <h2 class="section-title">
+            @if (_selectedCategoriaId.HasValue) {
+                <span>@(_categorias.FirstOrDefault(c => c.Id == _selectedCategoriaId)?.Nome ?? "Produtos")</span>
+                <button class="btn-clear-filter" @onclick="ClearFilter">✕ Limpar filtro</button>
+            } else {
+                <span>Todos os Produtos</span>
+            }
+        </h2>
+
+        @if (_loading) {
+            <div class="loading">A carregar produtos...</div>
+        } else if (!_produtos.Any()) {
+            <div class="empty-state">Nenhum produto encontrado.</div>
+        } else {
+            <div class="products-grid">
+                @foreach (var produto in _filteredProdutos) {
+                    <ProductCard Produto="produto"
+                                 OnViewDetails="ViewDetails"
+                                 OnAddToCart="AddToCart"/>
+                }
+            </div>
+        }
+    </section>
+
+    @* Suggestion Banner *@
+    @if (_suggestion != null) {
+        <section class="section-suggestion">
+            <ProductSuggestion Produto="_suggestion" OnClick="ViewDetails"/>
+        </section>
+    }
+</div>
+
+@code {
+    private List<CategoriaDTO> _categorias = new();
+    private List<ProdutoDTO> _produtos = new();
+    private ProdutoDTO? _suggestion;
+    private int? _selectedCategoriaId;
+    private bool _loading = true;
+
+    private IEnumerable<ProdutoDTO> _filteredProdutos => _selectedCategoriaId.HasValue
+        ? _produtos.Where(p => p.CategoriaNome == _categorias.FirstOrDefault(c => c.Id == _selectedCategoriaId)?.Nome)
+        : _produtos;
+
+    protected override async Task OnInitializedAsync() {
+        _categorias = await ProdutoService.GetCategoriasAsync();
+        _produtos = await ProdutoService.GetAllAsync();
+
+        // Pick random suggestion
+        if (_produtos.Any()) {
+            var random = new Random();
+            _suggestion = _produtos[random.Next(_produtos.Count)];
+        }
+
+        _loading = false;
+    }
+
+    private Task OnCategorySelected(int? categoriaId) {
+        _selectedCategoriaId = categoriaId;
+        return Task.CompletedTask;
+    }
+
+    private void ClearFilter() {
+        _selectedCategoriaId = null;
+    }
+
+    private void ViewDetails(int produtoId) {
+        Nav.NavigateTo($"/produto/{produtoId}");
+    }
+
+    private async Task AddToCart(ProdutoDTO produto) {
+        await CarrinhoService.AddItemAsync(produto);
+        // Could add toast notification here
+    }
+
+}

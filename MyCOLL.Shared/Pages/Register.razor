@@ -1,0 +1,98 @@
+@page "/registar"
+@inject IAuthService AuthService
+@inject NavigationManager Nav
+
+<PageTitle>Registar - MyCOLL</PageTitle>
+
+<div class="auth-container">
+    <div class="auth-card register-card">
+        <h1 class="auth-title">📝 Criar Conta</h1>
+        
+        @if (!string.IsNullOrEmpty(_error)) {
+            <div class="error-message">@_error</div>
+        }
+
+        @if (_success) {
+            <div class="success-message">
+                Conta criada com sucesso! Aguarde aprovação do administrador.
+                <br /><a href="/login">Ir para Login</a>
+            </div>
+        } else {
+            <EditForm Model="_registerModel" OnValidSubmit="HandleRegister">
+                <DataAnnotationsValidator />
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nome</label>
+                        <InputText @bind-Value="_registerModel.Nome" class="form-input" placeholder="O seu nome" />
+                        <ValidationMessage For="() => _registerModel.Nome" />
+                    </div>
+                    <div class="form-group">
+                        <label>Apelido</label>
+                        <InputText @bind-Value="_registerModel.Apelido" class="form-input" placeholder="O seu apelido" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <InputText @bind-Value="_registerModel.Email" class="form-input" placeholder="seu@email.com" />
+                    <ValidationMessage For="() => _registerModel.Email" />
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <InputText @bind-Value="_registerModel.Password" type="password" class="form-input" placeholder="Mínimo 6 caracteres" />
+                    <ValidationMessage For="() => _registerModel.Password" />
+                </div>
+
+                <div class="form-group">
+                    <label>Confirmar Password</label>
+                    <InputText @bind-Value="_registerModel.ConfirmPassword" type="password" class="form-input" placeholder="Repetir password" />
+                    <ValidationMessage For="() => _registerModel.ConfirmPassword" />
+                </div>
+
+                <div class="form-group">
+                    <label>Tipo de Conta</label>
+                    <InputSelect @bind-Value="_registerModel.TipoUtilizador" class="form-input">
+                        <option value="Cliente">Cliente</option>
+                        <option value="Fornecedor">Fornecedor</option>
+                    </InputSelect>
+                </div>
+
+                <button type="submit" class="btn-submit" disabled="@_loading">
+                    @if (_loading) {
+                        <span>A registar...</span>
+                    } else {
+                        <span>Criar Conta</span>
+                    }
+                </button>
+            </EditForm>
+
+            <div class="auth-footer">
+                <p>Já tem conta? <a href="/login">Login</a></p>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private RegisterDTO _registerModel = new();
+    private string? _error;
+    private bool _loading;
+    private bool _success;
+
+    private async Task HandleRegister() {
+        _loading = true;
+        _error = null;
+
+        var result = await AuthService.RegisterAsync(_registerModel);
+
+        if (result.Success) {
+            _success = true;
+        } else {
+            _error = result.Error ?? "Erro ao registar";
+        }
+
+        _loading = false;
+    }
+}

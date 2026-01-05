@@ -1,0 +1,114 @@
+@page "/carrinho"
+@inject ICarrinhoService CarrinhoService
+@inject NavigationManager Nav
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>Carrinho - MyCOLL</PageTitle>
+
+<div class="cart-container">
+    <h1 class="page-title">🛒 O Meu Carrinho</h1>
+
+    @if (!_items.Any()) {
+        <div class="empty-cart">
+            <div class="empty-icon">🛒</div>
+            <h2>O carrinho está vazio</h2>
+            <p>Adicione produtos para continuar</p>
+            <button class="btn-shop" @onclick="GoShopping">Ir às compras</button>
+        </div>
+    } else {
+        <div class="cart-content">
+            <div class="cart-items">
+                @foreach (var item in _items) {
+                    <div class="cart-item">
+                        <div class="item-image">
+                            @if (item.Imagem != null) {
+                                <img src="data:image/png;base64,@Convert.ToBase64String(item.Imagem)" alt="@item.Nome" />
+                            } else {
+                                <div class="item-placeholder">🎨</div>
+                            }
+                        </div>
+                        <div class="item-info">
+                            <h3>@item.Nome</h3>
+                            <p class="item-price">@item.Preco.ToString("C")</p>
+                        </div>
+                        <div class="item-quantity">
+                            <button @onclick="() => UpdateQty(item.ProdutoId, item.Quantidade - 1)">−</button>
+                            <span>@item.Quantidade</span>
+                            <button @onclick="() => UpdateQty(item.ProdutoId, item.Quantidade + 1)">+</button>
+                        </div>
+                        <div class="item-subtotal">
+                            <span>@item.Subtotal.ToString("C")</span>
+                        </div>
+                        <button class="btn-remove" @onclick="() => RemoveItem(item.ProdutoId)">🗑️</button>
+                    </div>
+                }
+            </div>
+
+            <div class="cart-summary">
+                <h2>Resumo</h2>
+                <div class="summary-line">
+                    <span>Subtotal</span>
+                    <span>@_total.ToString("C")</span>
+                </div>
+                <div class="summary-line">
+                    <span>Portes</span>
+                    <span>Grátis</span>
+                </div>
+                <div class="summary-total">
+                    <span>Total</span>
+                    <span>@_total.ToString("C")</span>
+                </div>
+
+                <textarea @bind="_observacoes" placeholder="Observações (opcional)" class="observations"></textarea>
+
+                <AuthorizeView>
+                    <Authorized>
+                        <button class="btn-checkout" @onclick="Checkout">
+                            Finalizar Encomenda →
+                        </button>
+                    </Authorized>
+                    <NotAuthorized>
+                        <p class="login-notice">Faça login para finalizar a compra</p>
+                        <button class="btn-login" @onclick="GoLogin">Fazer Login</button>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<CarrinhoItem> _items = new();
+    private decimal _total;
+    private string? _observacoes;
+
+    protected override async Task OnInitializedAsync() {
+        await LoadCart();
+    }
+
+    private async Task LoadCart() {
+        _items = await CarrinhoService.GetItemsAsync();
+        _total = await CarrinhoService.GetTotalAsync();
+    }
+
+    private async Task UpdateQty(int produtoId, int qty) {
+        await CarrinhoService.UpdateQuantidadeAsync(produtoId, qty);
+        await LoadCart();
+    }
+
+    private async Task RemoveItem(int produtoId) {
+        await CarrinhoService.RemoveItemAsync(produtoId);
+        await LoadCart();
+    }
+
+    private async Task Checkout() {
+        var success = await CarrinhoService.CheckoutAsync(_observacoes);
+        if (success) {
+            Nav.NavigateTo("/minhas-encomendas");
+        }
+    }
+
+    private void GoShopping() => Nav.NavigateTo("/");
+    private void GoLogin() => Nav.NavigateTo("/login");
+}

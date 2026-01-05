@@ -1,0 +1,107 @@
+@page "/produto/{Id:int}"
+@inject IProdutoService ProdutoService
+@inject ICarrinhoService CarrinhoService
+@inject NavigationManager Nav
+
+<PageTitle>@(_produto?.Nome ?? "Produto") - MyCOLL</PageTitle>
+
+@if (_loading) {
+    <div class="loading">A carregar...</div>
+} else if (_produto == null) {
+    <div class="not-found">
+        <h2>Produto não encontrado</h2>
+        <button class="btn-back" @onclick="GoBack">← Voltar</button>
+    </div>
+} else {
+    <div class="product-details">
+        <div class="product-image-section">
+            @if (_produto.Imagem != null) {
+                <img src="data:image/png;base64,@Convert.ToBase64String(_produto.Imagem)" 
+                     alt="@_produto.Nome" class="product-main-image" />
+            } else if (!string.IsNullOrEmpty(_produto.UrlImagem)) {
+                <img src="@_produto.UrlImagem" alt="@_produto.Nome" class="product-main-image" />
+            } else {
+                <div class="product-placeholder">🎨</div>
+            }
+        </div>
+
+        <div class="product-info-section">
+            <div class="product-meta">
+                @if (!string.IsNullOrEmpty(_produto.CategoriaNome)) {
+                    <span class="meta-tag">@_produto.CategoriaNome</span>
+                }
+                @if (!string.IsNullOrEmpty(_produto.TipoColecionavelNome)) {
+                    <span class="meta-tag">@_produto.TipoColecionavelNome</span>
+                }
+            </div>
+
+            <h1 class="product-title">@_produto.Nome</h1>
+            
+            <p class="product-price">@_produto.PrecoFinal.ToString("C")</p>
+
+            @if (!string.IsNullOrEmpty(_produto.Descricao)) {
+                <div class="product-description">
+                    <h3>Descrição</h3>
+                    <p>@_produto.Descricao</p>
+                </div>
+            }
+
+            <div class="product-details-list">
+                @if (_produto.Ano.HasValue) {
+                    <div class="detail-item">
+                        <span class="detail-label">Ano:</span>
+                        <span class="detail-value">@_produto.Ano</span>
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(_produto.PaisNome)) {
+                    <div class="detail-item">
+                        <span class="detail-label">País:</span>
+                        <span class="detail-value">@_produto.PaisNome</span>
+                    </div>
+                }
+                <div class="detail-item">
+                    <span class="detail-label">Stock:</span>
+                    <span class="detail-value">@_produto.Stock unidades</span>
+                </div>
+            </div>
+
+            <div class="product-actions">
+                <div class="quantity-selector">
+                    <button @onclick="DecreaseQty" disabled="@(_quantity <= 1)">−</button>
+                    <span>@_quantity</span>
+                    <button @onclick="IncreaseQty" disabled="@(_quantity >= _produto.Stock)">+</button>
+                </div>
+                <button class="btn-add-cart" @onclick="AddToCart" disabled="@(_produto.Stock <= 0)">
+                    🛒 Adicionar ao Carrinho
+                </button>
+            </div>
+
+            <button class="btn-back" @onclick="GoBack">← Voltar à loja</button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private ProdutoDTO? _produto;
+    private bool _loading = true;
+    private int _quantity = 1;
+
+    protected override async Task OnInitializedAsync() {
+        _produto = await ProdutoService.GetByIdAsync(Id);
+        _loading = false;
+    }
+
+    private void IncreaseQty() => _quantity++;
+    private void DecreaseQty() => _quantity--;
+
+    private async Task AddToCart() {
+        if (_produto != null) {
+            await CarrinhoService.AddItemAsync(_produto, _quantity);
+            Nav.NavigateTo("/carrinho");
+        }
+    }
+
+    private void GoBack() => Nav.NavigateTo("/");
+}
