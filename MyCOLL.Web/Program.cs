@@ -38,6 +38,14 @@ builder.Services.AddHttpClient<IEncomendaService, EncomendaService>(client =>
 
 var app = builder.Build();
 
+var supportedCultures = new[] { "pt-PT" };
+var localizationOptions = new RequestLocalizationOptions()
+    .SetDefaultCulture(supportedCultures[0])
+    .AddSupportedCultures(supportedCultures)
+    .AddSupportedUICultures(supportedCultures);
+
+app.UseRequestLocalization(localizationOptions);
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment()) {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);

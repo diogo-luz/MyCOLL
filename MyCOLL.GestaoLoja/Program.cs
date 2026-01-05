@@ -44,6 +44,14 @@ builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSe
 
 var app = builder.Build();
 
+var supportedCultures = new[] { "pt-PT" };
+var localizationOptions = new RequestLocalizationOptions()
+    .SetDefaultCulture(supportedCultures[0])
+    .AddSupportedCultures(supportedCultures)
+    .AddSupportedUICultures(supportedCultures);
+
+app.UseRequestLocalization(localizationOptions);
+
 // Seed initial data (roles + admin user)
 using (var scope = app.Services.CreateScope()) {
     var services = scope.ServiceProvider;
