@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using MyCOLL.Data.Data;
 using MyCOLL.Shared.DTOs;
-using MyCOLL.Data.Entities;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 namespace MyCOLL.API.Controllers;
@@ -75,7 +74,7 @@ public class AuthController : ControllerBase {
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new List<Claim> {
-            new(JwtRegisteredClaimNames.Sub, user.Email ?? string.Empty),
+            new(JwtRegisteredClaimNames.Sub, user.Id), // FIX: Sub deve ser o ID para o mapeamento automático funcionar
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new(ClaimTypes.NameIdentifier, user.Id),
             new(ClaimTypes.Name, user.UserName ?? string.Empty),

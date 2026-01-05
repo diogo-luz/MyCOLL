@@ -51,7 +51,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // registar serviços adicionais - Autenticação e endpoints da API
 builder.Services.AddAuthorization();
 
-builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
+// Usar AddIdentityCore para ter UserManager/SignInManager sem criar endpoints /identity/*
+// Os endpoints de auth são geridos pelo nosso AuthController com JWT personalizado
+builder.Services.AddIdentityCore<ApplicationUser>(options => {
+        options.Password.RequireDigit = false;
+        options.Password.RequiredLength = 6;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireLowercase = false;
+    })
     .AddRoles<IdentityRole>()
     .AddSignInManager()
     .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -66,8 +74,8 @@ builder.Services.AddCors(options => {
 
 var app = builder.Build();
 
-//mapear uma rota para o endpoint de identity
-app.MapGroup("/identity").MapIdentityApi<ApplicationUser>();
+// Endpoints de Identity removidos - usamos o AuthController para login/register
+// app.MapGroup("/identity").MapIdentityApi<ApplicationUser>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {

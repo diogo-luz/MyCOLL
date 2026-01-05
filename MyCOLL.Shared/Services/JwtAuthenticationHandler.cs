@@ -15,21 +15,20 @@ public class JwtAuthenticationHandler : DelegatingHandler {
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
         CancellationToken cancellationToken) {
-        var token = await _localStorage.GetItemAsync<string>("authToken");
+        try {
+            var token = await _localStorage.GetItemAsync<string>("authToken");
 
-        //Se existe um token válido, adicionar ao header Authorization
-        if (!string.IsNullOrEmpty(token)) {
-            //Formato do header -> Authorization: Bearer <token>
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            if (!string.IsNullOrEmpty(token)) {
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
+        } catch {
+            // Se o JS interop falhar, deixamos o pedido ir sem token
         }
 
-        // Enviar o pedido (agora com o header Authorization se houver token)
         var response = await base.SendAsync(request, cancellationToken);
 
-        // se receber 401, limpa o token e faz logout
         if (response.StatusCode == HttpStatusCode.Unauthorized) {
             await _localStorage.RemoveItemAsync("authToken");
-            // TODO: redirecionar para a página de login
         }
 
         return response;

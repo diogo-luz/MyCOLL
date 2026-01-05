@@ -52,13 +52,14 @@ public class CarrinhoService : ICarrinhoService {
     public async Task UpdateQuantidadeAsync(int produtoId, int quantidade) {
         var items = await GetItemsAsync();
         var item = items.FirstOrDefault(i => i.ProdutoId == produtoId);
-        
+
         if (item != null) {
             if (quantidade <= 0) {
                 items.Remove(item);
             } else {
                 item.Quantidade = quantidade;
             }
+
             await _localStorage.SetItemAsync(CarrinhoKey, items);
         }
     }
@@ -87,6 +88,13 @@ public class CarrinhoService : ICarrinhoService {
             var items = await GetItemsAsync();
             if (!items.Any()) return false;
 
+            // Obter token do LocalStorage e anexar manualmente
+            var token = await _localStorage.GetItemAsync<string>("authToken");
+            if (!string.IsNullOrEmpty(token)) {
+                _http.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            }
+
             var encomenda = new CreateEncomendaDTO {
                 Observacoes = observacoes,
                 Itens = items.Select(i => new CreateItemEncomendaDTO {
@@ -96,11 +104,12 @@ public class CarrinhoService : ICarrinhoService {
             };
 
             var response = await _http.PostAsJsonAsync("api/encomendas", encomenda);
-            
+
             if (response.IsSuccessStatusCode) {
                 await ClearAsync();
                 return true;
             }
+
             return false;
         } catch {
             return false;

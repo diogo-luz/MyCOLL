@@ -30,9 +30,24 @@ public class LocalStorageService : ILocalStorageService {
         try {
             var json = await _js.InvokeAsync<string?>("localStorage.getItem", key);
             if (string.IsNullOrEmpty(json)) return default;
+
+            // Se estamos a pedir uma STRING, tentamos devolver direto
+            // Isso resolve o problema se o token foi gravado sem aspas de JSON
+            if (typeof(T) == typeof(string) && !json.StartsWith("\"")) {
+                return (T)(object)json;
+            }
+
             return JsonSerializer.Deserialize<T>(json);
-        } catch {
-            // Se o JSON estiver estragado, devolvemos null em vez de dar erro fatal
+        } catch (JsonException) {
+            if (typeof(T) == typeof(string)) {
+                var raw = await _js.InvokeAsync<string?>("localStorage.getItem", key);
+                return (T)(object)raw!;
+            }
+
+            Console.WriteLine($"Erro JSON ao ler {key}");
+            return default;
+        } catch (Exception ex) {
+            Console.WriteLine($"Erro fatal LocalStorage ({key}): {ex.Message}");
             return default;
         }
     }

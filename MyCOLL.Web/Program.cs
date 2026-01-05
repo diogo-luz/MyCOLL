@@ -34,8 +34,7 @@ builder.Services.AddHttpClient<IProdutoService, ProdutoService>(client =>
     .AddHttpMessageHandler<JwtAuthenticationHandler>();
 
 builder.Services.AddHttpClient<ICarrinhoService, CarrinhoService>(client =>
-        client.BaseAddress = apiUrl)
-    .AddHttpMessageHandler<JwtAuthenticationHandler>();
+    client.BaseAddress = apiUrl);
 
 var app = builder.Build();
 
