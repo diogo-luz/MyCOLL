@@ -21,7 +21,7 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddCascadingAuthenticationState();
 
 
-var apiUrl = new Uri("http://localhost:5255/");
+var apiUrl = new Uri("https://r1zv1lz2-5255.uks1.devtunnels.ms/");
 
 // Registar serviços como Typed Clients para injetar HttpClient configurado
 builder.Services.AddHttpClient<IAuthService, AuthService>(client =>
