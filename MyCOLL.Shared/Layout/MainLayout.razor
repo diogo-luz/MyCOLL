@@ -1,0 +1,73 @@
+@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
+@inject IAuthService AuthService
+@inject ICarrinhoService CarrinhoService
+@inject NavigationManager Nav
+
+<div class="layout-container">
+    @* Header *@
+    <header class="main-header">
+        <div class="header-content">
+            <a href="/" class="logo">
+                <span class="logo-icon">🎨</span>
+                <span class="logo-text">MyCOLL</span>
+            </a>
+            
+            <nav class="nav-links">
+                <a href="/carrinho" class="nav-link">
+                    <span class="nav-icon">🛒</span>
+                    <span>Carrinho</span>
+                    @if (_cartCount > 0) {
+                        <span class="cart-badge">@_cartCount</span>
+                    }
+                </a>
+                
+                <AuthorizeView>
+                    <Authorized>
+                        <a href="/minhas-encomendas" class="nav-link">
+                            <span class="nav-icon">📦</span>
+                            <span>Encomendas</span>
+                        </a>
+                        <button class="nav-link logout-btn" @onclick="Logout">
+                            <span class="nav-icon">🚪</span>
+                            <span>Sair</span>
+                        </button>
+                    </Authorized>
+                    <NotAuthorized>
+                        <a href="/login" class="nav-link">
+                            <span class="nav-icon">🔑</span>
+                            <span>Login</span>
+                        </a>
+                        <a href="/registar" class="nav-link btn-register">
+                            <span class="nav-icon">📝</span>
+                            <span>Registar</span>
+                        </a>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </nav>
+        </div>
+    </header>
+
+    @* Main Content *@
+    <main class="main-content">
+        @Body
+    </main>
+
+    @* Footer *@
+    <footer class="main-footer">
+        <p>© @DateTime.Now.Year MyCOLL - Colecionáveis</p>
+    </footer>
+</div>
+
+@code {
+    private int _cartCount = 0;
+
+    protected override async Task OnInitializedAsync() {
+        _cartCount = await CarrinhoService.GetItemCountAsync();
+    }
+
+    private async Task Logout() {
+        await AuthService.LogoutAsync();
+        Nav.NavigateTo("/", forceLoad: true);
+    }
+}
