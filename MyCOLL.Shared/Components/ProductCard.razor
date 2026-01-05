@@ -1,0 +1,43 @@
+@using MyCOLL.Shared.DTOs
+
+<div class="product-card">
+    <div class="product-image-container">
+        @if (Produto.Imagem != null) {
+            <img src="data:image/png;base64,@Convert.ToBase64String(Produto.Imagem)" 
+                 alt="@Produto.Nome" class="product-image" />
+        } else if (!string.IsNullOrEmpty(Produto.UrlImagem)) {
+            <img src="@Produto.UrlImagem" alt="@Produto.Nome" class="product-image" />
+        } else {
+            <div class="product-placeholder">🎨</div>
+        }
+        <button class="favorite-btn">♡</button>
+    </div>
+    
+    <div class="product-info">
+        <h3 class="product-name">@Produto.Nome</h3>
+        <p class="product-price">@Produto.PrecoFinal.ToString("C")</p>
+        
+        @if (!string.IsNullOrEmpty(Produto.CategoriaNome)) {
+            <span class="product-category">@Produto.CategoriaNome</span>
+        }
+    </div>
+    
+    <div class="product-actions">
+        <button class="btn-details" @onclick="() => OnViewDetails.InvokeAsync(Produto.Id)">
+            Ver Detalhes
+        </button>
+        <button class="btn-cart" @onclick="AddToCart">
+            🛒 Adicionar
+        </button>
+    </div>
+</div>
+
+@code {
+    [Parameter] public ProdutoDTO Produto { get; set; } = new();
+    [Parameter] public EventCallback<int> OnViewDetails { get; set; }
+    [Parameter] public EventCallback<ProdutoDTO> OnAddToCart { get; set; }
+
+    private async Task AddToCart() {
+        await OnAddToCart.InvokeAsync(Produto);
+    }
+}

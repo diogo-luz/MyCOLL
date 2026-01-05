@@ -1,0 +1,18 @@
+@using MyCOLL.Shared.DTOs
+
+<div class="suggestion-banner">
+    <div class="suggestion-icon">🌟</div>
+    <div class="suggestion-content">
+        <span class="suggestion-label">A nossa sugestão</span>
+        <span class="suggestion-product">@Produto.Nome</span>
+        <span class="suggestion-price">@Produto.PrecoFinal.ToString("C")</span>
+    </div>
+    <button class="suggestion-btn" @onclick="() => OnClick.InvokeAsync(Produto.Id)">
+        Ver Produto →
+    </button>
+</div>
+
+@code {
+    [Parameter] public ProdutoDTO Produto { get; set; } = new();
+    [Parameter] public EventCallback<int> OnClick { get; set; }
+}
