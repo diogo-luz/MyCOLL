@@ -12,7 +12,7 @@
                 <span class="logo-icon">🎨</span>
                 <span class="logo-text">MyCOLL</span>
             </a>
-            
+
             <nav class="nav-links">
                 <a href="/carrinho" class="nav-link">
                     <span class="nav-icon">🛒</span>
@@ -21,9 +21,19 @@
                         <span class="cart-badge">@_cartCount</span>
                     }
                 </a>
-                
+
                 <AuthorizeView>
                     <Authorized>
+                        <AuthorizeView Roles="Fornecedor" Context="supplierContext">
+                            <a href="/fornecedor/dashboard" class="nav-link">
+                                <span class="nav-icon">📊</span>
+                                <span>Painel</span>
+                            </a>
+                            <a href="/fornecedor/produtos" class="nav-link">
+                                <span class="nav-icon">🛍️</span>
+                                <span>Produtos</span>
+                            </a>
+                        </AuthorizeView>
                         <a href="/minhas-encomendas" class="nav-link">
                             <span class="nav-icon">📦</span>
                             <span>Encomendas</span>
@@ -70,4 +80,5 @@
         await AuthService.LogoutAsync();
         Nav.NavigateTo("/", forceLoad: true);
     }
+
 }
