@@ -16,7 +16,9 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
 builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthStateProvider>();
+builder.Services.AddAuthentication();
 builder.Services.AddAuthorizationCore();
+builder.Services.AddCascadingAuthenticationState();
 
 builder.Services.AddTransient<JwtAuthenticationHandler>();
 
@@ -48,6 +50,9 @@ if (!app.Environment.IsDevelopment()) {
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
