@@ -1,14 +1,19 @@
 @using MyCOLL.Shared.DTOs
 
-<div class="suggestion-banner">
-    <div class="suggestion-icon">🌟</div>
-    <div class="suggestion-content">
-        <span class="suggestion-label">A nossa sugestão</span>
-        <span class="suggestion-product">@Produto.Nome</span>
-        <span class="suggestion-price">@Produto.PrecoFinal.ToString("C")</span>
+<div class="alert alert-warning border-0 shadow-sm d-flex flex-wrap align-items-center justify-content-between p-4 rounded-3 suggestion-banner">
+    <div class="d-flex align-items-center mb-3 mb-md-0">
+        <div class="bg-white rounded-circle p-3 shadow-sm me-3 text-warning">
+            <i class="bi bi-star-fill fs-4"></i>
+        </div>
+        <div>
+            <h6 class="text-uppercase text-warning fw-bold mb-1 small spacing-wide">A nossa sugestão</h6>
+            <h4 class="mb-0 fw-bold text-dark">@Produto.Nome</h4>
+            <span class="text-primary fw-bold fs-5">@Produto.PrecoFinal.ToString("C")</span>
+        </div>
     </div>
-    <button class="suggestion-btn" @onclick="() => OnClick.InvokeAsync(Produto.Id)">
-        Ver Produto →
+
+    <button class="btn btn-dark px-4 py-2 rounded-pill" @onclick="() => OnClick.InvokeAsync(Produto.Id)">
+        Ver Produto <i class="bi bi-arrow-right ms-2"></i>
     </button>
 </div>
 

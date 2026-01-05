@@ -5,81 +5,112 @@
 
 <PageTitle>@(_produto?.Nome ?? "Produto") - MyCOLL</PageTitle>
 
-@if (_loading) {
-    <div class="loading">A carregar...</div>
-} else if (_produto == null) {
-    <div class="not-found">
-        <h2>Produto não encontrado</h2>
-        <button class="btn-back" @onclick="GoBack">← Voltar</button>
-    </div>
-} else {
-    <div class="product-details">
-        <div class="product-image-section">
-            @if (_produto.Imagem != null) {
-                <img src="data:image/png;base64,@Convert.ToBase64String(_produto.Imagem)" 
-                     alt="@_produto.Nome" class="product-main-image" />
-            } else if (!string.IsNullOrEmpty(_produto.UrlImagem)) {
-                <img src="@_produto.UrlImagem" alt="@_produto.Nome" class="product-main-image" />
-            } else {
-                <div class="product-placeholder">🎨</div>
-            }
+<div class="container py-4">
+    @if (_loading) {
+        <div class="d-flex justify-content-center align-items-center" style="min-height: 400px;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">A carregar...</span>
+            </div>
         </div>
+    } else if (_produto == null) {
+        <div class="text-center py-5">
+            <h2 class="fw-bold mb-3">Produto não encontrado</h2>
+            <button class="btn btn-primary" @onclick="GoBack">
+                <i class="bi bi-arrow-left me-2"></i>Voltar
+            </button>
+        </div>
+    } else {
+        <button class="btn btn-link text-decoration-none ps-0 mb-4" @onclick="GoBack">
+            <i class="bi bi-arrow-left me-2"></i>Voltar à loja
+        </button>
 
-        <div class="product-info-section">
-            <div class="product-meta">
-                @if (!string.IsNullOrEmpty(_produto.CategoriaNome)) {
-                    <span class="meta-tag">@_produto.CategoriaNome</span>
-                }
-                @if (!string.IsNullOrEmpty(_produto.TipoColecionavelNome)) {
-                    <span class="meta-tag">@_produto.TipoColecionavelNome</span>
-                }
+        <div class="row">
+            @* Product Image *@
+            <div class="col-md-6 mb-4">
+                <div class="card border-0 shadow-sm overflow-hidden">
+                    <div class="ratio ratio-1x1 bg-light d-flex align-items-center justify-content-center">
+                        @if (_produto.Imagem != null) {
+                            <img src="data:image/png;base64,@Convert.ToBase64String(_produto.Imagem)"
+                                 alt="@_produto.Nome" class="w-100 h-100 object-fit-cover"/>
+                        } else if (!string.IsNullOrEmpty(_produto.UrlImagem)) {
+                            <img src="@_produto.UrlImagem" alt="@_produto.Nome" class="w-100 h-100 object-fit-cover"/>
+                        } else {
+                            <i class="bi bi-image text-muted" style="font-size: 5rem;"></i>
+                        }
+                    </div>
+                </div>
             </div>
 
-            <h1 class="product-title">@_produto.Nome</h1>
-            
-            <p class="product-price">@_produto.PrecoFinal.ToString("C")</p>
-
-            @if (!string.IsNullOrEmpty(_produto.Descricao)) {
-                <div class="product-description">
-                    <h3>Descrição</h3>
-                    <p>@_produto.Descricao</p>
+            @* Product Info *@
+            <div class="col-md-6">
+                <div class="mb-3">
+                    @if (!string.IsNullOrEmpty(_produto.CategoriaNome)) {
+                        <span class="badge bg-primary me-2">@_produto.CategoriaNome</span>
+                    }
+                    @if (!string.IsNullOrEmpty(_produto.TipoColecionavelNome)) {
+                        <span class="badge bg-secondary me-2">@_produto.TipoColecionavelNome</span>
+                    }
                 </div>
-            }
 
-            <div class="product-details-list">
-                @if (_produto.Ano.HasValue) {
-                    <div class="detail-item">
-                        <span class="detail-label">Ano:</span>
-                        <span class="detail-value">@_produto.Ano</span>
+                <h1 class="display-5 fw-bold mb-3">@_produto.Nome</h1>
+
+                <p class="display-6 text-primary fw-bold mb-4">@_produto.PrecoFinal.ToString("C")</p>
+
+                @if (!string.IsNullOrEmpty(_produto.Descricao)) {
+                    <div class="mb-4">
+                        <h5 class="fw-bold">Descrição</h5>
+                        <p class="text-muted">@_produto.Descricao</p>
                     </div>
                 }
-                @if (!string.IsNullOrEmpty(_produto.PaisNome)) {
-                    <div class="detail-item">
-                        <span class="detail-label">País:</span>
-                        <span class="detail-value">@_produto.PaisNome</span>
+
+                <div class="card bg-light border-0 mb-4">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            @if (_produto.Ano.HasValue) {
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Ano</small>
+                                    <span class="fw-medium">@_produto.Ano</span>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(_produto.PaisNome)) {
+                                <div class="col-6">
+                                    <small class="text-muted d-block">País</small>
+                                    <span class="fw-medium">@_produto.PaisNome</span>
+                                </div>
+                            }
+                            <div class="col-6">
+                                <small class="text-muted d-block">Stock</small>
+                                @if (_produto.Stock > 10) {
+                                    <span class="text-success fw-medium"><i class="bi bi-check-circle me-1"></i>Em Stock (@_produto.Stock)</span>
+                                } else if (_produto.Stock > 0) {
+                                    <span class="text-warning fw-medium"><i class="bi bi-exclamation-circle me-1"></i>Poucas unidades (@_produto.Stock)</span>
+                                } else {
+                                    <span class="text-danger fw-medium"><i class="bi bi-x-circle me-1"></i>Esgotado</span>
+                                }
+                            </div>
+                        </div>
                     </div>
-                }
-                <div class="detail-item">
-                    <span class="detail-label">Stock:</span>
-                    <span class="detail-value">@_produto.Stock unidades</span>
+                </div>
+
+                <div class="d-flex gap-3 align-items-center">
+                    <div class="input-group" style="width: 140px;">
+                        <button class="btn btn-outline-secondary" @onclick="DecreaseQty" disabled="@(_quantity <= 1)">
+                            <i class="bi bi-dash"></i>
+                        </button>
+                        <span class="input-group-text bg-white px-3 border-secondary-subtle">@_quantity</span>
+                        <button class="btn btn-outline-secondary" @onclick="IncreaseQty" disabled="@(_quantity >= _produto.Stock)">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+
+                    <button class="btn btn-primary btn-lg flex-grow-1" @onclick="AddToCart" disabled="@(_produto.Stock <= 0)">
+                        <i class="bi bi-cart-plus me-2"></i>Adicionar ao carrinho
+                    </button>
                 </div>
             </div>
-
-            <div class="product-actions">
-                <div class="quantity-selector">
-                    <button @onclick="DecreaseQty" disabled="@(_quantity <= 1)">−</button>
-                    <span>@_quantity</span>
-                    <button @onclick="IncreaseQty" disabled="@(_quantity >= _produto.Stock)">+</button>
-                </div>
-                <button class="btn-add-cart" @onclick="AddToCart" disabled="@(_produto.Stock <= 0)">
-                    🛒 Adicionar ao Carrinho
-                </button>
-            </div>
-
-            <button class="btn-back" @onclick="GoBack">← Voltar à loja</button>
         </div>
-    </div>
-}
+    }
+</div>
 
 @code {
     [Parameter] public int Id { get; set; }
@@ -89,8 +120,13 @@
     private int _quantity = 1;
 
     protected override async Task OnInitializedAsync() {
-        _produto = await ProdutoService.GetByIdAsync(Id);
-        _loading = false;
+        try {
+            _produto = await ProdutoService.GetByIdAsync(Id);
+        } catch {
+            _produto = null;
+        } finally {
+            _loading = false;
+        }
     }
 
     private void IncreaseQty() => _quantity++;

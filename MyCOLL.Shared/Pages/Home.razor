@@ -5,32 +5,46 @@
 
 <PageTitle>MyCOLL - Colecionáveis</PageTitle>
 
-<div class="home-container">
+<div class="container py-4">
     @* Category Slider *@
-    <section class="section-categories">
-        <h2 class="section-title">Explorar por Categoria</h2>
+    <section class="mb-5">
+        <h2 class="h4 fw-bold mb-4 border-start border-4 border-primary ps-3">Explorar por Categoria</h2>
         <CategorySlider Categorias="_categorias"
                         SelectedId="_selectedCategoriaId"
                         OnCategorySelected="OnCategorySelected"/>
     </section>
 
     @* Products Grid *@
-    <section class="section-products">
-        <h2 class="section-title">
+    <section class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="h4 fw-bold mb-0 border-start border-4 border-primary ps-3">
+                @if (_selectedCategoriaId.HasValue) {
+                    <span>@(_categorias.FirstOrDefault(c => c.Id == _selectedCategoriaId)?.Nome ?? "Produtos")</span>
+                } else {
+                    <span>Todos os Produtos</span>
+                }
+            </h2>
+
             @if (_selectedCategoriaId.HasValue) {
-                <span>@(_categorias.FirstOrDefault(c => c.Id == _selectedCategoriaId)?.Nome ?? "Produtos")</span>
-                <button class="btn-clear-filter" @onclick="ClearFilter">✕ Limpar filtro</button>
-            } else {
-                <span>Todos os Produtos</span>
+                <button class="btn btn-outline-secondary btn-sm" @onclick="ClearFilter">
+                    <i class="bi bi-x-lg me-1"></i>Limpar filtro
+                </button>
             }
-        </h2>
+        </div>
 
         @if (_loading) {
-            <div class="loading">A carregar produtos...</div>
+            <div class="d-flex justify-content-center align-items-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">A carregar...</span>
+                </div>
+            </div>
         } else if (!_produtos.Any()) {
-            <div class="empty-state">Nenhum produto encontrado.</div>
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-search display-1 mb-3"></i>
+                <p>Nenhum produto encontrado.</p>
+            </div>
         } else {
-            <div class="products-grid">
+            <div class="row">
                 @foreach (var produto in _filteredProdutos) {
                     <ProductCard Produto="produto"
                                  OnViewDetails="ViewDetails"
@@ -42,7 +56,8 @@
 
     @* Suggestion Banner *@
     @if (_suggestion != null) {
-        <section class="section-suggestion">
+        <section class="mb-5">
+            <h2 class="h4 fw-bold mb-4 border-start border-4 border-warning ps-3">Destaque do Dia</h2>
             <ProductSuggestion Produto="_suggestion" OnClick="ViewDetails"/>
         </section>
     }
@@ -55,21 +70,32 @@
     private int? _selectedCategoriaId;
     private bool _loading = true;
 
-    private IEnumerable<ProdutoDTO> _filteredProdutos => _selectedCategoriaId.HasValue
-        ? _produtos.Where(p => p.CategoriaNome == _categorias.FirstOrDefault(c => c.Id == _selectedCategoriaId)?.Nome)
-        : _produtos;
+    private IEnumerable<ProdutoDTO> _filteredProdutos {
+        get {
+            Console.WriteLine($"[Home] Total: {_produtos.Count}, SelectedCat: {_selectedCategoriaId}");
+            var filtered = _selectedCategoriaId.HasValue
+                ? _produtos.Where(p => p.CategoriaId == _selectedCategoriaId.Value)
+                : _produtos;
+            Console.WriteLine($"[Home] Filtered: {filtered.Count()}");
+            return filtered;
+        }
+    }
 
     protected override async Task OnInitializedAsync() {
-        _categorias = await ProdutoService.GetCategoriasAsync();
-        _produtos = await ProdutoService.GetAllAsync();
+        try {
+            _categorias = await ProdutoService.GetCategoriasAsync();
+            _produtos = await ProdutoService.GetAllAsync();
 
-        // Pick random suggestion
-        if (_produtos.Any()) {
-            var random = new Random();
-            _suggestion = _produtos[random.Next(_produtos.Count)];
+            // Pick random suggestion
+            if (_produtos.Any()) {
+                var random = new Random();
+                _suggestion = _produtos[random.Next(_produtos.Count)];
+            }
+        } catch (Exception) {
+            // Handle error
+        } finally {
+            _loading = false;
         }
-
-        _loading = false;
     }
 
     private Task OnCategorySelected(int? categoriaId) {

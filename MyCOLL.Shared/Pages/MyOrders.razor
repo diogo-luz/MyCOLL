@@ -6,50 +6,78 @@
 
 <AuthorizeView>
     <Authorized>
-        <div class="orders-container">
-            <h1 class="page-title">📦 Minhas Encomendas</h1>
+        <div class="container py-4">
+            <div class="d-flex align-items-center mb-4">
+                <h1 class="mb-0 fw-bold">
+                    <i class="bi bi-box-seam text-primary me-2"></i>Minhas Encomendas
+                </h1>
+            </div>
 
             @if (_loading) {
-                <div class="loading">A carregar encomendas...</div>
+                <div class="d-flex justify-content-center align-items-center" style="min-height: 200px;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">A carregar...</span>
+                    </div>
+                </div>
             } else if (!_encomendas.Any()) {
-                <div class="empty-state">
-                    <div class="empty-icon">📦</div>
-                    <h2>Sem encomendas</h2>
-                    <p>Ainda não fez nenhuma encomenda.</p>
-                    <a href="/" class="btn-shop">Ir às compras</a>
+                <div class="text-center py-5">
+                    <div class="mb-3">
+                        <i class="bi bi-inbox display-1 text-muted"></i>
+                    </div>
+                    <h2 class="fw-bold text-muted">Sem encomendas</h2>
+                    <p class="text-muted mb-4">Ainda não fez nenhuma encomenda.</p>
+                    <a href="/" class="btn btn-primary btn-lg">
+                        <i class="bi bi-shop me-2"></i>Ir às compras
+                    </a>
                 </div>
             } else {
-                <div class="orders-list">
+                <div class="row">
                     @foreach (var encomenda in _encomendas) {
-                        <div class="order-card">
-                            <div class="order-header">
-                                <div class="order-id">
-                                    <span class="label">Encomenda</span>
-                                    <span class="value">#@encomenda.Id</span>
-                                </div>
-                                <div class="order-date">
-                                    <span class="label">Data</span>
-                                    <span class="value">@encomenda.DataEncomenda.ToString("dd/MM/yyyy")</span>
-                                </div>
-                                <div class="order-status">
-                                    <span class="status-badge @GetStatusClass(encomenda.Estado)">
-                                        @encomenda.Estado
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="order-items">
-                                @foreach (var item in encomenda.Itens) {
-                                    <div class="order-item">
-                                        <span class="item-name">@item.ProdutoNome</span>
-                                        <span class="item-qty">x @item.Quantidade</span>
-                                        <span class="item-price">@item.Subtotal.ToString("C")</span>
+                        <div class="col-12 mb-4">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-header bg-light py-3 d-flex flex-wrap justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <span class="fw-bold text-primary">
+                                            <i class="bi bi-hash"></i>@encomenda.Id
+                                        </span>
+                                        <span class="text-muted small">
+                                            <i class="bi bi-calendar3 me-1"></i>@encomenda.DataEncomenda.ToString("dd/MM/yyyy")
+                                        </span>
                                     </div>
-                                }
-                            </div>
-
-                            <div class="order-footer">
-                                <span class="order-total">Total: @encomenda.Total.ToString("C")</span>
+                                    <div>
+                                        <span class="badge rounded-pill @GetBadgeClass(encomenda.Estado)">
+                                            @encomenda.Estado
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-borderless align-middle mb-0">
+                                            <thead class="border-bottom">
+                                            <tr class="text-uppercase small text-muted">
+                                                <th class="ps-4">Produto</th>
+                                                <th class="text-center">Qtd</th>
+                                                <th class="text-end pe-4">Preço</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            @foreach (var item in encomenda.Itens) {
+                                                <tr>
+                                                    <td class="ps-4 fw-medium">@item.ProdutoNome</td>
+                                                    <td class="text-center">x @item.Quantidade</td>
+                                                    <td class="text-end pe-4">@item.Subtotal.ToString("C")</td>
+                                                </tr>
+                                            }
+                                            </tbody>
+                                            <tfoot class="border-top bg-white">
+                                            <tr>
+                                                <td colspan="2" class="text-end fw-bold py-3">Total</td>
+                                                <td class="text-end fw-bold py-3 pe-4 text-primary">@encomenda.Total.ToString("C")</td>
+                                            </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     }
@@ -58,13 +86,15 @@
         </div>
     </Authorized>
     <NotAuthorized>
-        <div class="orders-container">
-            <div class="empty-state">
-                <div class="empty-icon">🔒</div>
-                <h2>Autenticação necessária</h2>
-                <p>Por favor faça login para ver as suas encomendas.</p>
-                <a href="/login" class="btn-shop">Entrar</a>
+        <div class="container py-5 text-center">
+            <div class="mb-3">
+                <i class="bi bi-shield-lock display-1 text-muted"></i>
             </div>
+            <h2 class="fw-bold text-dark">Autenticação necessária</h2>
+            <p class="text-muted mb-4">Por favor faça login para ver as suas encomendas.</p>
+            <a href="/login" class="btn btn-primary px-4 py-2">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Entrar
+            </a>
         </div>
     </NotAuthorized>
 </AuthorizeView>
@@ -81,14 +111,13 @@
         }
     }
 
-    private string GetStatusClass(string? estado) => estado?.ToLower() switch {
-        "pendente" => "status-pending",
-        "confirmada" => "status-confirmed",
-        "enviada" => "status-shipped",
-        "entregue" => "status-delivered",
-        "cancelada" => "status-cancelled",
-        _ => ""
+    private string GetBadgeClass(string? estado) => estado?.ToLower() switch {
+        "pendente" => "bg-warning text-dark",
+        "confirmada" => "bg-info",
+        "enviada" => "bg-primary",
+        "entregue" => "bg-success",
+        "cancelada" => "bg-danger",
+        _ => "bg-secondary"
     };
 
 }
-
