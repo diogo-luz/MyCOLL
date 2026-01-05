@@ -14,6 +14,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProdutoService, ProdutoService>();
 builder.Services.AddScoped<ICarrinhoService, CarrinhoService>();
 builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthStateProvider>();
+builder.Services.AddAuthorizationCore();
 builder.Services.AddTransient<JwtAuthenticationHandler>();
 builder.Services.AddHttpClient("API", client => {
     client.BaseAddress = new Uri("https://localhost:5255/"); // URL da API
