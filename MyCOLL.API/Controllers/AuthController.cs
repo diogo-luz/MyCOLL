@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -66,6 +67,82 @@ public class AuthController : ControllerBase {
         await _userManager.AddToRoleAsync(user, registerData.TipoUtilizador);
 
         return Ok(new { message = "Registo efetuado com sucesso! A aguardar aprovação." });
+    }
+
+    [Authorize]
+    [HttpGet("profile")]
+    public async Task<ActionResult<UserProfileDTO>> GetProfile() {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var user = await _userManager.FindByIdAsync(userId!);
+
+        if (user == null) return NotFound("Utilizador não encontrado");
+
+        return Ok(new UserProfileDTO {
+            Id = user.Id,
+            Nome = user.Nome,
+            Apelido = user.Apelido,
+            Email = user.Email!,
+            NIF = user.NIF,
+            Rua = user.Rua,
+            Localidade = user.Localidade,
+            CodigoPostal = user.CodigoPostal,
+            Pais = user.Pais,
+            Telefone = user.PhoneNumber,
+            Fotografia = user.Fotografia,
+            TipoUtilizador = user.TipoUtilizador
+        });
+    }
+
+    [Authorize]
+    [HttpPut("profile")]
+    public async Task<IActionResult> UpdateProfile([FromBody] UserProfileDTO profile) {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var user = await _userManager.FindByIdAsync(userId!);
+
+        if (user == null) return NotFound("Utilizador não encontrado");
+
+        user.Nome = profile.Nome;
+        user.Apelido = profile.Apelido;
+        user.NIF = profile.NIF;
+        user.Rua = profile.Rua;
+        user.Localidade = profile.Localidade;
+        user.CodigoPostal = profile.CodigoPostal;
+        user.Pais = profile.Pais;
+        user.PhoneNumber = profile.Telefone;
+
+        // Se a foto vier, atualiza. (Lógica simples, poderia ser melhorada)
+        if (profile.Fotografia != null) {
+            user.Fotografia = profile.Fotografia;
+        }
+
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded) {
+            return BadRequest(new { message = "Erro ao atualizar perfil", errors = result.Errors });
+        }
+
+        return Ok(new { message = "Perfil atualizado com sucesso" });
+    }
+
+    [Authorize]
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO data) {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var user = await _userManager.FindByIdAsync(userId!);
+
+        if (user == null) return NotFound("Utilizador não encontrado");
+
+        var result = await _userManager.ChangePasswordAsync(user, data.CurrentPassword, data.NewPassword);
+
+        if (!result.Succeeded) {
+            return BadRequest(new {
+                message = "Erro ao alterar a password. Verifique se a password atual está correta.",
+                errors = result.Errors
+            });
+        }
+
+        return Ok(new { message = "Password alterada com sucesso" });
     }
 
     private async Task<string> GenerateJwtToken(ApplicationUser user) {

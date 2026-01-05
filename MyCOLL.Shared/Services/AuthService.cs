@@ -9,6 +9,11 @@ public interface IAuthService {
     Task LogoutAsync();
     Task<string?> GetTokenAsync();
     Task<bool> IsAuthenticatedAsync();
+
+    // New methods
+    Task<UserProfileDTO?> GetProfileAsync();
+    Task<AuthResult> UpdateProfileAsync(UserProfileDTO profile);
+    Task<AuthResult> ChangePasswordAsync(ChangePasswordDTO data);
 }
 
 public class AuthService : IAuthService {
@@ -68,6 +73,73 @@ public class AuthService : IAuthService {
     public async Task<bool> IsAuthenticatedAsync() {
         var token = await GetTokenAsync();
         return !string.IsNullOrEmpty(token);
+    }
+
+    public async Task<UserProfileDTO?> GetProfileAsync() {
+        await AddAuthToken();
+        try {
+            return await _http.GetFromJsonAsync<UserProfileDTO>("api/auth/profile");
+        } catch {
+            return null;
+        }
+    }
+
+    public async Task<AuthResult> UpdateProfileAsync(UserProfileDTO profile) {
+        await AddAuthToken();
+        try {
+            var response = await _http.PutAsJsonAsync("api/auth/profile", profile);
+            if (response.IsSuccessStatusCode) {
+                return new AuthResult { Success = true };
+            }
+
+            var error = await ParseErrorResponse(response);
+            return new AuthResult { Success = false, Error = error };
+        } catch (Exception ex) {
+            return new AuthResult { Success = false, Error = ex.Message };
+        }
+    }
+
+    public async Task<AuthResult> ChangePasswordAsync(ChangePasswordDTO data) {
+        await AddAuthToken();
+        try {
+            var response = await _http.PostAsJsonAsync("api/auth/change-password", data);
+            if (response.IsSuccessStatusCode) {
+                return new AuthResult { Success = true };
+            }
+
+            var error = await ParseErrorResponse(response);
+            return new AuthResult { Success = false, Error = error };
+        } catch (Exception ex) {
+            return new AuthResult { Success = false, Error = ex.Message };
+        }
+    }
+
+    private async Task AddAuthToken() {
+        var token = await GetTokenAsync();
+        if (!string.IsNullOrEmpty(token)) {
+            _http.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        }
+    }
+
+    private async Task<string> ParseErrorResponse(HttpResponseMessage response) {
+        var content = await response.Content.ReadAsStringAsync();
+        try {
+            // Tentar extrair a propriedade "message" do JSON
+            var options = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var errorObj = System.Text.Json.JsonSerializer.Deserialize<ErrorResponse>(content, options);
+            if (!string.IsNullOrEmpty(errorObj?.Message)) {
+                return errorObj.Message;
+            }
+        } catch {
+            // Se falhar o parse, retorna o conteúdo original
+        }
+
+        return content;
+    }
+
+    private class ErrorResponse {
+        public string? Message { get; set; }
     }
 }
 
