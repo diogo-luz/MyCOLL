@@ -154,6 +154,13 @@ public class ProdutosController : ControllerBase {
             Activo = p.Activo,
             UrlImagem = p.UrlImagem,
             Imagem = p.Imagem,
+
+            // Mapear IDs para edição
+            CategoriaId = p.CategoriaId,
+            TipoColecionavelId = p.TipoColecionavelId,
+            PaisId = p.PaisId,
+            ModoDisponibilizacaoId = p.ModoDisponibilizacaoId,
+
             CategoriaNome = p.Categoria?.Nome,
             TipoColecionavelNome = p.TipoColecionavel?.Nome,
             PaisNome = p.Pais?.Nome,
