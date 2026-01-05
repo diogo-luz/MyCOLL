@@ -1,4 +1,4 @@
-namespace MyCOLL.Data.DTOs;
+namespace MyCOLL.Shared.DTOs;
 
 public class ProdutoDTO {
     public int Id { get; set; }

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MyCOLL.API.Repositories;
-using MyCOLL.Data.DTOs;
+using MyCOLL.Shared.DTOs;
 
 namespace MyCOLL.API.Controllers;
 

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace MyCOLL.Data.DTOs;
+namespace MyCOLL.Shared.DTOs;
 
 public class LoginDTO {
     [Required(ErrorMessage = "O email é obrigatório")]

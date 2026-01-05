@@ -2,7 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyCOLL.API.Repositories;
-using MyCOLL.Data.DTOs;
+using MyCOLL.Shared.DTOs;
 using MyCOLL.Data.Entities;
 
 namespace MyCOLL.API.Controllers;

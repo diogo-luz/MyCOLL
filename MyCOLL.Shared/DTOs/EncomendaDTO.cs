@@ -1,4 +1,4 @@
-namespace MyCOLL.Data.DTOs;
+namespace MyCOLL.Shared.DTOs;
 
 public class EncomendaDTO {
     public int Id { get; set; }

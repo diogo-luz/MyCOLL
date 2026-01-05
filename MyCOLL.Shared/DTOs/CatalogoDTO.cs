@@ -1,4 +1,4 @@
-namespace MyCOLL.Data.DTOs;
+namespace MyCOLL.Shared.DTOs;
 
 public class CategoriaDTO {
     public int Id { get; set; }

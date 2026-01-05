@@ -13,6 +13,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\MyCOLL.Data\MyCOLL.Data.csproj" />
+      <ProjectReference Include="..\MyCOLL.Shared\MyCOLL.Shared.csproj" />
     </ItemGroup>
 
 </Project>
