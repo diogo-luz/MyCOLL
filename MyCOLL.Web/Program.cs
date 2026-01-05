@@ -36,6 +36,9 @@ builder.Services.AddHttpClient<IProdutoService, ProdutoService>(client =>
 builder.Services.AddHttpClient<ICarrinhoService, CarrinhoService>(client =>
     client.BaseAddress = apiUrl);
 
+builder.Services.AddHttpClient<IEncomendaService, EncomendaService>(client =>
+    client.BaseAddress = apiUrl);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
