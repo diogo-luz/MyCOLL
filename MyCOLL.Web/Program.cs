@@ -20,18 +20,15 @@ builder.Services.AddAuthentication();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddCascadingAuthenticationState();
 
-builder.Services.AddTransient<JwtAuthenticationHandler>();
 
 var apiUrl = new Uri("http://localhost:5255/");
 
 // Registar serviços como Typed Clients para injetar HttpClient configurado
 builder.Services.AddHttpClient<IAuthService, AuthService>(client =>
-        client.BaseAddress = apiUrl)
-    .AddHttpMessageHandler<JwtAuthenticationHandler>();
+    client.BaseAddress = apiUrl);
 
 builder.Services.AddHttpClient<IProdutoService, ProdutoService>(client =>
-        client.BaseAddress = apiUrl)
-    .AddHttpMessageHandler<JwtAuthenticationHandler>();
+    client.BaseAddress = apiUrl);
 
 builder.Services.AddHttpClient<ICarrinhoService, CarrinhoService>(client =>
     client.BaseAddress = apiUrl);
