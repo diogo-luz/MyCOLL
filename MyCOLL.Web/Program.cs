@@ -10,15 +10,25 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IProdutoService, ProdutoService>();
-builder.Services.AddScoped<ICarrinhoService, CarrinhoService>();
 builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthStateProvider>();
 builder.Services.AddAuthorizationCore();
+
 builder.Services.AddTransient<JwtAuthenticationHandler>();
-builder.Services.AddHttpClient("API", client => {
-    client.BaseAddress = new Uri("https://localhost:5255/"); // URL da API
-}).AddHttpMessageHandler<JwtAuthenticationHandler>();
+
+var apiUrl = new Uri("http://localhost:5255/");
+
+// Registar serviços como Typed Clients para injetar HttpClient configurado
+builder.Services.AddHttpClient<IAuthService, AuthService>(client =>
+        client.BaseAddress = apiUrl)
+    .AddHttpMessageHandler<JwtAuthenticationHandler>();
+
+builder.Services.AddHttpClient<IProdutoService, ProdutoService>(client =>
+        client.BaseAddress = apiUrl)
+    .AddHttpMessageHandler<JwtAuthenticationHandler>();
+
+builder.Services.AddHttpClient<ICarrinhoService, CarrinhoService>(client =>
+        client.BaseAddress = apiUrl)
+    .AddHttpMessageHandler<JwtAuthenticationHandler>();
 
 var app = builder.Build();
 
@@ -29,7 +39,7 @@ if (!app.Environment.IsDevelopment()) {
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();

@@ -1,13 +1,16 @@
-﻿@using MyCOLL.Shared.Layout
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using MyCOLL.Shared.Layout
 @using MyCOLL.Shared.Pages
 
-<Router AppAssembly="typeof(Program).Assembly"
-        AdditionalAssemblies="new[] { typeof(Home).Assembly }">
-    <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)"/>
-        <FocusOnNavigate RouteData="routeData" Selector="h1"/>
-    </Found>
-    <NotFound>
-        <p>Página não encontrada.</p>
-    </NotFound>
-</Router>
+<CascadingAuthenticationState>
+    <Router AppAssembly="typeof(Program).Assembly"
+            AdditionalAssemblies="new[] { typeof(Home).Assembly }">
+        <Found Context="routeData">
+            <RouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)"/>
+            <FocusOnNavigate RouteData="routeData" Selector="h1"/>
+        </Found>
+        <NotFound>
+            <p>Página não encontrada.</p>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
