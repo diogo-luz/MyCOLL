@@ -46,4 +46,13 @@ public class EncomendaRepository : IEncomendaRepository {
         await _context.SaveChangesAsync();
         return encomenda;
     }
+
+    public async Task<IEnumerable<ItemEncomenda>> GetVendasByFornecedorAsync(string fornecedorId) {
+        return await _context.ItensEncomenda
+            .Include(i => i.Produto)
+            .Include(i => i.Encomenda) // Para saber a data da venda
+            .Where(i => i.Produto != null && i.Produto.FornecedorId == fornecedorId)
+            .OrderByDescending(i => i.Encomenda != null ? i.Encomenda.DataEncomenda : DateTime.MinValue)
+            .ToListAsync();
+    }
 }

@@ -9,6 +9,7 @@ public interface IProdutoService {
     Task<List<ProdutoDTO>> GetByCategoriaAsync(int categoriaId);
     Task<List<CategoriaDTO>> GetCategoriasAsync();
     Task<List<TipoColecionavelDTO>> GetTiposAsync();
+    Task<List<ProdutoDTO>> GetMyProductsAsync();
 }
 
 public class ProdutoService : IProdutoService {
@@ -78,6 +79,16 @@ public class ProdutoService : IProdutoService {
             return tipos ?? new List<TipoColecionavelDTO>();
         } catch {
             return new List<TipoColecionavelDTO>();
+        }
+    }
+
+    public async Task<List<ProdutoDTO>> GetMyProductsAsync() {
+        try {
+            await AddAuthToken();
+            var produtos = await _http.GetFromJsonAsync<List<ProdutoDTO>>("api/produtos/meus");
+            return produtos ?? new List<ProdutoDTO>();
+        } catch {
+            return new List<ProdutoDTO>();
         }
     }
 }

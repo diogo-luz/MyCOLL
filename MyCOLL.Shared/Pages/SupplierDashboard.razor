@@ -1,0 +1,111 @@
+@page "/fornecedor/dashboard"
+@using Microsoft.AspNetCore.Components.Authorization
+@using MyCOLL.Shared.DTOs
+@using MyCOLL.Shared.Services
+@inject IEncomendaService EncomendaService
+
+<PageTitle>Dashboard Fornecedor - MyCOLL</PageTitle>
+
+<AuthorizeView Roles="Fornecedor">
+    <Authorized>
+        <div class="dashboard-container">
+            <h1 class="page-title">📊 Painel do Fornecedor</h1>
+
+            @if (_loading) {
+                <div class="loading">A carregar estatísticas...</div>
+            } else if (_stats == null) {
+                <div class="error-message">Não foi possível carregar os dados. Tente novamente mais tarde.</div>
+            } else {
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-info">
+                            <span class="stat-label">Total Ganhos</span>
+                            <span class="stat-value">@_stats.TotalGanhos.ToString("C")</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">📦</div>
+                        <div class="stat-info">
+                            <span class="stat-label">Itens Vendidos</span>
+                            <span class="stat-value">@_stats.TotalItensVendidos</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">🏷️</div>
+                        <div class="stat-info">
+                            <span class="stat-label">Produtos Ativos</span>
+                            <span class="stat-value">@_stats.TotalProdutosAtivos</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recent-sales">
+                    <h2>Últimas Vendas</h2>
+                    @if (!_stats.UltimasVendas.Any()) {
+                        <p>Ainda não tem vendas registadas.</p>
+                    } else {
+                        <table class="table sales-table">
+                            <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Produto</th>
+                                <th>Qtd</th>
+                                <th>Total</th>
+                                <th>Estado</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var venda in _stats.UltimasVendas) {
+                                <tr>
+                                    <td>@venda.Data.ToString("dd/MM/yyyy")</td>
+                                    <td>@venda.ProdutoNome</td>
+                                    <td>@venda.Quantidade</td>
+                                    <td>@venda.Total.ToString("C")</td>
+                                    <td>
+                                        <span class="status-badge @GetStatusClass(venda.Estado)">
+                                            @venda.Estado
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            }
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <div class="container text-center mt-5">
+            <h2>🔒 Acesso Restrito</h2>
+            <p>Apenas fornecedores podem aceder a esta página.</p>
+            <a href="/login" class="btn btn-primary">Entrar</a>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private SupplierDashboardDTO? _stats;
+    private bool _loading = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if (firstRender) {
+            _stats = await EncomendaService.GetSupplierDashboardAsync();
+            _loading = false;
+            StateHasChanged();
+        }
+    }
+
+    private string GetStatusClass(string estado) => estado.ToLower() switch {
+        "pendente" => "status-pending",
+        "confirmada" => "status-confirmed",
+        "enviada" => "status-shipped",
+        "entregue" => "status-delivered",
+        "cancelada" => "status-cancelled",
+        _ => ""
+    };
+
+}

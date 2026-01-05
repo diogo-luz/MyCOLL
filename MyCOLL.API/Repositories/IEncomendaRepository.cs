@@ -7,4 +7,5 @@ public interface IEncomendaRepository {
     Task<Encomenda?> GetByIdAsync(int id);
     Task<Encomenda> AddAsync(Encomenda encomenda);
     Task<Encomenda> UpdateEstadoAsync(int id, string novoEstado);
+    Task<IEnumerable<ItemEncomenda>> GetVendasByFornecedorAsync(string fornecedorId);
 }

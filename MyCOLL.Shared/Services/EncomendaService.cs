@@ -5,6 +5,7 @@ namespace MyCOLL.Shared.Services;
 
 public interface IEncomendaService {
     Task<List<EncomendaDTO>> GetMinhasEncomendasAsync();
+    Task<SupplierDashboardDTO?> GetSupplierDashboardAsync();
 }
 
 public class EncomendaService : IEncomendaService {
@@ -29,6 +30,20 @@ public class EncomendaService : IEncomendaService {
                    ?? new List<EncomendaDTO>();
         } catch {
             return new List<EncomendaDTO>();
+        }
+    }
+
+    public async Task<SupplierDashboardDTO?> GetSupplierDashboardAsync() {
+        try {
+            var token = await _localStorage.GetItemAsync<string>("authToken");
+            if (!string.IsNullOrEmpty(token)) {
+                _http.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            }
+
+            return await _http.GetFromJsonAsync<SupplierDashboardDTO>("api/encomendas/vendas");
+        } catch {
+            return null;
         }
     }
 }

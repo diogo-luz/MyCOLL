@@ -86,4 +86,35 @@ public class EncomendasController : ControllerBase {
 
         return CreatedAtAction(nameof(GetMinhas), null);
     }
+
+    // GET: api/encomendas/vendas (Dashboard Fornecedor)
+    [Authorize(Roles = "Fornecedor")]
+    [HttpGet("vendas")]
+    public async Task<ActionResult<SupplierDashboardDTO>> GetVendas() {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null) return Unauthorized();
+
+        // 1. Obter itens vendidos
+        var itensVendidos = (await _encomendaRepository.GetVendasByFornecedorAsync(userId)).ToList();
+
+        // 2. Obter meus produtos (para contar ativos)
+        var meusProdutos = (await _produtoRepository.GetByFornecedorAsync(userId)).ToList();
+
+        // 3. Calcular estatísticas
+        var stats = new SupplierDashboardDTO {
+            TotalGanhos = itensVendidos.Sum(i => i.Quantidade * i.PrecoUnitario),
+            TotalItensVendidos = itensVendidos.Sum(i => i.Quantidade),
+            TotalProdutosAtivos = meusProdutos.Count(p => p.Activo),
+            UltimasVendas = itensVendidos.Take(10).Select(i => new VendaRecenteDTO {
+                EncomendaId = i.EncomendaId,
+                Data = i.Encomenda?.DataEncomenda ?? DateTime.MinValue,
+                ProdutoNome = i.Produto?.Nome ?? "Produto Removido",
+                Quantidade = i.Quantidade,
+                Total = i.Quantidade * i.PrecoUnitario,
+                Estado = i.Encomenda?.Estado ?? "Desconhecido"
+            }).ToList()
+        };
+
+        return stats;
+    }
 }
