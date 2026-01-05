@@ -42,7 +42,7 @@
                                 @foreach (var item in encomenda.Itens) {
                                     <div class="order-item">
                                         <span class="item-name">@item.ProdutoNome</span>
-                                        <span class="item-qty">x@item.Quantidade</span>
+                                        <span class="item-qty">x @item.Quantidade</span>
                                         <span class="item-price">@item.Subtotal.ToString("C")</span>
                                     </div>
                                 }

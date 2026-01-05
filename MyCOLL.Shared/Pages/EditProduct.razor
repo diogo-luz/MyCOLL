@@ -11,133 +11,240 @@
 
 <PageTitle>@Title - MyCOLL</PageTitle>
 
-<AuthorizeView Roles="Fornecedor">
-    <Authorized Context="authContext">
-        <div class="edit-product-container">
-            <h1 class="page-title">@Title</h1>
+<AuthorizeView Roles="Fornecedor" Context="authContext">
+<Authorized>
+    <div class="container-fluid p-0">
+        @if (_loading) {
+            <div class="d-flex justify-content-center align-items-center" style="min-height: 400px;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">A carregar...</span>
+                </div>
+            </div>
+        } else {
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="mb-0 fs-2 fw-bold text-dark">
+                        <i class="bi @(Id == 0 ? "bi-plus-circle" : "bi-pencil-square") text-primary me-2"></i>@Title
+                    </h1>
+                    <p class="text-muted mb-0">@(Id == 0 ? "Preencha os dados do novo produto" : "Atualize as informações do seu produto")</p>
+                </div>
+                <a href="/fornecedor/produtos" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Voltar
+                </a>
+            </div>
 
-            @if (_loading) {
-                <div class="loading">A carregar dados...</div>
-            } else {
-                <EditForm Model="@_produto" OnValidSubmit="HandleSubmit">
-                    <DataAnnotationsValidator/>
-                    <ValidationSummary/>
+            <div class="row">
+                <div class="col-lg-8">
+                    <EditForm Model="@_produto" OnValidSubmit="HandleSubmit" Context="editContext">
+                        <DataAnnotationsValidator/>
+                        <ValidationSummary class="alert alert-danger shadow-sm mb-4" role="alert"/>
 
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Nome</label>
-                            <InputText @bind-Value="_produto.Nome" class="form-control"/>
-                        </div>
-
-                        <div class="form-group full-width">
-                            <label>Descrição</label>
-                            <InputTextArea @bind-Value="_produto.Descricao" class="form-control" rows="3"/>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Preço Base (€)</label>
-                            <InputNumber @bind-Value="_produto.PrecoBase" class="form-control"/>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Stock</label>
-                            <InputNumber @bind-Value="_produto.Stock" class="form-control"/>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Categoria</label>
-                            <InputSelect @bind-Value="_produto.CategoriaId" class="form-control">
-                                <option value="">-- Selecione --</option>
-                                @foreach (var c in _categorias) {
-                                    <option value="@c.Id">@c.Nome</option>
-                                }
-                            </InputSelect>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Tipo Colecionável</label>
-                            <InputSelect @bind-Value="_produto.TipoColecionavelId" class="form-control">
-                                <option value="">-- Selecione --</option>
-                                @foreach (var t in _tipos) {
-                                    <option value="@t.Id">@t.Nome</option>
-                                }
-                            </InputSelect>
-                        </div>
-
-                        <div class="form-group">
-                            <label>País</label>
-                            <InputSelect @bind-Value="_produto.PaisId" class="form-control">
-                                <option value="">-- Selecione --</option>
-                                @foreach (var p in _paises) {
-                                    <option value="@p.Id">@p.Nome</option>
-                                }
-                            </InputSelect>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Ano</label>
-                            <InputNumber @bind-Value="_produto.Ano" class="form-control"/>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Estado de Conservação</label>
-                            <InputText @bind-Value="_produto.Estado" class="form-control"/>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Modo de Disponibilização</label>
-                            <InputSelect @bind-Value="_produto.ModoDisponibilizacaoId" class="form-control">
-                                <option value="">-- Selecione --</option>
-                                @foreach (var m in _modos) {
-                                    <option value="@m.Id">@m.Nome</option>
-                                }
-                            </InputSelect>
-                        </div>
-
-                        <div class="form-group checkbox-group">
-                            <InputCheckbox @bind-Value="_produto.ParaVenda" id="paravenda"/>
-                            <label for="paravenda">Disponível para Venda</label>
-                        </div>
-
-                        <div class="form-group full-width">
-                            <label>Imagem</label>
-                            <InputFile OnChange="HandleFileSelected" accept="image/*" class="form-control"/>
-                            @if (_produto.Imagem != null) {
-                                <div class="image-preview mt-2">
-                                    <img src="data:image/png;base64,@Convert.ToBase64String(_produto.Imagem)" style="max-height: 150px;"/>
+                        <!-- Info Geral -->
+                        <div class="card shadow-sm border-0 mb-4 rounded-3 overflow-hidden">
+                            <div class="card-header bg-light py-3">
+                                <h5 class="mb-0 fw-semibold text-primary"><i class="bi bi-info-circle me-2"></i>Informações Gerais</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="mb-3">
+                                    <label for="nome" class="form-label fw-medium">Nome <span class="text-danger">*</span></label>
+                                    <InputText id="nome" @bind-Value="_produto.Nome" class="form-control" placeholder="Ex: Selo Raro 1950"/>
+                                    <ValidationMessage For="@(() => _produto.Nome)" class="text-danger small"/>
                                 </div>
-                            } else if (!string.IsNullOrEmpty(_produto.UrlImagem)) {
-                                <div class="image-preview mt-2">
-                                    <img src="@_produto.UrlImagem" style="max-height: 150px;"/>
+
+                                <div class="mb-3">
+                                    <label for="descricao" class="form-label fw-medium">Descrição <span class="text-danger">*</span></label>
+                                    <InputTextArea id="descricao" @bind-Value="_produto.Descricao" class="form-control" rows="4" placeholder="Descreva os detalhes do produto..."/>
+                                    <ValidationMessage For="@(() => _produto.Descricao)" class="text-danger small"/>
                                 </div>
+
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="precobase" class="form-label fw-medium">Preço Base (€) <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">€</span>
+                                            <InputNumber id="precobase" @bind-Value="_produto.PrecoBase" class="form-control"/>
+                                        </div>
+                                        <ValidationMessage For="@(() => _produto.PrecoBase)" class="text-danger small"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="stock" class="form-label fw-medium">Stock</label>
+                                        <InputNumber id="stock" @bind-Value="_produto.Stock" class="form-control"/>
+                                        <ValidationMessage For="@(() => _produto.Stock)" class="text-danger small"/>
+                                    </div>
+                                </div>
+
+                                <div class="row g-3 mt-1">
+                                    <div class="col-md-6">
+                                        <label for="ano" class="form-label fw-medium">Ano</label>
+                                        <InputNumber id="ano" @bind-Value="_produto.Ano" class="form-control" placeholder="Ex: 2023"/>
+                                        <ValidationMessage For="@(() => _produto.Ano)" class="text-danger small"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="estado" class="form-label fw-medium">Estado</label>
+                                        <InputSelect id="estado" class="form-select" @bind-Value="_produto.Estado">
+                                            <option value="Novo">Novo</option>
+                                            <option value="Como Novo">Como Novo</option>
+                                            <option value="Usado">Usado</option>
+                                            <option value="Danificado">Danificado</option>
+                                            <option value="Restaurado">Restaurado</option>
+                                        </InputSelect>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Classificação -->
+                        <div class="card shadow-sm border-0 mb-4 rounded-3 overflow-hidden">
+                            <div class="card-header bg-light py-3">
+                                <h5 class="mb-0 fw-semibold text-primary"><i class="bi bi-tags me-2"></i>Classificação</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="categoria" class="form-label fw-medium">Categoria <span class="text-danger">*</span></label>
+                                        <InputSelect id="categoria" @bind-Value="_produto.CategoriaId" class="form-select">
+                                            <option value="">-- Selecione --</option>
+                                            @foreach (var c in _categorias) {
+                                                <option value="@c.Id">@c.Nome</option>
+                                            }
+                                        </InputSelect>
+                                        <ValidationMessage For="@(() => _produto.CategoriaId)" class="text-danger small"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="tipo" class="form-label fw-medium">Tipo Colecionável <span class="text-danger">*</span></label>
+                                        <InputSelect id="tipo" @bind-Value="_produto.TipoColecionavelId" class="form-select">
+                                            <option value="">-- Selecione --</option>
+                                            @foreach (var t in _tipos) {
+                                                <option value="@t.Id">@t.Nome</option>
+                                            }
+                                        </InputSelect>
+                                        <ValidationMessage For="@(() => _produto.TipoColecionavelId)" class="text-danger small"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="pais" class="form-label fw-medium">País <span class="text-danger">*</span></label>
+                                        <InputSelect id="pais" @bind-Value="_produto.PaisId" class="form-select">
+                                            <option value="">-- Selecione --</option>
+                                            @foreach (var p in _paises) {
+                                                <option value="@p.Id">@p.Nome</option>
+                                            }
+                                        </InputSelect>
+                                        <ValidationMessage For="@(() => _produto.PaisId)" class="text-danger small"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="modo" class="form-label fw-medium">Modo Disponibilização <span class="text-danger">*</span></label>
+                                        <InputSelect id="modo" @bind-Value="_produto.ModoDisponibilizacaoId" class="form-select">
+                                            <option value="">-- Selecione --</option>
+                                            @foreach (var m in _modos) {
+                                                <option value="@m.Id">@m.Nome</option>
+                                            }
+                                        </InputSelect>
+                                        <ValidationMessage For="@(() => _produto.ModoDisponibilizacaoId)" class="text-danger small"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Imagem -->
+                        <div class="card shadow-sm border-0 mb-4 rounded-3 overflow-hidden">
+                            <div class="card-header bg-light py-3">
+                                <h5 class="mb-0 fw-semibold text-primary"><i class="bi bi-image me-2"></i>Imagem</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="mb-3">
+                                    <label class="form-label fw-medium">Carregar Imagem</label>
+                                    <InputFile OnChange="HandleFileSelected" accept="image/*" class="form-control"/>
+                                </div>
+
+                                <div class="bg-light rounded p-3 text-center border border-dashed">
+                                    @if (_produto.Imagem != null) {
+                                        <img src="data:image/png;base64,@Convert.ToBase64String(_produto.Imagem)" class="img-fluid rounded shadow-sm" style="max-height: 250px;"/>
+                                    } else if (!string.IsNullOrEmpty(_produto.UrlImagem)) {
+                                        <img src="@_produto.UrlImagem" class="img-fluid rounded shadow-sm" style="max-height: 250px;"/>
+                                    } else {
+                                        <div class="d-flex flex-column align-items-center justify-content-center text-muted py-4">
+                                            <i class="bi bi-image fs-1 mb-2"></i>
+                                            <span>Sem imagem selecionada</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Definições -->
+                        <div class="card shadow-sm border-0 mb-4 rounded-3 overflow-hidden">
+                            <div class="card-header bg-light py-3">
+                                <h5 class="mb-0 fw-semibold text-primary"><i class="bi bi-gear me-2"></i>Definições</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="form-check form-switch custom-switch">
+                                    <InputCheckbox @bind-Value="_produto.ParaVenda" id="paravenda" class="form-check-input"/>
+                                    <label for="paravenda" class="form-check-label fw-medium">Disponível para Venda</label>
+                                    <div class="form-text">Ative esta opção para que o produto apareça na loja.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex gap-2 mb-5">
+                            <button type="submit" class="btn btn-primary px-4 py-2 fw-medium" disabled="@_submitting">
+                                <i class="bi bi-check-lg me-1"></i>
+                                @if (_submitting) {
+                                    <span>A guardar...</span>
+                                } else {
+                                    <span>Guardar Alterações</span>
+                                }
+                            </button>
+                            <a href="/fornecedor/produtos" class="btn btn-outline-secondary px-4 py-2 fw-medium">
+                                <i class="bi bi-x-lg me-1"></i> Cancelar
+                            </a>
+                            @if (Id > 0) {
+                                <button type="button" class="btn btn-danger px-4 py-2 fw-medium ms-auto" @onclick="DeleteProduct">
+                                    <i class="bi bi-trash me-1"></i> Apagar
+                                </button>
                             }
                         </div>
-                    </div>
+                    </EditForm>
+                </div>
 
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary" disabled="@_submitting">
-                            @if (_submitting) {
-                                <span>A guardar...</span>
-                            } else {
-                                <span>Guardar</span>
-                            }
-                        </button>
-                        <a href="/fornecedor/produtos" class="btn btn-secondary">Cancelar</a>
-
-                        @if (Id > 0) {
-                            <button type="button" class="btn btn-danger" @onclick="DeleteProduct">Apagar</button>
-                        }
+                <!-- Sidebar Dicas -->
+                <div class="col-lg-4">
+                    <div class="card border-0 bg-primary bg-opacity-10 mb-4 sticky-top" style="top: 2rem; z-index: 1;">
+                        <div class="card-body p-4">
+                            <h5 class="card-title text-primary fw-bold mb-3"><i class="bi bi-lightbulb me-2"></i>Dicas Úteis</h5>
+                            <ul class="list-unstyled mb-0 d-flex flex-column gap-3">
+                                <li class="d-flex align-items-start">
+                                    <i class="bi bi-check-circle-fill text-primary mt-1 me-2"></i>
+                                    <small class="text-secondary">Escreva nomes claros e descrições detalhadas para atrair compradores.</small>
+                                </li>
+                                <li class="d-flex align-items-start">
+                                    <i class="bi bi-check-circle-fill text-primary mt-1 me-2"></i>
+                                    <small class="text-secondary">Use imagens de alta qualidade e com boa iluminação.</small>
+                                </li>
+                                <li class="d-flex align-items-start">
+                                    <i class="bi bi-check-circle-fill text-primary mt-1 me-2"></i>
+                                    <small class="text-secondary">O preço deve ser justo e refletir o estado do colecionável.</small>
+                                </li>
+                                <li class="d-flex align-items-start">
+                                    <i class="bi bi-check-circle-fill text-primary mt-1 me-2"></i>
+                                    <small class="text-secondary">Desative a opção "Disponível para Venda" se o produto não tiver stock imediato.</small>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
-                </EditForm>
-            }
-        </div>
-    </Authorized>
-    <NotAuthorized>
-        <div class="text-center mt-5">
-            <h2>Acesso Restrito</h2>
-            <a href="/login" class="btn btn-primary">Login</a>
-        </div>
-    </NotAuthorized>
+                </div>
+            </div>
+        }
+    </div>
+</Authorized>
+<NotAuthorized>
+    <div class="d-flex flex-column align-items-center justify-content-center py-5">
+        <i class="bi bi-shield-lock display-1 text-muted mb-3"></i>
+        <h2 class="fw-bold text-dark">Acesso Restrito</h2>
+        <p class="text-muted mb-4">Tem de ser um Fornecedor para aceder a esta página.</p>
+        <a href="/login" class="btn btn-primary px-4 py-2"><i class="bi bi-box-arrow-in-right me-2"></i>Login</a>
+    </div>
+</NotAuthorized>
 </AuthorizeView>
 
 @code {
@@ -152,69 +259,60 @@
     private bool _loading = true;
     private bool _submitting = false;
 
-    private string Title => Id > 0 ? "Editar Produto" : "Novo Produto";
+    private string Title => Id == 0 ? "Novo Produto" : "Editar Produto";
 
-    protected override async Task OnAfterRenderAsync(bool firstRender) {
-        if (firstRender) {
-            await LoadDataAsync();
-            StateHasChanged();
-        }
-    }
+    protected override async Task OnInitializedAsync() {
+        try {
+            _loading = true;
 
-    private async Task LoadDataAsync() {
-        _loading = true;
-        // Carregar listas auxiliares
-        var t1 = ProdutoService.GetCategoriasAsync();
-        var t2 = ProdutoService.GetTiposAsync();
-        var t3 = ProdutoService.GetPaisesAsync();
-        var t4 = ProdutoService.GetModosAsync();
+            // Carregar auxiliares sempre
+            var tCategorias = ProdutoService.GetCategoriasAsync();
+            var tTipos = ProdutoService.GetTiposAsync();
+            var tPaises = ProdutoService.GetPaisesAsync();
+            var tModos = ProdutoService.GetModosAsync();
 
-        await Task.WhenAll(t1, t2, t3, t4);
-        _categorias = await t1;
-        _tipos = await t2;
-        _paises = await t3;
-        _modos = await t4;
+            await Task.WhenAll(tCategorias, tTipos, tPaises, tModos);
 
-        if (Id > 0) {
-            var prod = await ProdutoService.GetByIdAsync(Id);
-            if (prod != null) {
-                _produto = prod;
-            } else {
-                Navigation.NavigateTo("/fornecedor/produtos");
+            _categorias = (await tCategorias).ToList();
+            _tipos = (await tTipos).ToList();
+            _paises = (await tPaises).ToList();
+            _modos = (await tModos).ToList();
+
+            if (Id > 0) {
+                var produtoExistente = await ProdutoService.GetByIdAsync(Id);
+                if (produtoExistente != null) {
+                    _produto = produtoExistente;
+                } else {
+                    Navigation.NavigateTo("/fornecedor/produtos");
+                }
             }
+        } catch (Exception ex) {
+            Console.WriteLine($"Erro ao carregar dados: {ex.Message}");
+        } finally {
+            _loading = false;
         }
-
-        _loading = false;
     }
 
     private async Task HandleSubmit() {
         _submitting = true;
-        ProdutoDTO? result;
+        try {
+            ProdutoDTO? resultado;
+            if (Id == 0) {
+                resultado = await ProdutoService.CreateProductAsync(_produto);
+            } else {
+                resultado = await ProdutoService.UpdateProductAsync(_produto);
+            }
 
-        if (Id > 0) {
-            result = await ProdutoService.UpdateProductAsync(_produto);
-        } else {
-            result = await ProdutoService.CreateProductAsync(_produto);
-        }
-
-        _submitting = false;
-
-        if (result != null) {
-            Navigation.NavigateTo("/fornecedor/produtos");
-        } else {
-            Console.WriteLine("Erro ao guardar");
-        }
-    }
-
-    private async Task HandleFileSelected(InputFileChangeEventArgs e) {
-        var file = e.File;
-        if (file != null) {
-            // Limitar tamanho a 5MB
-            var resizedFile = await file.RequestImageFileAsync("image/png", 800, 600);
-            var buffer = new byte[resizedFile.Size];
-            await resizedFile.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024).ReadAsync(buffer);
-            _produto.Imagem = buffer;
-            _produto.UrlImagem = null;
+            if (resultado != null) {
+                Navigation.NavigateTo("/fornecedor/produtos");
+            } else {
+                Console.WriteLine("Erro ao guardar produto");
+                // Podia adicionar toast de erro aqui
+            }
+        } catch (Exception ex) {
+            Console.WriteLine($"Erro submit: {ex.Message}");
+        } finally {
+            _submitting = false;
         }
     }
 
@@ -223,6 +321,22 @@
         if (confirmed) {
             var success = await ProdutoService.DeleteProductAsync(Id);
             if (success) Navigation.NavigateTo("/fornecedor/produtos");
+        }
+    }
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e) {
+        var file = e.File;
+        // Limite 5MB
+        long maxFileSize = 5 * 1024 * 1024;
+
+        try {
+            using var stream = new MemoryStream();
+            await file.OpenReadStream(maxFileSize).CopyToAsync(stream);
+            _produto.Imagem = stream.ToArray();
+            _produto.UrlImagem = null; // Limpa URL se carregar nova imagem
+        } catch (Exception ex) {
+            Console.WriteLine($"Erro upload imagem: {ex.Message}");
+            await JSRuntime.InvokeVoidAsync("alert", "Erro ao carregar imagem. Verifique se tem menos de 5MB.");
         }
     }
 
