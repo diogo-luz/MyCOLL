@@ -4,76 +4,157 @@
 
 <PageTitle>Registar - MyCOLL</PageTitle>
 
-<div class="auth-container">
-    <div class="auth-card register-card">
-        <h1 class="auth-title">📝 Criar Conta</h1>
-        
-        @if (!string.IsNullOrEmpty(_error)) {
-            <div class="error-message">@_error</div>
-        }
-
-        @if (_success) {
-            <div class="success-message">
-                Conta criada com sucesso! Aguarde aprovação do administrador.
-                <br /><a href="/login">Ir para Login</a>
-            </div>
-        } else {
-            <EditForm Model="_registerModel" OnValidSubmit="HandleRegister">
-                <DataAnnotationsValidator />
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Nome</label>
-                        <InputText @bind-Value="_registerModel.Nome" class="form-input" placeholder="O seu nome" />
-                        <ValidationMessage For="() => _registerModel.Nome" />
-                    </div>
-                    <div class="form-group">
-                        <label>Apelido</label>
-                        <InputText @bind-Value="_registerModel.Apelido" class="form-input" placeholder="O seu apelido" />
-                    </div>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6 col-xl-5">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-primary text-white text-center py-4 overlay-header">
+                    <h2 class="mb-0 fw-bold"><i class="bi bi-person-plus-fill me-2"></i>Criar Conta</h2>
+                    <p class="mb-0 opacity-75 small">Junte-se à comunidade MyCOLL</p>
                 </div>
 
-                <div class="form-group">
-                    <label>Email</label>
-                    <InputText @bind-Value="_registerModel.Email" class="form-input" placeholder="seu@email.com" />
-                    <ValidationMessage For="() => _registerModel.Email" />
-                </div>
-
-                <div class="form-group">
-                    <label>Password</label>
-                    <InputText @bind-Value="_registerModel.Password" type="password" class="form-input" placeholder="Mínimo 6 caracteres" />
-                    <ValidationMessage For="() => _registerModel.Password" />
-                </div>
-
-                <div class="form-group">
-                    <label>Confirmar Password</label>
-                    <InputText @bind-Value="_registerModel.ConfirmPassword" type="password" class="form-input" placeholder="Repetir password" />
-                    <ValidationMessage For="() => _registerModel.ConfirmPassword" />
-                </div>
-
-                <div class="form-group">
-                    <label>Tipo de Conta</label>
-                    <InputSelect @bind-Value="_registerModel.TipoUtilizador" class="form-input">
-                        <option value="Cliente">Cliente</option>
-                        <option value="Fornecedor">Fornecedor</option>
-                    </InputSelect>
-                </div>
-
-                <button type="submit" class="btn-submit" disabled="@_loading">
-                    @if (_loading) {
-                        <span>A registar...</span>
-                    } else {
-                        <span>Criar Conta</span>
+                <div class="card-body p-4 p-md-5">
+                    @if (!string.IsNullOrEmpty(_error)) {
+                        <div class="alert alert-danger d-flex align-items-center mb-4" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <div>@_error</div>
+                        </div>
                     }
-                </button>
-            </EditForm>
 
-            <div class="auth-footer">
-                <p>Já tem conta? <a href="/login">Login</a></p>
+                    @if (_success) {
+                        <div class="text-center py-5">
+                            <div class="mb-4 text-success">
+                                <i class="bi bi-check-circle-fill display-1"></i>
+                            </div>
+                            <h3 class="fw-bold text-success mb-3">Conta criada com sucesso!</h3>
+                            <p class="text-muted mb-4">
+                                A sua conta foi registada. Aguarde a aprovação do administrador para aceder.
+                            </p>
+                            <a href="/login" class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>Ir para Login
+                            </a>
+                        </div>
+                    } else {
+                        <EditForm Model="_registerModel" OnValidSubmit="HandleRegister">
+                            <DataAnnotationsValidator/>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small fw-bold">Nome</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0">
+                                            <i class="bi bi-person text-primary"></i>
+                                        </span>
+                                        <InputText @bind-Value="_registerModel.Nome" class="form-control border-start-0 ps-0 bg-light" placeholder="Seu nome"/>
+                                    </div>
+                                    <ValidationMessage For="() => _registerModel.Nome" class="text-danger small mt-1"/>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small fw-bold">Apelido</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0">
+                                            <i class="bi bi-person text-primary"></i>
+                                        </span>
+                                        <InputText @bind-Value="_registerModel.Apelido" class="form-control border-start-0 ps-0 bg-light" placeholder="Seu apelido"/>
+                                    </div>
+                                    <ValidationMessage For="() => _registerModel.Apelido" class="text-danger small mt-1"/>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label text-muted small fw-bold">Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-envelope text-primary"></i>
+                                    </span>
+                                    <InputText @bind-Value="_registerModel.Email" class="form-control border-start-0 ps-0 bg-light" placeholder="seu@email.com"/>
+                                </div>
+                                <ValidationMessage For="() => _registerModel.Email" class="text-danger small mt-1"/>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label text-muted small fw-bold">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-key text-primary"></i>
+                                    </span>
+                                    <InputText @bind-Value="_registerModel.Password" type="password" class="form-control border-start-0 ps-0 bg-light" placeholder="Mínimo 6 caracteres"/>
+                                </div>
+                                <ValidationMessage For="() => _registerModel.Password" class="text-danger small mt-1"/>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label text-muted small fw-bold">Confirmar Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-check2-circle text-primary"></i>
+                                    </span>
+                                    <InputText @bind-Value="_registerModel.ConfirmPassword" type="password" class="form-control border-start-0 ps-0 bg-light" placeholder="Repetir password"/>
+                                </div>
+                                <ValidationMessage For="() => _registerModel.ConfirmPassword" class="text-danger small mt-1"/>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label text-muted small fw-bold">Tipo de Conta</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-person-badge text-primary"></i>
+                                    </span>
+                                    <InputSelect @bind-Value="_registerModel.TipoUtilizador" class="form-select border-start-0 ps-2 bg-light">
+                                        <option value="Cliente">Cliente (Comprar)</option>
+                                        <option value="Fornecedor">Fornecedor (Vender)</option>
+                                    </InputSelect>
+                                </div>
+                            </div>
+
+                            <div class="d-grid mb-4">
+                                <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold shadow-sm" disabled="@_loading">
+                                    @if (_loading) {
+                                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        <span>A criar conta...</span>
+                                    } else {
+                                        <span>Criar Conta</span>
+                                    }
+                                </button>
+                            </div>
+                        </EditForm>
+
+                        <div class="text-center">
+                            <p class="text-muted small mb-0">
+                                Já tem conta?
+                                <a href="/login" class="text-primary text-decoration-none fw-bold">
+                                    Fazer Login
+                                </a>
+                            </p>
+                        </div>
+                    }
+                </div>
             </div>
-        }
+        </div>
     </div>
 </div>
+
+<style>
+    /* Reuse consistent styling from login */
+    .input-group-text {
+        border-color: #dee2e6;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #dee2e6;
+        box-shadow: none;
+        background-color: #fff !important;
+    }
+    .form-control:focus + .input-group-text, 
+    .input-group:focus-within .input-group-text {
+        background-color: #fff !important;
+        border-color: var(--bs-primary);
+    }
+    .input-group:focus-within .form-control,
+    .input-group:focus-within .form-select {
+        border-color: var(--bs-primary);
+        background-color: #fff !important;
+    }
+</style>
 
 @code {
     private RegisterDTO _registerModel = new();
@@ -95,4 +176,5 @@
 
         _loading = false;
     }
+
 }
